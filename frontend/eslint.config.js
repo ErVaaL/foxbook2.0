@@ -1,28 +1,46 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import tseslint from 'typescript-eslint'
+import globals from "globals";
+import pluginJs from "@eslint/js";
+import tseslint from "@typescript-eslint/eslint-plugin";
+import tsParser from "@typescript-eslint/parser";
+import pluginReact from "eslint-plugin-react";
+import pluginReactHooks from "eslint-plugin-react-hooks";
 
-export default tseslint.config(
-  { ignores: ['dist'] },
+/** @type {import('eslint').Linter.FlatConfig[]} */
+export default [
   {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
-    files: ['**/*.{ts,tsx}'],
+    files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"], // Match all JS and TS files
     languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
+      parser: tsParser, // Use TypeScript parser
+      parserOptions: {
+        ecmaVersion: "latest", // Use latest ECMAScript features
+        sourceType: "module", // Enable ESM
+        ecmaFeatures: {
+          jsx: true, // Enable JSX support
+        },
+      },
+      globals: {
+        ...globals.browser, // Add browser globals (e.g., window, document)
+      },
     },
     plugins: {
-      'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
+      "@typescript-eslint": tseslint,
+      react: pluginReact,
+      "react-hooks": pluginReactHooks,
     },
     rules: {
-      ...reactHooks.configs.recommended.rules,
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
-      ],
+      ...pluginJs.configs.recommended.rules, // JavaScript recommended rules
+      ...tseslint.configs.recommended.rules, // TypeScript recommended rules
+      ...pluginReact.configs.recommended.rules, // React recommended rules
+      ...pluginReactHooks.configs.recommended.rules, // React Hooks recommended rules
+      "react/react-in-jsx-scope": "off", // Not needed with React 17+
+      "@typescript-eslint/no-unused-vars": ["warn"], // Warn for unused variables
+      "react-hooks/rules-of-hooks": "error", // Enforce hook rules
+      "react-hooks/exhaustive-deps": "warn", // Warn for missing dependencies in hooks
+    },
+    settings: {
+      react: {
+        version: "detect", // Auto-detect React version
+      },
     },
   },
-)
+];
