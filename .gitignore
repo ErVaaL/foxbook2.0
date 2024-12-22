@@ -1,0 +1,11 @@
+backend/.kamal
+backend/tmp
+tmp/*
+!tmp/.keep
+
+/vendor/bundle
+/vendor/assets
+/vendor/cache
+/vendor/node_modules
+/vendor/yarn-cache
+
