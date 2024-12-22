@@ -1,0 +1,5 @@
+development:
+  clients:
+    default:
+      uri: mongodb://root:password@mongodb:27017/rails_db
+

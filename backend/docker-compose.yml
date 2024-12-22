@@ -1,0 +1,35 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        RUBY_VERSION: 3.3.5
+    container_name: backend
+    ports:
+      - "3000:80" # Map container port 80 to localhost:3000
+    environment:
+      RAILS_MASTER_KEY: "${RAILS_MASTER_KEY}" # Load the Rails master key from an environment variable
+      RAILS_ENV: "development" # Set Rails environment
+    volumes:
+      - .:/rails # Mount the app directory for development
+      - rails_cache:/rails/tmp/cache # Shared Rails cache
+      - bundle:/usr/local/bundle # Shared gems
+    depends_on:
+      - mongodb # Ensure MongoDB starts before backend
+
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    ports:
+      - "27017:27017" # MongoDB default port
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root # MongoDB root username
+      MONGO_INITDB_ROOT_PASSWORD: password # MongoDB root password
+    volumes:
+      - mongo_data:/data/db # Persist MongoDB data
+
+volumes:
+  rails_cache:
+  bundle:
+  mongo_data:
