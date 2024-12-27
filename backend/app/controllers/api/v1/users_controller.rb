@@ -2,6 +2,12 @@ class Api::V1::UsersController < ApplicationController
   skip_before_action :authorized, only: [ :create ]
 
   def create
+    existing_user = User.where(email: user_params[:email]).first
+    if existing_user
+      render json: { error: "User already exists", details: [ "Email is already taken" ] }, status: :conflict
+      return
+    end
+
     @user = User.new(user_params)
     if @user.save
       token = issue_token({ user_id: @user.id })
