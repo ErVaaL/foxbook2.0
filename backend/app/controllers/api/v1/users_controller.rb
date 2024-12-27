@@ -20,11 +20,11 @@ class Api::V1::UsersController < ApplicationController
 
   private
 
-  def user_params
-    params.require(:user).permit(:name, :email, :password, :password_confirmation)
-  end
+    def user_params
+      params.require(:user).permit(:name, :email, :password, :password_confirmation)
+    end
 
-  def ensure_json_request
-  render json: { error: "Only JSON requests ar accepted" }, status: 406 unless request.format.json?
-  end
+    def ensure_json_request
+      render json: { error: "Only JSON requests ar accepted" }, status: 406 unless request.format.json?
+    end
 end
