@@ -8,9 +8,7 @@ development:
 test:
   clients:
     default:
-      database: backend_test
-      hosts:
-        - localhost:27017
+      uri: <%= ENV['DATABASE_URL'] %>
       options:
         read:
           mode: :primary
