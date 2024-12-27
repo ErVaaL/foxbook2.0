@@ -26,6 +26,8 @@ gem "thruster", require: false
 
 gem "mongoid"
 
+gem "dotenv-rails", groups: [ :development, :test ]
+
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 # gem "rack-cors"
 

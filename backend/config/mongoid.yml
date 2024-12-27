@@ -1,9 +1,7 @@
 development:
   clients:
     default:
-      database: backend_development
-      hosts:
-        - localhost:27017
+      uri: <%= ENV['DATABASE_URL'] %>
       options:
         server_selection_timeout: 5
 
