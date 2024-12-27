@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       # User routes
-      post "/users/register", to: "users#register"
+      post "/users/register", to: "users#create"
       post "/auth/login", to: "auth#login"
       delete "/auth/logout", to: "auth#logout"
       get "/users/:id/profile", to: "users#profile"

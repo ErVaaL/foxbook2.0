@@ -28,6 +28,12 @@ gem "mongoid"
 
 gem "dotenv-rails", groups: [ :development, :test ]
 
+gem "bcrypt"
+
+gem "rspec-rails", "~> 5.0"
+
+gem "jwt"
+
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 # gem "rack-cors"
 
