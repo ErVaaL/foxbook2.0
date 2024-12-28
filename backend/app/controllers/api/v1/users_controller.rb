@@ -21,7 +21,7 @@ class Api::V1::UsersController < ApplicationController
   private
 
     def user_params
-      params.require(:user).permit(:name, :email, :password, :password_confirmation)
+      params.require(:user).permit(:first_name, :last_name, :username, :email, :phone, :password, :password_confirmation)
     end
 
     def ensure_json_request
