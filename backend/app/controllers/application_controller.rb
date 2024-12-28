@@ -1,35 +1,58 @@
 class ApplicationController < ActionController::API
-  before_action :authorized
+  before_action :authorize_request
 
   SECRET_KEY = Rails.application.credentials.jwt_key
 
   def issue_token(user)
-    JWT.encode(user, SECRET_KEY, "HS256")
+    payload = { user_id: user.id, exp: 24.hours.from_now.to_i }
+    JWT.encode(payload, SECRET_KEY, "HS256")
   end
 
   def decoded_token
-    if request.headers["Authorization"]
-      token = request.headers["Authorization"].split(" ").last
-      begin
-        JWT.decode(token, SECRET_KEY, true, { algorithm: "HS256" })
-      rescue JWT::DecodeError
-        nil
-      end
+    header = request.headers["Authorization"]
+    token = header.split(" ")&.last
+    return nil unless token
+
+    begin
+      JWT.decode(token, SECRET_KEY, true, { algorithm: "HS256" })[0]
+    rescue JWT::DecodeError
+      nil
     end
   end
 
   def current_user
-    if decoded_token
-      user_id = decoded_token[0]["user_id"]
-      @current_user ||= User.find_by(user_id)
-    end
+    @current_user ||= User.find(decoded_token["user_id"]) if @decoded_token
   end
 
   def logged_in?
     !!current_user
   end
 
-  def authorized
-    render json: { message: "Unauthorized" }, status: :unauthorized unless logged_in?
+  def authorize_request
+    header = request.headers["Authorization"]
+    token = header&.split(" ")&.last
+    return render_unauthorized("No token provided") unless token
+
+    begin
+      decoded = JWT.decode(token, SECRET_KEY, true, { algorithm: "HS256" })[0]
+
+      if BlackListedToken.exists?(token: token)
+        Rails.logger.info("Token is blacklisted: #{token}")
+        return render_unauthorized("Token has been revoked")
+      end
+
+      @current_user = User.find(decoded["user_id"])
+    rescue JWT::ExpiredSignature
+      render_unauthorized("Expired token")
+    rescue JWT::DecodeError
+      render_unauthorized("Invalid token")
+    end
   end
+
+
+  private
+
+    def render_unauthorized(message)
+      render json: { error: message }, status: :unauthorized
+    end
 end
