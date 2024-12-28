@@ -6,11 +6,16 @@ Rails.application.routes.draw do
       post "/users/register", to: "users#create"
       post "/auth/login", to: "auth#login"
       delete "/auth/logout", to: "auth#logout"
-      get "/users/:id/profile", to: "users#profile"
-      get "/users/:id/settings", to: "users#settings"
-      get "/users/:id/preferences", to: "users#preferences"
-      get "/users/:id/friends", to: "users#friends"
-      get "/users/:id/activity", to: "users#activity"
+
+      resources :users do
+        resource :profile, only: [ :show, :update ]
+      end
+
+      # get "/users/:id/profile", to: "users#profile"
+      # get "/users/:id/settings", to: "users#settings"
+      # get "/users/:id/preferences", to: "users#preferences"
+      # get "/users/:id/friends", to: "users#friends"
+      # get "/users/:id/activity", to: "users#activity"
 
       # Friends routes
       resources :friends, only: [ :index, :show ]
