@@ -4,8 +4,11 @@ RSpec.describe "Users API", type: :request do
   let(:valid_attributes) do
     {
       user: {
-        name: "Jane Doe",
+        first_name: "Jane",
+        last_name: "Doe",
+        username: "jane_doe",
         email: "jane.doe@example.com",
+        phone: "123456789",
         password: "password123",
         password_confirmation: "password123"
       }
@@ -15,8 +18,10 @@ RSpec.describe "Users API", type: :request do
   let(:invalid_attributes) do
     {
       user: {
-        name: "",
+        first_name: "",
         email: "invalid_email",
+        username: "short",
+        phone: "123456789",
         password: "short",
         password_confirmation: "mismatch"
       }
