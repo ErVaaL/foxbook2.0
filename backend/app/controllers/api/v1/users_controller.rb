@@ -1,5 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-  skip_before_action :authorized, only: [ :create ]
+  skip_before_action :authorize_request, only: [ :create ]
 
   def create
     existing_user = User.where(email: user_params[:email]).first
@@ -10,18 +10,21 @@ class Api::V1::UsersController < ApplicationController
 
     @user = User.new(user_params)
     if @user.save
-      token = issue_token({ user_id: @user.id })
+      token = issue_token(@user)
       render json: { message: "User registered successfully", user: @user, token: token }, status: :created
     else
       render json: { error: "Failed to create user", details: @user.errors.full_messages }, status: :bad_request
     end
   end
 
+  def profile
+  end
+
 
   private
 
     def user_params
-      params.require(:user).permit(:first_name, :last_name, :username, :email, :phone, :password, :password_confirmation)
+      params.require(:user).permit(:first_name, :last_name, :username, :age, :email, :phone, :password, :password_confirmation)
     end
 
     def ensure_json_request
