@@ -35,6 +35,6 @@ class Api::V1::ProfilesController < ApplicationController
     end
 
     def profile_params
-      params.require(:profile).permit(:description, :birthday, address_attributes: [ :street, :city, :state ])
+      params.require(:profile).permit(:description, :birthday, address: [ :country, :state, :city ])
     end
 end
