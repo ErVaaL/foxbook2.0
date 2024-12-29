@@ -10,9 +10,9 @@ Rails.application.routes.draw do
       resources :users do
         resource :profile, only: [ :show, :update ]
         resource :settings, only: [ :show, :update ]
+        resource :preferences, only: [ :show, :update ]
       end
 
-      # get "/users/:id/settings", to: "users#settings"
       # get "/users/:id/preferences", to: "users#preferences"
       # get "/users/:id/friends", to: "users#friends"
       # get "/users/:id/activity", to: "users#activity"
