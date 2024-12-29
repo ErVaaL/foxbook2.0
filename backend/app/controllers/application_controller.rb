@@ -49,6 +49,16 @@ class ApplicationController < ActionController::API
     end
   end
 
+  def set_user
+    @user = User.find(params[:user_id])
+  rescue Mongoid::Errors::DocumentNotFound
+    render json: { error: "User not found" }, status: :not_found
+  end
+
+  def needed_params(head_param, params_to_permit)
+    params.require(head_param).permit(*params_to_permit)
+  end
+
 
   private
 

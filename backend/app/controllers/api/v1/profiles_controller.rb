@@ -13,6 +13,7 @@ class Api::V1::ProfilesController < ApplicationController
   end
 
   def update
+    profile_params = needed_params(:profile, [ :description, :birthday, address: [ :country, :state, :city ] ])
     profile = @user.profile
     if profile.update(profile_params)
       render json: ProfileSerializer.new(profile).serializable_hash, status: :accepted
@@ -25,16 +26,4 @@ class Api::V1::ProfilesController < ApplicationController
     @current_user.destroy
     render json: { message: "User deleted" }, status: :accepted
   end
-
-  private
-
-    def set_user
-      @user = User.find(params[:user_id])
-    rescue Mongoid::Errors::DocumentNotFound
-      render json: { error: "User not found" }, status: :not_found
-    end
-
-    def profile_params
-      params.require(:profile).permit(:description, :birthday, address: [ :country, :state, :city ])
-    end
 end

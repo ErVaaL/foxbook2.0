@@ -2,6 +2,7 @@ class Api::V1::UsersController < ApplicationController
   skip_before_action :authorize_request, only: [ :create ]
 
   def create
+    user_params = needed_params(:user, [ :first_name, :last_name, :username, :age, :email, :phone, :password, :password_confirmation ])
     existing_user = User.where(email: user_params[:email]).first
     if existing_user
       render json: { error: "User already exists", details: [ "Email is already taken" ] }, status: :conflict
@@ -22,11 +23,6 @@ class Api::V1::UsersController < ApplicationController
 
 
   private
-
-    def user_params
-      params.require(:user).permit(:first_name, :last_name, :username, :age, :email, :phone, :password, :password_confirmation)
-    end
-
     def ensure_json_request
       render json: { error: "Only JSON requests ar accepted" }, status: 406 unless request.format.json?
     end

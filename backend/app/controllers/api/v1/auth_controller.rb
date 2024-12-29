@@ -3,6 +3,7 @@ class Api::V1::AuthController < ApplicationController
   before_action :authorize_request, only: [ :logout ]
 
   def login
+    auth_params = needed_params(:user, [ :email, :password ])
     user = User.find_by(email: auth_params[:email])
     if user && user.authenticate(auth_params[:password])
       token = issue_token(user)
@@ -22,11 +23,4 @@ class Api::V1::AuthController < ApplicationController
   rescue ActiveRecord::RecordInvalid => e
     render json: { error: "Logout failed: #{e.message}" }, status: :internal_server_error
   end
-
-
-  private
-
-    def auth_params
-      params.require(:user).permit(:email, :password)
-    end
 end
