@@ -1,0 +1,38 @@
+---
+# Directories to include in the workspace
+include:
+  - "app/**/*.rb"
+  - "lib/**/*.rb"
+  - "config/**/*.rb"
+  - "db/**/*.rb"
+  - "test/**/*.rb"
+  - "spec/**/*.rb"
+
+# Directories to exclude from the workspace
+exclude:
+  - "log/**/*"
+  - "tmp/**/*"
+  - "node_modules/**/*"
+  - "public/**/*"
+  - "storage/**/*"
+
+# Require gems in the environment
+require:
+  - rubocop
+  - solargraph-rails
+
+# Environment variables for Solargraph
+env:
+  RAILS_ENV: development
+
+# Linting and diagnostics
+reporters:
+  - rubocop
+
+# Additional gem paths (if using `vendor/bundle` or custom paths)
+gem_path:
+  - "vendor/bundle"
+
+# Rails-specific settings
+extensions:
+  - solargraph-rails
