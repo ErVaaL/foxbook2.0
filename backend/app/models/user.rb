@@ -12,6 +12,7 @@ class User
   field :password_digest, type: String
 
   has_one :profile, dependent: :destroy
+  has_one :settings, class_name: "Settings", dependent: :destroy
 
   has_secure_password
 
@@ -23,6 +24,7 @@ class User
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
 
   after_create :create_blank_profile
+  after_create :create_default_settings
 
   private
     def create_blank_profile
@@ -31,5 +33,9 @@ class User
         birthday: nil,
         address: Address.new(country: "", state: "", city: "")
       ).save
+    end
+
+    def create_default_settings
+      build_settings.save
     end
 end
