@@ -18,10 +18,6 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
-  def profile
-  end
-
-
   private
     def ensure_json_request
       render json: { error: "Only JSON requests ar accepted" }, status: 406 unless request.format.json?

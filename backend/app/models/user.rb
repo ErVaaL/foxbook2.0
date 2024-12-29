@@ -13,6 +13,7 @@ class User
 
   has_one :profile, dependent: :destroy
   has_one :settings, class_name: "Settings", dependent: :destroy
+  has_one :presences, class_name: "Presences", dependent: :destroy
 
   has_secure_password
 
@@ -25,6 +26,7 @@ class User
 
   after_create :create_blank_profile
   after_create :create_default_settings
+  after_create :create_default_preferences
 
   private
     def create_blank_profile
@@ -37,5 +39,9 @@ class User
 
     def create_default_settings
       build_settings.save
+    end
+
+    def create_default_preferences
+      build_presences.save
     end
 end
