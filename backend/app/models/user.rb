@@ -13,7 +13,7 @@ class User
 
   has_one :profile, dependent: :destroy
   has_one :settings, class_name: "Settings", dependent: :destroy
-  has_one :presences, class_name: "Presences", dependent: :destroy
+  has_one :preferences, class_name: "Preferences", dependent: :destroy
 
   has_secure_password
 
