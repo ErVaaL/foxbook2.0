@@ -2,6 +2,10 @@ Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
   namespace :api do
     namespace :v1 do
+      get "friend_requests/index"
+      get "friend_requests/create"
+      get "friend_requests/update"
+      get "friend_requests/destroy"
       # User routes
       post "/users/register", to: "users#create"
       post "/auth/login", to: "auth#login"
@@ -11,14 +15,13 @@ Rails.application.routes.draw do
         resource :profile, only: [ :show, :update ]
         resource :settings, only: [ :show, :update ]
         resource :preferences, only: [ :show, :update ]
+        resource :friends, only: [ :show, :destroy ]
       end
 
-      # get "/users/:id/preferences", to: "users#preferences"
-      # get "/users/:id/friends", to: "users#friends"
       # get "/users/:id/activity", to: "users#activity"
 
       # Friends routes
-      resources :friends, only: [ :index, :show ]
+      resources :friends, only: [ :index, :create, :update, :destroy ], controller: "friend_requests"
 
       # Message routes
       resources :messages, only: [ :index, :show ]
