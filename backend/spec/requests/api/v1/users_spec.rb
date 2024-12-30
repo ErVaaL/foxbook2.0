@@ -7,6 +7,7 @@ RSpec.describe "Users API", type: :request do
         first_name: "Jane",
         last_name: "Doe",
         username: "jane_doe",
+        age: 20,
         email: "jane.doe@example.com",
         phone: "123456789",
         password: "password123",
@@ -19,8 +20,10 @@ RSpec.describe "Users API", type: :request do
     {
       user: {
         first_name: "",
+        last_name: "",
         email: "invalid_email",
         username: "short",
+        age: 10,
         phone: "123456789",
         password: "short",
         password_confirmation: "mismatch"
