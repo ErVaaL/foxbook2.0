@@ -10,6 +10,10 @@ class User
   field :email, type: String
   field :phone, type: String
   field :password_digest, type: String
+  field :friends, type: Array, default: []
+  field :friend_requests_recieved, type: Array, default: []
+  field :friend_requests_sent, type: Array, default: []
+
 
   has_one :profile, dependent: :destroy
   has_one :settings, class_name: "Settings", dependent: :destroy
@@ -28,6 +32,67 @@ class User
   after_create :create_default_settings
   after_create :create_default_preferences
 
+  def add_friend(friend_id)
+    self.friends << friend_id unless self.friends.include?(friend_id)
+    self.save
+  end
+
+  def remove_friend(friend_id)
+    self.friends.delete(friend_id)
+    self.save
+  end
+
+  def sent_friend_request?(friend_id)
+    self.friend_requests_sent.include?(friend_id)
+  end
+
+  def send_friend_request(friend_id)
+    unless sent_friend_request?(friend_id)
+      self.friend_requests_sent << friend_id unless self.friend_requests_sent.include?(friend_id)
+      self.save
+    end
+  end
+
+  def recieved_friend_request?(friend_id)
+    self.friend_requests_recieved.include?(friend_id)
+  end
+
+  def recieve_friend_request(friend_id)
+    unless recieved_friend_request?(friend_id)
+      self.friend_requests_recieved << friend_id unless self.friend_requests_recieved.include?(friend_id)
+      self.save
+    end
+  end
+
+  def remove_recieved_request(friend_id)
+    if recieved_friend_request?(friend_id)
+      self.friend_requests_recieved.delete(friend_id)
+      self.save
+    end
+  end
+
+  def remove_sent_request(friend_id)
+    if sent_friend_request?(friend_id)
+      self.friend_requests_sent.delete(friend_id)
+      self.save
+    end
+  end
+
+  def accept_friend_request(friend_id)
+    if recieved_friend_request?(friend_id)
+      self.friend_requests_recieved.delete(friend_id)
+      self.add_friend(friend_id)
+      self.save
+    end
+  end
+
+  def decline_friend_request(friend_id)
+    if recieved_friend_request?(friend_id)
+      self.remove_request(friend_id, :recieved)
+      self.save
+    end
+  end
+
   private
     def create_blank_profile
       build_profile(
@@ -42,6 +107,6 @@ class User
     end
 
     def create_default_preferences
-      build_presences.save
+      build_preferences.save
     end
 end
