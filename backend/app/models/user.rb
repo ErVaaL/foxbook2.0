@@ -19,6 +19,9 @@ class User
   has_one :settings, class_name: "Settings", dependent: :destroy
   has_one :preferences, class_name: "Preferences", dependent: :destroy
 
+  has_many :memberships, dependent: :destroy
+
+
   has_secure_password
 
   validates :first_name, presence: true, length: { minimum: 3, maximum: 20 }

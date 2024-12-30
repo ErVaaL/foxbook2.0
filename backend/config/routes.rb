@@ -2,10 +2,6 @@ Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
   namespace :api do
     namespace :v1 do
-      get "friend_requests/index"
-      get "friend_requests/create"
-      get "friend_requests/update"
-      get "friend_requests/destroy"
       # User routes
       post "/users/register", to: "users#create"
       post "/auth/login", to: "auth#login"
@@ -18,18 +14,20 @@ Rails.application.routes.draw do
         resource :friends, only: [ :show, :destroy ]
       end
 
+      # TODO
       # get "/users/:id/activity", to: "users#activity"
 
       # Friends routes
       resources :friends, only: [ :index, :create, :update, :destroy ], controller: "friend_requests"
 
-      # Message routes
+      # TODO Message routes
       resources :messages, only: [ :index, :show ]
 
       # Group routes
       resources :groups, only: [ :index, :show, :create, :update, :destroy ] do
-        get :members, on: :member
-        get :events, on: :member
+        get :members
+        post :members, to: "groups#add_member", as: :add_member
+        delete "members/:user_id", to: "groups#remove_member", as: :remove_member
       end
 
       # Post routes
