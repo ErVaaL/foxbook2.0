@@ -2,7 +2,7 @@ class Api::V1::FriendRequestsController < ApplicationController
   before_action :authorize_request
 
   def index
-    render json: { friend_requests: @current_user.friend_requests_received.map { |id| User.find(id) } }, status: :ok
+    render json: { friend_requests: @current_user.friend_requests_recieved.map { |id| User.find(id) } }, status: :ok
   end
 
   def create
