@@ -32,7 +32,7 @@ Rails.application.routes.draw do
 
       # Post routes
       resources :posts, only: [ :index, :show, :create, :update, :destroy ] do
-        resources :comments, only: [ :index, :create, :destroy ]
+        resources :comments, only: [ :index, :create, :update, :destroy ]
         resources :likes, only: [ :index, :create, :destroy ]
         get :share, on: :member
       end

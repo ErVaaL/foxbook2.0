@@ -20,6 +20,7 @@ class User
   has_one :preferences, class_name: "Preferences", dependent: :destroy
 
   has_many :memberships, dependent: :destroy
+  has_many :posts, dependent: :destroy
 
 
   has_secure_password
