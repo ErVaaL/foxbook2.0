@@ -22,6 +22,8 @@ class User
   has_many :memberships, dependent: :destroy
   has_many :posts, dependent: :destroy
 
+  has_and_belongs_to_many :events, class_name: "Event", inverse_of: :attendees
+
 
   has_secure_password
 

@@ -40,6 +40,8 @@ Rails.application.routes.draw do
       # Event routes
       resources :events, only: [ :index, :show, :create, :update, :destroy ] do
         get :attendees, on: :member
+        post :attendees, to: "events#attend", as: :attend
+        delete "attendees/:user_id", to: "events#unattend", as: :unattend
       end
 
       # Admin routes
