@@ -37,7 +37,6 @@ class ApplicationController < ActionController::API
       decoded = JWT.decode(token, SECRET_KEY, true, { algorithm: "HS256" })[0]
 
       if BlackListedToken.exists?(token: token)
-        Rails.logger.info("Token is blacklisted: #{token}")
         return render_unauthorized("Token has been revoked")
       end
 
