@@ -99,6 +99,17 @@ class User
     end
   end
 
+  def handle_delete_user
+    posts.update_all(user_id: nil)
+
+    profile&.destroy
+    settings&.destroy
+    preferences&.destroy
+    memberships.each(&:destroy)
+
+    destroy
+  end
+
   private
     def create_blank_profile
       build_profile(
