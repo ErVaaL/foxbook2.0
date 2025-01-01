@@ -10,6 +10,6 @@ class Api::V1::UsersController < ApplicationController
 
   private
     def set_service
-      @service = UserServices::UsersService.new
+      @service = initialize_service(UserServices::UsersService)
     end
 end

@@ -1,4 +1,7 @@
 class ApplicationService
+  def initialize(current_user)
+    @current_user = current_user
+  end
   protected
     def user_not_found_error
       { success: false, error: "User not found", status: :not_found }
