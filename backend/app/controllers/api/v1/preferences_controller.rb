@@ -1,24 +1,22 @@
 class Api::V1::PreferencesController < ApplicationController
   before_action :authorize_request
   before_action :set_user
+  before_action :set_service
 
   def show
-    preferences = @user.preferences
-
-    if preferences
-      render json: PreferencesSerializer.new(preferences).serializable_hash, status: :ok
-    else
-      render json: { error: "Preferences not found" }, status: :not_found
-    end
+    result = @service.show_preferences(@user)
+    render json: result, status: result[:success] ? :ok : :not_found
   end
 
   def update
     preferences_params = needed_params(:preferences, [ :friend_recommendations, :group_recommendations, :stranger_invites ])
-    preferences = @user.preferences
-    if preferences.update(preferences_params)
-      render json: PreferencesSerializer.new(preferences).serializable_hash, status: :accepted
-    else
-      render json: { error: "Failed to update preferences", details: preferences.errors.full_messages }, status: :bad_request
-    end
+    result = @service.update_preferences(@user, preferences_params)
+    render json: result, status: result[:success] ? :ok : :bad_request
   end
+
+  private
+
+    def set_service
+      @service = initialize_service(SettingServices::PreferencesService)
+    end
 end

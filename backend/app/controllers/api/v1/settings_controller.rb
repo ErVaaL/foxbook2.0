@@ -1,16 +1,22 @@
 class Api::V1::SettingsController < ApplicationController
   before_action :authorize_request
+  before_action :set_service
+  before_action :set_user
 
   def show
-    render json: SettingsSerializer.new(@current_user.settings).serializable_hash, status: :ok
+    result = @service.show_settings(@user)
+    render json: result, status: result[:success] ? :ok : :not_found
   end
 
   def update
-    settings_params = needed_params(:settings, [ :theme, :language, :notifications, :privacy ])
-    if @current_user.settings.update(settings_params)
-      render json: SettingsSerializer.new(@current_user.settings).serializable_hash, status: :accepted
-    else
-      render json: { error: "Failed to update settings", details: @current_user.settings.errors.full_messages }, status: :bad_request
-    end
+    preferences_paramsams = needed_params(:settings, [ :theme, :language, :notifications, :privacy ])
+    result = @service.update(preferences_params)
+    render json: result, status: result[:success] ? :ok : :bad_request
   end
+
+  private
+
+    def set_service
+      @service = initialize_service(SettingServices::SettingsService)
+    end
 end
