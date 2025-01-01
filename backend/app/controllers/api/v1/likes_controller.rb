@@ -1,39 +1,27 @@
 class Api::V1::LikesController < ApplicationController
   before_action :authorize_request, except: [ :index ]
+  before_action :set_service
   before_action :set_post, only: [ :create, :destroy ]
 
   def index
-    if !@post.nil?
-      likes = @post.likes
-      render json: UserSerializer.new(likes).serializable_hash, status: :ok
-    else
-      render json: { error: "Post not found" }, status: :not_found
-    end
+    result = @service.post_likes(@post)
+    render json: result.except(:status), status: result[:status]
   end
 
   def create
-    if @post.nil?
-      render json: { error: "Post not found" }, status: :not_found
-      return
-    end
-    if @post.liked_by?(@current_user.id)
-      render json: { error: "Post already liked" }, status: :bad_request
-      return
-    end
-    @post.like!(@current_user)
-    render json: { message: "Post liked successfully" }, status: :created
+    result = @service.like_post(@current_user, @post)
+    render json: result.except(:status), status: result[:status]
   end
 
   def destroy
-    if @post.nil?
-      render json: { error: "Post not found" }, status: :not_found
-      return
-    end
-    if !@post.liked_by?(@current_user.id)
-      render json: { error: "Post already unliked" }, status: :not_found
-      return
-    end
-    @post.unlike!(@current_user)
-    render json: { message: "Post unliked successfully" }, status: :no_content
+    user_id = params[:id]
+    result = @service.unlike_post(@current_user, user_id, @post)
+    render json: result.except(:status), status: result[:status]
   end
+
+  private
+
+    def set_service
+      @service = initialize_service(PostServices::LikesService)
+    end
 end

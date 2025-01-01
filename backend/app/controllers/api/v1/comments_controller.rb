@@ -2,40 +2,33 @@ class Api::V1::CommentsController < ApplicationController
   before_action :authorize_request, except: [ :index, :show ]
   before_action :set_post
   before_action :set_comment, except: [ :index, :create ]
+  before_action :set_service
 
   def index
-    comments = @post.comments.order(created_at: :desc)
-    render json: CommentSerializer.new(comments).serializable_hash, status: :ok
+    result = @service.get_post_comments(@post)
+    render json: result.except(:status), status: result[:status]
   end
 
   def show
-    render json: CommentSerializer.new(@comment).serializable_hash, status: :ok
+    result = @service.get_comment(@comment)
+    render json: result.except(:status), status: result[:status]
   end
 
   def create
-    comment = @post.comments.build(needed_params(:comments, [ :content ]).merge(user: @current_user))
-    if comment.save
-      render json: CommentSerializer.new(comment).serializable_hash, status: :created
-    else
-      render json: { error: "Failed to create comment", messages: comment.errors.full_messages }, status: :bad_request
-    end
+    comment_params = needed_params(:comments, [ :content ])
+    result = @service.create_comment(@post, @current_user, comment_params)
+    render json: result.except(:status), status: result[:status]
   end
 
   def update
-    if @comment.update(needed_params(:comments, [ :content ]))
-      render json: CommentSerializer.new(@comment).serializable_hash, status: :ok
-    else
-      render json: { error: "Failed to update comment", messages: @comment.errors.full_messages }, status: :bad_request
-    end
+    comment_params = needed_params(:comments, [ :content ])
+    result = @service.comment_update(@current_user, @comment, comment_params)
+    render json: result.except(:status), status: result[:status]
   end
 
   def destroy
-    if @post.comments.include?(@comment)
-      @comment.destroy
-      render json: { message: "Comment deleted successfully" }, status: :no_content
-    else
-      render json: { error: "No comment to delete" }, status: :not_found
-    end
+    result = @service.delete_comment(@current_user, @post, @comment)
+    render json: result.except(:status), status: result[:status]
   end
 
   private
@@ -44,5 +37,9 @@ class Api::V1::CommentsController < ApplicationController
       @comment = @post.comments.where(id: params[:id]).first
     rescue Mongoid::Errors::DocumentNotFound
       render json: { error: "Comment not found" }, status: :not_found
+    end
+
+    def set_service
+      @service = initialize_service(PostServices::CommentService)
     end
 end
