@@ -9,10 +9,6 @@ class Api::V1::UsersController < ApplicationController
   end
 
   private
-    def ensure_json_request
-      render json: { error: "Only JSON requests ar accepted" }, status: 406 unless request.format.json?
-    end
-
     def set_service
       @service = UserServices::UsersService.new
     end
