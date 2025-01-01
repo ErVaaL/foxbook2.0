@@ -13,6 +13,16 @@ class Event
   validates :event_date, presence: true
   validate :event_date_must_be_future
 
+  def attend(user)
+    attendees << user
+    save
+  end
+
+  def unattend(user)
+    attendees.delete(user)
+    save
+  end
+
 
   private
 
