@@ -1,54 +1,29 @@
 class Api::V1::FriendRequestsController < ApplicationController
   before_action :authorize_request
+  before_action :set_service, only: [ :create, :update, :destroy ]
 
   def index
     render json: { friend_requests: @current_user.friend_requests_recieved.map { |id| User.find(id) } }, status: :ok
   end
 
   def create
-    friend = User.find(params[:friend_id])
-
-    if @current_user.friends.include?(friend.id)
-      render json: { error: "Already friends" }, status: :bad_request
-      return
-    end
-
-    if @current_user.sent_friend_request?(friend.id) || @current_user.recieved_friend_request?(friend.id)
-      render json: { error: "Friend request already sent" }, status: :bad_request
-      return
-    end
-
-    @current_user.send_friend_request(friend.id)
-    friend.recieve_friend_request(@current_user.id)
-
-    render json: { message: "Friend request sent" }, status: :created
+    result = @service.send_request
+    render json: result, status: result[:success] ? :created : :bad_request
   end
 
   def update
-    friend = User.find_by(id: params[:id])
-    Rails.logger.debug("id: #{params[:id]}")
-
-    if @current_user.recieved_friend_request?(friend.id)
-      @current_user.accept_friend_request(friend.id)
-      friend.add_friend(@current_user.id)
-      friend.remove_sent_request(@current_user.id)
-
-      render json: { message: "Friend request accepted" }, status: :accepted
-    else
-      render json: { error: "No friend request found" }, status: :not_found
-    end
+    result = @service.accept_request
+    render json: result, status: result[:success] ? :accepted : :not_found
   end
 
   def destroy
-    friend = User.find(params[:id])
-
-    if @current_user.recieved_friend_request?(friend.id)
-      @current_user.remove_recieved_request(friend.id)
-      friend.remove_sent_request(@current_user.id)
-
-      render json: { message: "Friend request declined" }, status: :accepted
-    else
-      render json: { error: "No friend request found" }, status: :not_found
-    end
+    result = @service.decline_request
+    render json: result, status: result[:success] ? :ok : :not_found
   end
+
+  private
+
+    def set_service
+      @service = initialize_service(FriendServices::FriendRequestsService, friend_id: params[:friend_id] || params[:id])
+    end
 end

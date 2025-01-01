@@ -49,6 +49,10 @@ class ApplicationController < ActionController::API
     end
   end
 
+  def initialize_service(service_class, params = {})
+    service_class.new(current_user: @current_user, **params)
+  end
+
   def set_user
     @user = User.find(params[:user_id])
   rescue Mongoid::Errors::DocumentNotFound
