@@ -8,17 +8,17 @@ class Api::V1::FriendRequestsController < ApplicationController
 
   def create
     result = @service.send_request
-    render json: result, status: result[:success] ? :created : :bad_request
+    render json: result.except(:status), status: result[:status]
   end
 
   def update
     result = @service.accept_request
-    render json: result, status: result[:success] ? :accepted : :not_found
+    render json: result.except(:status), status: result[:status]
   end
 
   def destroy
     result = @service.decline_request
-    render json: result, status: result[:success] ? :ok : :not_found
+    render json: result.except(:status), status: result[:status]
   end
 
   private

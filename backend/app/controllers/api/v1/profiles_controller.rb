@@ -5,13 +5,13 @@ class Api::V1::ProfilesController < ApplicationController
 
   def show
     result = @service.show
-    render json: result, status: result[:success] ? :ok : :not_found
+    render json: result.except(:status), status: result[:status]
   end
 
   def update
     profile_params = needed_params(:profile, [ :description, :birthday, address: [ :country, :state, :city ] ])
     result = @service.update_profile(profile_params)
-    render json: result, status: result[:success] ? :accepted : :bad_request
+    render json: result.except(:status), status: result[:status]
   end
 
   private

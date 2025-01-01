@@ -1,16 +1,16 @@
 module SettingServices
   class SettingsService < BaseSettingsService
     def show_settings(user)
-      return { success: false, error: "You are not authorized to view other user's settings" } if user != @current_user
-      { success: true, settings: SettingsSerializer.new(Settings.find_by(user_id: user.id)).serializable_hash }
+      return not_the_same_user_error if user != @current_user
+      { success: true, settings: SettingsSerializer.new(Settings.find_by(user_id: user.id)).serializable_hash, status: :ok }
     rescue Mongoid::Errors::DocumentNotFound
-      { success: false, error: "This should not be possible" }
+      { success: false, error: "This should not be possible", status: :failed_dependency }
     end
 
     def update(user, preferences_params)
-      return { success: false, error: "You are not authorized to change other user's settings" } if user != @current_user
-      return { success: false, error: "Failed to update settings", details: user.settings.errors.full_messages } if !user.settings.update(preferences_params)
-      { success: true, settings: SettingsSerializer.new(user.settings).serializable_hash }
+      return not_the_same_user_error if user != @current_user
+      return { success: false, error: "Failed to update settings", details: user.settings.errors.full_messages, status: :bad_request } if !user.settings.update(preferences_params)
+      { success: true, settings: SettingsSerializer.new(user.settings).serializable_hash, status: :accepted }
     end
   end
 end

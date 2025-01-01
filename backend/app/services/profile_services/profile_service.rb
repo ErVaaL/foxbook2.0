@@ -1,5 +1,5 @@
 module ProfileServices
-  class ProfileService
+  class ProfileService < ApplicationService
     def initialize(user)
       @user = user
     end

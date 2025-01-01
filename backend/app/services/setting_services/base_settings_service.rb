@@ -1,5 +1,5 @@
 module SettingServices
-  class BaseSettingsService
+  class BaseSettingsService < ApplicationService
     def initialize(current_user:)
       @current_user = current_user
     end

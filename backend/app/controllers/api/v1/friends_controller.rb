@@ -9,7 +9,7 @@ class Api::V1::FriendsController < ApplicationController
 
   def destroy
     result = @service.remove_friend
-    render json: result, status: result[:success] ? :ok : :not_found
+    render json: result.except(:status), status: result[:status]
   end
 
   private

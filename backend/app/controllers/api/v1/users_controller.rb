@@ -5,7 +5,7 @@ class Api::V1::UsersController < ApplicationController
   def create
     user_params = needed_params(:user, [ :first_name, :last_name, :username, :age, :email, :phone, :password, :password_confirmation ])
     result = @service.create_user(user_params)
-    render json: result, status: result[:success] ? :created : :bad_request
+    render json: result.except(:status), status: result[:status]
   end
 
   private

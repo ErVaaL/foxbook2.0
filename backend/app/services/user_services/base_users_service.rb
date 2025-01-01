@@ -1,5 +1,5 @@
 module UserServices
-  class BaseUsersService
+  class BaseUsersService < ApplicationService
     def initialize(current_user:)
       @current_user = current_user
     end
