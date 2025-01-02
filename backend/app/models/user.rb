@@ -10,6 +10,8 @@ class User
   field :email, type: String
   field :phone, type: String
   field :password_digest, type: String
+  field :role, type: String, default: "user"
+
   field :friends, type: Array, default: []
   field :friend_requests_recieved, type: Array, default: []
   field :friend_requests_sent, type: Array, default: []
@@ -37,6 +39,14 @@ class User
   after_create :create_blank_profile
   after_create :create_default_settings
   after_create :create_default_preferences
+
+  def admin?
+    self.role == "admin" || self.role == "superadmin"
+  end
+
+  def superadmin?
+    self.role == "superadmin"
+  end
 
   def add_friend(friend_id)
     self.friends << friend_id unless self.friends.include?(friend_id)

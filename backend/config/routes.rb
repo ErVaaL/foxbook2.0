@@ -46,9 +46,9 @@ Rails.application.routes.draw do
 
       # Admin routes
       namespace :admin do
-        resources :users, only: [ :index ]
-        resources :content, only: [ :index ]
-        resources :groups, only: [ :index ]
+        resources :users, only: [ :index, :show, :update, :destroy ]
+        resources :content, only: [ :index, :show, :update, :destroy ]
+        resources :groups, only: [ :index, :show, :update, :destroy ]
         resources :reports, only: [ :index ]
       end
 
