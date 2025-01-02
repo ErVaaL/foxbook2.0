@@ -2,9 +2,7 @@ module UserServices
   class UsersService < BaseUsersService
     def create_user(user_params)
       existing_user = User.where(email: user_params[:email]).first
-      if existing_user
-        return { success: false, error: "User already exists", details: [ "Email is already taken" ], status: :conflict }
-      end
+      return { success: false, error: "User already exists", details: [ "Email is already taken" ], status: :conflict } if existing_user
 
       user = User.new(user_params)
       if user.save
@@ -13,6 +11,13 @@ module UserServices
       else
         { success: false, error: "Failed to create user", details: user.errors.full_messages, status: :bad_request }
       end
+    end
+
+    def update_user(user_id, user_params)
+      user = User.find_by(id: user_id)
+      return { success: false, error: "User not found", status: :not_found } unless user
+      return { success: false, error: "Failed to update user", details: user.errors.full_messages, status: :bad_request } unless user.update(user_params)
+      { success: true, message: "User updated successfully", user: user, status: :ok }
     end
 
     def delete_user(user_id)
