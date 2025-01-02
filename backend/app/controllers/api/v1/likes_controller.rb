@@ -9,13 +9,13 @@ class Api::V1::LikesController < ApplicationController
   end
 
   def create
-    result = @service.like_post(@current_user, @post)
+    result = @service.like_post(@post)
     render json: result.except(:status), status: result[:status]
   end
 
   def destroy
     user_id = params[:id]
-    result = @service.unlike_post(@current_user, user_id, @post)
+    result = @service.unlike_post(user_id, @post)
     render json: result.except(:status), status: result[:status]
   end
 

@@ -10,26 +10,27 @@ module EventServices
       { success: true, data: EventSerializer.new(event).serializable_hash, status: :ok }
     end
 
-    def create_event(current_user, event_params)
+    def create_event(event_params)
       event = Event.new(event_params)
-      event.user = current_user
+      event.user = @current_user
       return { success: false, data: { errors: event.errors.full_messages }, status: :unprocessable_entity } unless event.save
       { success: true, data: EventSerializer.new(event).serializable_hash, status: :created }
     end
-    def update_event(current_user, event_id, event_params)
+
+    def update_event(event_id, event_params)
       event = Event.find(event_id)
       return { success: false, data: { errors: "Event not found" }, status: :not_found } if event.nil?
-      return not_the_same_user_error unless event.user_id == current_user.id
+      return not_the_same_user_error unless event.user_id == @current_user.id || @current_user.admin?
       return { success: false, data: { errors: event.errors.full_messages }, status: :unprocessable_entity } unless event.update(event_params)
       { success: true, data: EventSerializer.new(event).serializable_hash, status: :ok }
     rescue Mongoid::Errors::DocumentNotFound
       { success: false, data: { errors: "Event not found" }, status: :not_found }
     end
 
-    def delete_event(current_user, event_id)
+    def delete_event(event_id)
       event = Event.find_by(id: event_id)
       return { success: false, data: { errors: "Event not found" }, status: :not_found } if event.nil?
-      return not_the_same_user_error unless event.user_id == current_user.id
+      return not_the_same_user_error unless event.user_id == @current_user.id || @current_user.admin?
       return { success: false, data: { errors: event.errors.full_messages }, status: :unprocessable_entity } unless event.destroy
       { success: true, data: { message: "Event deleted" }, status: :no_content }
     rescue Mongoid::Errors::DocumentNotFound
@@ -42,18 +43,18 @@ module EventServices
       { success: true, data: UserSerializer.new(attendees).serializable_hash, status: :ok }
     end
 
-    def attend_event(current_user, event)
+    def attend_event(event)
       return event_not_found_error if event.nil?
-      return already_attending_error if event.attendees.include?(current_user)
-      event.attend(current_user)
+      return already_attending_error if event.attendees.include?(@current_user)
+      event.attend(@current_user)
       { success: true, data: { message: "User is now attending event" }, status: :created }
     end
 
-    def unattend_event(current_user, user_id, event)
+    def unattend_event(user_id, event)
       return event_not_found_error if event.nil?
-      return no_such_attendee_error unless event.attendees.include?(current_user)
-      return not_the_same_user_error unless user_id == current_user.id
-      event.unattend(current_user)
+      return no_such_attendee_error unless event.attendees.include?(@current_user)
+      return not_the_same_user_error unless user_id == @current_user.id
+      event.unattend(@current_user)
       { success: true, data: { message: "User no longer attending event" }, status: :no_content }
     end
 

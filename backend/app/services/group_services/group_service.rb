@@ -10,7 +10,7 @@ module GroupServices
       { success: true, details: GroupSerializer.new(group).serializable_hash, status: :ok }
     end
 
-    def create_group(user, group_params)
+    def create_group(group_params)
       group = Group.new(group_params)
       group.owner = user
 
@@ -21,17 +21,17 @@ module GroupServices
       { success: true, details: GroupSerializer.new(group).serializable_hash, status: :created }
     end
 
-    def update_group(current_user, group, group_params)
+    def update_group(group, group_params)
       return no_group_error if group.nil?
-      return not_group_owner_error if group.owner_id != current_user.id
+      return not_group_owner_error if group.owner_id != @current_user.id || @current_user.admin?
 
       return { success: false, error: "Failed to update group", details: group.errors.full_messages, status: :bad_request } unless group.update(group_params)
       { success: true, details: GroupSerializer.new(group).serializable_hash, status: :accepted }
     end
 
-    def delete_group(current_user, group)
+    def delete_group(group)
       return no_group_error if group.nil?
-      return not_group_owner_error if group.owner_id != current_user.id
+      return not_group_owner_error if group.owner_id != @current_user.id || @current_user.admin?
 
       { success: false, message: "Failed to delete group", details: group.errors.full_messages, status: :bad_request } unless group.destroy
       { success: true, message: "Group deleted successfully", status: :no_content }

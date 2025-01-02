@@ -15,18 +15,18 @@ class Api::V1::GroupsController < ApplicationController
 
   def create
     group_params = needed_params(:group, [ :name, :description, :is_public ])
-    result = @service.create_group(@current_user, group_params)
+    result = @service.create_group(group_params)
     render json: result.except(:status), status: result[:status]
   end
 
   def update
     group_params = needed_params(:group, [ :name, :description, :is_public ])
-    result = @service.update_group(@current_user, @group, group_params)
+    result = @service.update_group(@group, group_params)
     render json: result.except(:status), status: result[:status]
   end
 
   def destroy
-    result = @service.delete_group(@current_user, @group)
+    result = @service.delete_group(@group)
     render json: result.except(:status), status: result[:status]
   end
 

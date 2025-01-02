@@ -15,18 +15,18 @@ class Api::V1::PostsController < ApplicationController
 
   def create
     post_params = needed_params(:posts, [ :title, :contents ])
-    result = @service.create_post(@current_user, post_params)
+    result = @service.create_post(post_params)
     render json: result.except(:status), status: result[:status]
   end
 
   def update
     post_params = needed_params(:posts, [ :title, :contents ])
-    result = @service.update_post(@current_user, @post, post_params)
+    result = @service.update_post(@post, post_params)
     render json: result.except(:status), status: result[:status]
   end
 
   def destroy
-    result = @service.delete_post(@current_user, @post)
+    result = @service.delete_post(@post)
     render json: result.except(:status), status: result[:status]
   end
 

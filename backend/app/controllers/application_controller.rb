@@ -40,7 +40,7 @@ class ApplicationController < ActionController::API
         return render_unauthorized("Token has been revoked")
       end
 
-      @current_user = User.find(decoded["user_id"])
+      @current_user = User.find_by(id: decoded["user_id"])
     rescue JWT::ExpiredSignature
       render_unauthorized("Expired token")
     rescue JWT::DecodeError
@@ -48,8 +48,14 @@ class ApplicationController < ActionController::API
     end
   end
 
+  def authorize_admin
+    unless @current_user&.role == "admin" || @current_user&.role == "superadmin"
+      render json: { error: "Must be admin to perforn this operation" }, status: :forbidden
+    end
+  end
+
   def initialize_service(service_class, params = {})
-    service_class.new(current_user: @current_user, **params)
+    service_class.new(@current_user, **params)
   end
 
   def set_user

@@ -3,6 +3,9 @@ class ApplicationService
     @current_user = current_user
   end
   protected
+    def initialize_service(service_class, params = {})
+      service_class.new(@current_user, **params)
+    end
     def user_not_found_error
       { success: false, error: "User not found", status: :not_found }
     end

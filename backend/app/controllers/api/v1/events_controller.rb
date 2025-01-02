@@ -5,47 +5,47 @@ class Api::V1::EventsController < ApplicationController
 
   def index
     result = @service.get_all_events
-    render json: result[:data], status: result[:status]
+    render json: result.except(:status), status: result[:status]
   end
 
   def show
     result = @service.get_event(@event)
-    render json: result[:data], status: result[:status]
+    render json: result.except(:status), status: result[:status]
   end
 
   def create
     event_params = needed_params(:event, [ :title, :description, :event_date ])
-    result = @service.create_event(@current_user, event_params)
-    render json: result[:data], status: result[:status]
+    result = @service.create_event(event_params)
+    render json: result.except(:status), status: result[:status]
   end
 
   def update
     event_id =Event.find(params[:id])
     event_params = needed_params(:event, [ :title, :description, :event_date ])
-    result = @service.update_event(@current_user, event_id, event_params)
-    render json: result[:data], status: result[:status]
+    result = @service.update_event(event_id, event_params)
+    render json: result.except(:status), status: result[:status]
   end
 
   def destroy
     event_id = params[:id]
-    result = @service.delete_event(@current_user, event_id)
-    render json: result[:data], status: result[:status]
+    result = @service.delete_event(event_id)
+    render json: result.except(:status), status: result[:status]
   end
 
   def attendees
     result = @service.check_attendees(@event)
-    render json: result[:data], status: result[:status]
+    render json: result.except(:status), status: result[:status]
   end
 
   def attend
-    result = @service.attend_event(@current_user, @event)
-    render json: result[:data], status: result[:status]
+    result = @service.attend_event(@event)
+    render json: result.except(:status), status: result[:status]
   end
 
   def unattend
     user_id = params[:user_id]
-    result = @service.unattend_event(@current_user, user_id, @event)
-    render json: result[:data], status: result[:status]
+    result = @service.unattend_event(user_id, @event)
+    render json: result.except(:status), status: result[:status]
   end
 
   private

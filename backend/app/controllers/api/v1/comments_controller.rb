@@ -16,18 +16,18 @@ class Api::V1::CommentsController < ApplicationController
 
   def create
     comment_params = needed_params(:comments, [ :content ])
-    result = @service.create_comment(@post, @current_user, comment_params)
+    result = @service.create_comment(@post, comment_params)
     render json: result.except(:status), status: result[:status]
   end
 
   def update
     comment_params = needed_params(:comments, [ :content ])
-    result = @service.comment_update(@current_user, @comment, comment_params)
+    result = @service.comment_update(@comment, comment_params)
     render json: result.except(:status), status: result[:status]
   end
 
   def destroy
-    result = @service.delete_comment(@current_user, @post, @comment)
+    result = @service.delete_comment(@post, @comment)
     render json: result.except(:status), status: result[:status]
   end
 
