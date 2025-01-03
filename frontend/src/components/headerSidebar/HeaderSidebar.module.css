@@ -1,0 +1,30 @@
+.headerSidebar {
+  @apply bg-orange-600;
+  @apply text-white;
+}
+button {
+  @apply rounded-full;
+  @apply border border-transparent border-solid;
+  @apply py-[10px] px-[10px];
+  @apply text-base;
+  @apply font-medium;
+  @apply bg-orange-400;
+  @apply text-white;
+  @apply cursor-pointer;
+  @apply transition-colors duration-200;
+}
+button:hover {
+  @apply bg-orange-700;
+}
+
+@media (prefers-color-scheme: dark) {
+  .headerSidebar {
+    background-color: #1a1a1a;
+  }
+  button {
+    background-color: #2e2e2eff;
+  }
+  button:hover {
+    background-color: #b8860b;
+  }
+}

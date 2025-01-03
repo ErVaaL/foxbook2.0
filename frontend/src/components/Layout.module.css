@@ -1,0 +1,10 @@
+.mainComponent {
+  @apply bg-gray-200;
+  @apply transition-colors duration-200;
+}
+
+@media (prefers-color-scheme: dark) {
+  .mainComponent {
+    background-color: #1e1e1e;
+  }
+}
