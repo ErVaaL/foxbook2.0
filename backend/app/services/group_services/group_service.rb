@@ -23,7 +23,7 @@ module GroupServices
 
     def update_group(group, group_params)
       return no_group_error if group.nil?
-      return not_group_owner_error if group.owner_id != @current_user.id || @current_user.admin?
+      return not_group_owner_error unless group.owner_id == @current_user.id || @current_user.admin?
 
       return { success: false, error: "Failed to update group", details: group.errors.full_messages, status: :bad_request } unless group.update(group_params)
       { success: true, details: GroupSerializer.new(group).serializable_hash, status: :accepted }
