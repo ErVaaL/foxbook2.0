@@ -49,13 +49,17 @@ Rails.application.routes.draw do
         resources :users, only: [ :index, :show, :update, :destroy ]
         resources :content, only: [ :index, :show, :update, :destroy ]
         resources :groups, only: [ :index, :show, :update, :destroy ]
+        # TODO
         resources :reports, only: [ :index ]
       end
 
       # Additional routes
+      # ask about
       get "/settings/:id", to: "settings#show"
+
       post "/social/share", to: "social#share"
       post "/social/follow", to: "social#follow"
+
       get "/reports", to: "reports#index"
       get "/forums/:id/moderate", to: "forums#moderate"
       get "/history/changes", to: "history#changes"
