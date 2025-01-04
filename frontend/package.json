@@ -10,11 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "formik": "^2.4.6",
+    "lodash": "^4.17.21",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.4.0",
     "react-router-dom": "^7.1.1",
     "react-switch": "^7.1.0",
+    "yup": "^1.6.1",
     "zustand": "^5.0.2"
   },
   "devDependencies": {
