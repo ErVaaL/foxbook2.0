@@ -34,3 +34,4 @@ dist-ssr
 
 backend/.env
 frontend/.yarnclean
+frontend/.env
