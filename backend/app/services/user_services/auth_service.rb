@@ -8,6 +8,8 @@ module UserServices
       else
         { success: false, error: "Invalid email or password", status: :unauthorized }
       end
+    rescue Mongoid::Errors::DocumentNotFound
+      { success: false, error: "Invalid email or password", status: :unauthorized }
     end
 
     def logout_user(token)
