@@ -9,11 +9,11 @@ const Layout: React.FC = () => {
   const noChatPages = ["/login", "/register"];
 
   return (
-    <div className="flex h-full ">
+    <div className="flex h-full min-h-screen ">
       <HeaderSidebar />
       <main
         id="content"
-        className={`bg-gray-200 dark:bg-[#1e1e1e] transition-colors duration-200 flex-grow p-4 overflow-auto w-full`}
+        className={`bg-gray-200 dark:bg-[#1e1e1e] transition-colors duration-200 flex-grow p-0 overflow-auto w-full pt-0 min-h-screen h-full`}
       >
         <Outlet />
       </main>
