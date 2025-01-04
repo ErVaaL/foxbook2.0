@@ -9,7 +9,7 @@ class Api::V1::ProfilesController < ApplicationController
   end
 
   def update
-    profile_params = needed_params(:profile, [ :description, :birthday, address: [ :country, :state, :city ] ])
+    profile_params = needed_params(:profile, [ :description, address: [ :country, :state, :city ] ])
     result = @service.update_profile(profile_params)
     render json: result.except(:status), status: result[:status]
   end

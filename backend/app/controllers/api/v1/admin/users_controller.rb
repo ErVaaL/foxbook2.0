@@ -15,12 +15,12 @@ class Api::V1::Admin::UsersController < ApplicationController
   end
 
   def update
-    result = @service.update_user(params[:id], @user_params, @profile_params)
+    result = @service.user_update(params[:id], @user_params, @profile_params)
     render json: result.except(:status), status: result[:status]
   end
 
   def destroy
-    result = @service.delete_user(params[:id])
+    result = @service.user_delete(params[:id])
     render json: result.except(:status), status: result[:status]
   end
 

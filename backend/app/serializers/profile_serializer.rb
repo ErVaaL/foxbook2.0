@@ -1,7 +1,7 @@
 class ProfileSerializer
   include JSONAPI::Serializer
 
-  attributes :description, :birthday
+  attributes :description
 
   attribute :address do |profile|
     {
@@ -17,9 +17,9 @@ class ProfileSerializer
       first_name: profile.user.first_name,
       last_name: profile.user.last_name,
       username: profile.user.username,
+      birthday: profile.user.birthday,
       email: profile.user.email,
       phone: profile.user.phone,
-      age: profile.user.age
     }
   end
 end
