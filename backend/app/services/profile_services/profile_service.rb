@@ -1,7 +1,7 @@
 module ProfileServices
   class ProfileService < ApplicationService
-    def initialize(current_user, user)
-      super(current_user: current_user)
+    def initialize(current_user, user:)
+      super(current_user)
       @user = user
     end
 

@@ -17,6 +17,6 @@ class Api::V1::ProfilesController < ApplicationController
   private
 
     def set_service
-      @service = ProfileServices::ProfileService.new(@user)
+      @service = initialize_service(ProfileServices::ProfileService,user: @user)
     end
 end
