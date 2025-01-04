@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "../features/auth/useAuthStore";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../store";
+import { login } from "../store/authSlice";
 import { API_BASE_URL, API_ENDPOINTS } from "../config";
 
 const Login: React.FC = () => {
@@ -8,7 +10,8 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
 
-  const { login, isLoggedIn } = useAuthStore();
+  const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -35,8 +38,8 @@ const Login: React.FC = () => {
         return;
       }
 
-      const { user, token } = await response.json();
-      login(user, token);
+      const { token } = await response.json();
+      dispatch(login({ token }));
       navigate("/");
     } catch (error) {
       setError(`An error occurred. ${error}`);
@@ -44,7 +47,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-200 dark:bg-[#1e1e1e] transition-colors duration-200 ">
+    <div className="flex justify-center items-center h-screen bg-gray-200 dark:bg-[#1e1e1e] transition-colors duration-200">
       {isLoggedIn ? (
         <div className="text-center">
           <h1 className="text-2xl mb-4 text-gray-800 dark:text-gray-200">

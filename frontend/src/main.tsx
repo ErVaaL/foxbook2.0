@@ -3,11 +3,15 @@ import { createRoot } from "react-dom/client";
 import "./globals.css";
 import App from "./App";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import store from "./store";
+import { Provider } from "react-redux";
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ThemeProvider>
-      <App />
-    </ThemeProvider>
+    <Provider store={store}>
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    </Provider>
   </React.StrictMode>,
 );
