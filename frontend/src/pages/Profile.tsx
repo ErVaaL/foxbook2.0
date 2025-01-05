@@ -106,10 +106,14 @@ const Profile: React.FC = () => {
             toggleEditing={toggleEditing}
             avatarUrl={profile?.avatarUrl || DEFAULT_PROFILE_AVATAR}
           />
-          <ProfileBoard posts={profile.posts} />
+          <ProfileBoard />
         </>
       ) : (
-        <ProfileEdit toggleEditing={toggleEditing} profile={profile} updatedProfile={updateProfile} />
+        <ProfileEdit
+          toggleEditing={toggleEditing}
+          profile={profile}
+          updatedProfile={updateProfile}
+        />
       )}
     </div>
   );

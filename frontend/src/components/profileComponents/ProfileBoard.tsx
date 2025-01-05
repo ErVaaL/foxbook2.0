@@ -1,37 +1,31 @@
-import React from "react";
-import ProfilePost from "./ProfilePost";
+import React, { useState } from "react";
+import ProfileBoardNav from "./profileBoardSubComponents/ProfileBoardNav";
+import ProfileBoardPosts from "./profileBoardSubComponents/ProfileBoardPosts";
+import ProfileBoardGroups from "./profileBoardSubComponents/ProfileBoardGroups";
+import { useParams } from "react-router-dom";
+import ProfileBoardFriends from "./profileBoardSubComponents/ProfileBoardFriends";
 
-type Post = {
-  id: string;
-  title: string;
-  content: string;
-};
-
-type ProfileBoardProps = {
-  posts: Post[];
-};
-
-const ProfileBoard: React.FC<ProfileBoardProps> = ({ posts = [] }) => {
+const ProfileBoard: React.FC = () => {
+  const [activeSession, setActiveSession] = useState<string>("Posts");
+  const { userId } = useParams<{ userId: string }>();
+  if (!userId) return <div>Invalid user ID</div>;
   return (
     <div className="flex-grow h-full">
       <div className="relative w-full h-12">
         <span className="absolute top-7 left-0 right-0 h-px bg-gradient-to-r from-transparent dark:via-gray-400 via-gray-500 to-transparent"></span>
       </div>
-      {posts.length ? (
-        <div className="space-y-4">
-          {posts.map((post) => (
-            <ProfilePost
-              key={post.id}
-              title={post.title}
-              content={post.content}
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="text-center text-gray-500">
-          <p>No posts available.</p>
-        </div>
-      )}
+      <div className="flex justify-center items-center ">
+        <ProfileBoardNav
+          activeSession={activeSession}
+          setActiveSession={setActiveSession}
+        />
+      </div>
+      <div className="relative w-full h-12">
+        <span className="absolute top-7 left-0 right-0 h-px bg-gradient-to-r from-transparent dark:via-gray-400 via-gray-500 to-transparent"></span>
+      </div>
+      {activeSession === "Posts" && <ProfileBoardPosts userId={userId} />}
+      {activeSession === "Groups" && <ProfileBoardGroups userId={userId} />}
+      {activeSession === "Friends" && <ProfileBoardFriends userId={userId} />}
     </div>
   );
 };
