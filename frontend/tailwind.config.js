@@ -7,10 +7,12 @@ export const content = [
 ];
 export const theme = {
   extend: {
-    colors:{
-      darkgoldenrod:"#b8860b",
-      goldenrodhover:"#a47c00",
-    }
+    colors: {
+      darkgoldenrod: "#b8860b",
+      goldenrodhover: "#a47c00",
+      dimgray: "#2e2e2e",
+      darkdimgray: "#1e1e1e",
+    },
   },
 };
 export const plugins = [];
