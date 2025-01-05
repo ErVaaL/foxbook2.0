@@ -6,6 +6,11 @@ export const content = [
   "./src/**/*.module.css",
 ];
 export const theme = {
-  extend: {},
+  extend: {
+    colors:{
+      darkgoldenrod:"#b8860b",
+      goldenrodhover:"#a47c00",
+    }
+  },
 };
 export const plugins = [];
