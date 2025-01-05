@@ -8,6 +8,12 @@ class Api::V1::UsersController < ApplicationController
     render json: result.except(:status), status: result[:status]
   end
 
+  def update
+    user_params = needed_params(:user, [ :first_name, :last_name, :username, :birthday, :email, :phone ])
+    result = @service.update_user(params[:id], user_params)
+    render json: result.except(:status), status: result[:status]
+  end
+
   private
     def set_service
       @service = initialize_service(UserServices::UsersService)

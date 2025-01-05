@@ -1,5 +1,5 @@
 class Api::V1::ProfilesController < ApplicationController
-  before_action :authorize_request
+  before_action :authorize_request, only: [ :update ]
   before_action :set_user
   before_action :set_service
 
@@ -17,6 +17,6 @@ class Api::V1::ProfilesController < ApplicationController
   private
 
     def set_service
-      @service = initialize_service(ProfileServices::ProfileService,user: @user)
+      @service = initialize_service(ProfileServices::ProfileService, user: @user)
     end
 end
