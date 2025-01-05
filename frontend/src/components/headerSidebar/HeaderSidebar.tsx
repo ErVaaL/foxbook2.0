@@ -84,7 +84,7 @@ const HeaderSidebar: React.FC = () => {
   return (
     <aside
       id="headerSidebar"
-      className={`bg-orange-600 dark:bg-[#1a1a1a] text-white h-full w-24 flex flex-col items-center py-4`}
+      className={`bg-orange-600 dark:bg-[#1a1a1a] text-white w-24 flex flex-col items-center py-4`}
     >
       <div className="flex-grow text-2xl items-center font-bold mb-3">Logo</div>
       <nav className="flex flex-col items-center space-y-6">
