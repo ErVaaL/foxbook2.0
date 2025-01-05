@@ -95,7 +95,7 @@ const Profile: React.FC = () => {
   if (error) return <p>An error occurred. {error}</p>;
 
   return (
-    <div className="max-w-5xl flex flex-col mx-auto p-0 min-h-screen h-full bg-gray-300 dark:bg-[#242424] transition-colors duration-200">
+    <div className="max-w-5xl flex flex-col mx-auto p-0 min-h-screen bg-gray-300 dark:bg-[#242424] transition-colors duration-200">
       {!isEditing ? (
         <>
           <ProfileHeader
@@ -106,7 +106,12 @@ const Profile: React.FC = () => {
             toggleEditing={toggleEditing}
             avatarUrl={profile?.avatarUrl || DEFAULT_PROFILE_AVATAR}
           />
-          <ProfileBoard />
+          <ProfileBoard
+            email={profile.email}
+            phone={profile.phone}
+            birthday={profile.birthday}
+            address={profile.address}
+          />
         </>
       ) : (
         <ProfileEdit
