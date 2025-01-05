@@ -1,5 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-  skip_before_action :authorize_request, only: [ :create, :posts, :groups ]
+  skip_before_action :authorize_request, only: [ :create, :posts, :groups, :events ]
   before_action :set_service
 
   def create
@@ -21,6 +21,11 @@ class Api::V1::UsersController < ApplicationController
 
   def groups
     result = @service.get_user_groups(params[:id])
+    render json: result.except(:status), status: result[:status]
+  end
+
+  def events
+    result = @service.get_user_events(params[:id])
     render json: result.except(:status), status: result[:status]
   end
 

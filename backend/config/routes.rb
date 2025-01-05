@@ -11,6 +11,7 @@ Rails.application.routes.draw do
         member do
           get :posts
           get :groups
+          get :events
         end
         resource :profile, only: [ :show, :update ]
         resource :settings, only: [ :show, :update ]

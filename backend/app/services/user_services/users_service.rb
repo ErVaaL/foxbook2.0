@@ -45,5 +45,16 @@ module UserServices
     rescue Mongoid::Errors::DocumentNotFound
       { success: false, error: "User not found", status: :not_found }
     end
+
+    def get_user_events(user_id)
+      user = User.find_by(id: user_id)
+      { success: false, error: "User not found", status: :not_found } unless User.find_by(id: user_id)
+      event_ids = user.event_ids
+      { success: false, error: "No events found", status: :not_found } if event_ids.empty?
+      events = Event.where(id: { "$in": event_ids })
+      { success: true, events: events.map { |event| EventSerializer.new(event).serializable_hash }, status: :ok }
+    rescue Mongoid::Errors::DocumentNotFound
+      { success: false, error: "User not found", status: :not_found }
+    end
   end
 end
