@@ -28,5 +28,22 @@ module UserServices
     rescue Mongoid::Errors::DocumentNotFound
       { success: false, error: "User not found", status: :not_found }
     end
+
+    def get_user_posts(user_id)
+      { success: false, error: "User not found", status: :not_found } unless User.find_by(id: user_id)
+      posts = Post.where(user_id: user_id)
+      { success: true, posts: posts.map { |post| PostSerializer.new(post).serializable_hash }, status: :ok }
+    rescue Mongoid::Errors::DocumentNotFound
+      { success: false, error: "User not found", status: :not_found }
+    end
+
+    def get_user_groups(user_id)
+      { success: false, error: "User not found", status: :not_found } unless User.find_by(id: user_id)
+      group_ids = Membership.where(user_id: user_id).pluck(:group_id)
+      groups = Group.where(id: { "$in": group_ids })
+      { success: true, groups: groups.map { |group| GroupSerializer.new(group).serializable_hash }, status: :ok }
+    rescue Mongoid::Errors::DocumentNotFound
+      { success: false, error: "User not found", status: :not_found }
+    end
   end
 end

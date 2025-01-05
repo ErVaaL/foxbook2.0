@@ -1,5 +1,5 @@
 class Api::V1::FriendsController < ApplicationController
-  before_action :authorize_request
+  skip_before_action :authorize_request, only: [ :show ]
   before_action :set_user
   before_action :set_service, only: [ :destroy ]
 
@@ -9,6 +9,16 @@ class Api::V1::FriendsController < ApplicationController
 
   def destroy
     result = @service.remove_friend
+    render json: result.except(:status), status: result[:status]
+  end
+
+  def recieved_friend_requests
+    result = @service.recieved_friend_requests
+    render json: result.except(:status), status: result[:status]
+  end
+
+  def sent_friend_requests
+    result = @service.sent_friend_requests
     render json: result.except(:status), status: result[:status]
   end
 

@@ -8,5 +8,15 @@ module FriendServices
 
       { success: true, message: "Friend removed" }
     end
+
+    def recieved_friend_requests
+      requests = @current_user.friend_requests_recieved
+      { success: true, requests: requests.map { |id| UserSerializer.new(User.find(id)).serializable_hash[:data][:attributes] } }
+    end
+
+    def sent_friend_requests
+      requests = @current_user.friend_requests_sent
+      { success: true, requests: requests.map { |id| UserSerializer.new(User.find(id)).serializable_hash[:data][:attributes] } }
+    end
   end
 end

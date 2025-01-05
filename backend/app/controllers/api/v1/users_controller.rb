@@ -1,5 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-  skip_before_action :authorize_request, only: [ :create ]
+  skip_before_action :authorize_request, only: [ :create, :posts, :groups ]
   before_action :set_service
 
   def create
@@ -11,6 +11,16 @@ class Api::V1::UsersController < ApplicationController
   def update
     user_params = needed_params(:user, [ :first_name, :last_name, :username, :birthday, :email, :phone ])
     result = @service.update_user(params[:id], user_params)
+    render json: result.except(:status), status: result[:status]
+  end
+
+  def posts
+    result = @service.get_user_posts(params[:id])
+    render json: result.except(:status), status: result[:status]
+  end
+
+  def groups
+    result = @service.get_user_groups(params[:id])
     render json: result.except(:status), status: result[:status]
   end
 

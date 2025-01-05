@@ -8,10 +8,19 @@ Rails.application.routes.draw do
       delete "/auth/logout", to: "auth#logout"
 
       resources :users do
+        member do
+          get :posts
+          get :groups
+        end
         resource :profile, only: [ :show, :update ]
         resource :settings, only: [ :show, :update ]
         resource :preferences, only: [ :show, :update ]
-        resource :friends, only: [ :show, :destroy ]
+        resource :friends, only: [ :show, :destroy ] do
+          collection do
+            get :recieved_friend_requests
+            get :sent_friend_requests
+          end
+        end
       end
 
       # TODO

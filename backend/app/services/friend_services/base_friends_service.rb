@@ -1,7 +1,7 @@
 module FriendServices
   class BaseFriendsService < ApplicationService
-    def initialize(current_user:, friend_id: nil)
-      super(current_user: current_user)
+    def initialize(current_user, friend_id: nil)
+      super(current_user)
       @friend = friend_id ? User.find_by(id: friend_id) : nil
     rescue Mongoid::Errors::DocumentNotFound
       user_not_found_error
