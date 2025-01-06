@@ -11,11 +11,11 @@ module AdminServices
       post = Post.find_by(id: post_id) unless post_id.nil?
       case content_type
       when ->(type) { type == Post }
-        get_all_posts
+        all_posts
       when ->(type) { type == Comment }
-        get_all_comments(post)
+        all_comments(post)
       when ->(type) { type == Event }
-        get_all_events
+        all_events
       else
         { success: false, error: "Invalid resource", status: :bad_request }
       end
@@ -69,15 +69,15 @@ module AdminServices
 
     private
 
-      def get_all_posts
+      def all_posts
         @posts_service.get_all_posts
       end
 
-      def get_all_comments(post)
+      def all_comments(post)
         @comments_service.get_post_comments(post)
       end
 
-      def get_all_events
+      def all_events
         @events_service.get_all_events
       end
   end
