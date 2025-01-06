@@ -2,7 +2,7 @@ module PostServices
   class PostService < BasePostsService
     def get_all_posts
       posts = Post.all.order(created_at: :desc)
-      { success: true, data: PostSerializer.new(posts).serializable_hash, status: :ok }
+      { success: true, posts: PostSerializer.new(posts).serializable_hash, status: :ok }
     rescue Mongoid::Errors::DocumentNotFound
       { success: false, error: "Posts not found", status: :not_found }
     end

@@ -10,6 +10,7 @@ class User
   field :birthday, type: Date
   field :phone, type: String
   field :password_digest, type: String
+  field :avatar, type: String, default: "/src/assets/default-profile.png"
   field :role, type: String, default: "user"
 
   field :friends, type: Array, default: []

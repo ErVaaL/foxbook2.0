@@ -20,6 +20,7 @@ class ProfileSerializer
       birthday: profile.user.birthday,
       email: profile.user.email,
       phone: profile.user.phone,
+      avatar: profile.user.avatar
     }
   end
 end

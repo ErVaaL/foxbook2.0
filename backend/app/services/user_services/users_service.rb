@@ -31,8 +31,8 @@ module UserServices
 
     def get_user_posts(user_id)
       { success: false, error: "User not found", status: :not_found } unless User.find_by(id: user_id)
-      posts = Post.where(user_id: user_id)
-      { success: true, posts: posts.map { |post| PostSerializer.new(post).serializable_hash }, status: :ok }
+      posts = Post.where(user_id: user_id).order(created_at: :desc)
+      { success: true, posts: PostSerializer.new(posts).serializable_hash, status: :ok }
     rescue Mongoid::Errors::DocumentNotFound
       { success: false, error: "User not found", status: :not_found }
     end
