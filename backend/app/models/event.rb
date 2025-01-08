@@ -8,6 +8,8 @@ class Event
   belongs_to :user
   has_and_belongs_to_many :attendees, class_name: "User", inverse_of: :events
 
+  index({ title: "text", description: "text" })
+
   validates :title, presence: true, length: { minimum: 5, maximum: 50 }
   validates :description, presence: true
   validates :event_date, presence: true

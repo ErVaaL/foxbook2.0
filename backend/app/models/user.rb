@@ -27,6 +27,7 @@ class User
 
   has_and_belongs_to_many :events, class_name: "Event", inverse_of: :attendees
 
+  index({ first_name: "text", last_name: "text", username: "text" })
 
   has_secure_password
 

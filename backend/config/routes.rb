@@ -54,6 +54,8 @@ Rails.application.routes.draw do
         delete "attendees/:user_id", to: "events#unattend", as: :unattend
       end
 
+      get "/search", to: "search#index"
+
       # Admin routes
       namespace :admin do
         resources :users, only: [ :index, :show, :update, :destroy ]

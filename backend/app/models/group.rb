@@ -9,6 +9,8 @@ class Group
   belongs_to :owner, class_name: "User", inverse_of: :owned_groups
   has_many :memberships, dependent: :destroy
 
+  index({ name: "text", description: "text" })
+
   validates :name, presence: true, uniqueness: true, length: { minimum: 3, maximum: 30 }
   validates :description, presence: true
 
