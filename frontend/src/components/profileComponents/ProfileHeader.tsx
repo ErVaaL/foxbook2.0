@@ -40,7 +40,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             </button>
           )}
           {isLoggedIn && userId === profileUserId && (
-            <button onClick={toggleEditing} className="bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 text-black dark:text-white font-bold py-2 px-4 rounded">
+            <button
+              onClick={toggleEditing}
+              className="bg-gray-400 dark:bg-gray-700 hover:bg-gray-500 dark:hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
+            >
               Edit Profile
             </button>
           )}
