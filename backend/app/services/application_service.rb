@@ -1,5 +1,5 @@
 class ApplicationService
-  def initialize(current_user)
+  def initialize(current_user = nil)
     @current_user = current_user
   end
   protected

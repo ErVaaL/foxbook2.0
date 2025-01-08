@@ -55,8 +55,11 @@ class ApplicationController < ActionController::API
   end
 
   def initialize_service(service_class, params = {})
-    service_class.new(@current_user, **params) if params.is_a?(Hash)
-    service_class.new(@current_user, params)
+    if params.is_a?(Hash)
+      service_class.new(@current_user, **params)
+    else
+      service_class.new(@current_user, params)
+    end
   end
 
   def set_user
