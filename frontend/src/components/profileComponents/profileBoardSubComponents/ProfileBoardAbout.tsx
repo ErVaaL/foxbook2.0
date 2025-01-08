@@ -24,7 +24,6 @@ const ProfileBoardAbout: React.FC<ProfileBoardAboutProps> = ({
   birthday,
   address,
 }) => {
-
   const formattedBirthday = new Date(birthday).toLocaleDateString("en-UK", {
     year: "numeric",
     month: "long",
@@ -54,7 +53,7 @@ const ProfileBoardAbout: React.FC<ProfileBoardAboutProps> = ({
           </p>
         </div>
       </div>
-      {address && <AddressSection {...address} />}
+      <AddressSection {...address} />
     </div>
   );
 };
@@ -62,6 +61,7 @@ const ProfileBoardAbout: React.FC<ProfileBoardAboutProps> = ({
 export default ProfileBoardAbout;
 
 const AddressSection: React.FC<Address> = ({ country, state, city }) => {
+  if (!country && !state && !city) return null;
   return (
     <div className="mt-4 w-full">
       <h2 className="text-2xl font-semibold w-full text-center">Address</h2>

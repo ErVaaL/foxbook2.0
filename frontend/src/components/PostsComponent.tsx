@@ -55,9 +55,9 @@ const PostsComponent: React.FC<PostsComponentProps> = ({ endpoint }) => {
       try {
         const response = await fetch(`${API_BASE_URL}${endpoint}`);
         if (!response.ok) throw new Error("Failed to fetch posts");
+
         const data = await response.json();
         var posts = data.posts.data;
-        console.log(posts);
 
         if (!Array.isArray(posts)) throw new Error("Invalid response data");
 
@@ -93,7 +93,7 @@ const PostsComponent: React.FC<PostsComponentProps> = ({ endpoint }) => {
         posts.map((post) => <PostItem key={post.id} post={post} />)
       ) : (
         <div className="text-center text-gray-500 place-self-center">
-          <p>User hasn&apos;t made any posts yet</p>
+          <p>There are no posts to be shown</p>
         </div>
       )}
     </div>
