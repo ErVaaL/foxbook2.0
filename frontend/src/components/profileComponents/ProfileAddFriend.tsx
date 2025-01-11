@@ -1,4 +1,4 @@
-import React, { use, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import axios from "axios";
 import { API_BASE_URL, API_ENDPOINTS } from "../../config";
 import { useSelector } from "react-redux";
@@ -19,6 +19,20 @@ const fetchFriends = (profileUserId: string): Promise<string[]> => {
       );
   }
   return friendsPromiseCache[profileUserId];
+};
+
+const fetchUserSentRequests = (
+  userId: string,
+  token: string,
+): Promise<string[]> => {
+  const sentRequests = axios.get(
+    `${API_BASE_URL}${API_ENDPOINTS.USER_SENT_REQUESTS(userId)}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
 };
 
 const ProfileAddFriend: React.FC<ProfileAddFriendProps> = ({
