@@ -24,10 +24,14 @@ class User
 
   has_many :memberships, dependent: :destroy
   has_many :posts, dependent: :destroy
+  has_many :notifications, dependent: :destroy
 
   has_and_belongs_to_many :events, class_name: "Event", inverse_of: :attendees
 
   index({ first_name: "text", last_name: "text", username: "text" })
+  index({ user_id: 1, was_seen: 1 })
+  index({ created_at: -1 })
+
 
   has_secure_password
 

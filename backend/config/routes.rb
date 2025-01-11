@@ -24,6 +24,12 @@ Rails.application.routes.draw do
         end
       end
 
+      resources :notifications, only: [ :index ] do
+        member do
+          patch :switch_read_status
+        end
+      end
+
       # TODO
       # get "/users/:id/activity", to: "users#activity"
 
