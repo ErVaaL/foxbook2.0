@@ -7,7 +7,7 @@ class Api::V1::FriendRequestsController < ApplicationController
   end
 
   def create
-    result = @service.send_request
+    result = @service.friend_send_request
     render json: result.except(:status), status: result[:status]
   end
 

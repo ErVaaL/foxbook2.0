@@ -1,6 +1,6 @@
 module FriendServices
   class FriendRequestsService < BaseFriendsService
-    def send_request
+    def friend_send_request
       return user_not_found_error unless @friend
       return already_friends_error if @current_user.friends.include?(@friend.id)
       return friend_request_already_sent_error if request_already_exists?
