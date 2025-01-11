@@ -1,20 +1,27 @@
 class NotificationSerializer
   include JSONAPI::Serializer
 
-  attributes :type, :was_seen, :created_at
+  attributes :id, :type, :was_seen, :created_at
 
   attribute :content do |notification|
     case notification.type
     when "friend_request"
+      sender = User.find(notification.content["sender_id"])
       {
         sender_id: notification.content["sender_id"],
-        sender_name: User.find(notification.content["sender_id"]).username
+        sender_name: sender&.username || "No user/Deleted user",
+        message: notification.content["message"]
+      }
+    when "friend_request_accepted"
+      {
+        message: notification.content["message"]
       }
     when "event_reminder"
+      event = Event.find_by(id: notification.content["event_id"])
       {
         event_id: notification.content["event_id"],
-        event_title: Event.find(notification.content["event_id"]).title,
-        event_date: Event.find(notification.content["event_id"]).event_date
+        event_title: event&.title || "No event/Deleted event",
+        event_date: event&.date || "No date"
       }
     when "tagged"
       {
