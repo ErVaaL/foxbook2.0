@@ -18,10 +18,9 @@ const Layout: React.FC = () => {
       >
         <Outlet />
       </main>
-      <div className="absolute top-4 right-72 z-50">
-        <NotificationComponent />
-      </div>
+      <div className="absolute top-4 right-72 z-50"></div>
       {!noChatPages.includes(location.pathname) && <ChatList />}
+      <NotificationComponent />
     </div>
   );
 };
