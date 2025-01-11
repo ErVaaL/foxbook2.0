@@ -14,6 +14,8 @@ export const API_ENDPOINTS = {
   USER_GROUPS: (userId: string) => `/users/${userId}/groups`,
   USER_EVENTS: (userId: string) => `/users/${userId}/events`,
   POSTS: "/posts",
+  USER_FRIENDS: (userId: string) => `/users/${userId}/friends`,
+  SEND_FRIEND_REQUEST: "/friends",
 };
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;

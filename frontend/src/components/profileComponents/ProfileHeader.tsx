@@ -1,6 +1,8 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { RootState } from "../../store";
 import { useSelector } from "react-redux";
+import ProfileAddFriend from "./ProfileAddFriend";
+import ProfileFollowUser from "./ProfileFollowUser";
 
 type ProfileHeaderProps = {
   profileUserId: string;
@@ -33,12 +35,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           {firstName} {lastName}
         </h1>
         <p className="text-gray-600 dark:text-gray-400">@{username}</p>
-        <div className="absolute bottom-0 right-0 pr-4 space-x-2">
-          {isLoggedIn && userId !== profileUserId && (
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-              Follow
-            </button>
-          )}
+        <div className="flex absolute bottom-0 right-0 pr-4 space-x-2">
+          <Suspense fallback={<div></div>}>
+            <ProfileFollowUser profileUserId={profileUserId} />
+            <ProfileAddFriend profileUserId={profileUserId} />
+          </Suspense>
           {isLoggedIn && userId === profileUserId && (
             <button
               onClick={toggleEditing}
