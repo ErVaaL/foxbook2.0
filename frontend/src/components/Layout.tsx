@@ -2,6 +2,7 @@ import React from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import ChatList from "./chatList/ChatList";
 import HeaderSidebar from "./headerSidebar/HeaderSidebar";
+import NotificationComponent from "./NotificationComponent";
 
 const Layout: React.FC = () => {
   const location = useLocation();
@@ -17,6 +18,9 @@ const Layout: React.FC = () => {
       >
         <Outlet />
       </main>
+      <div className="absolute top-4 right-72 z-50">
+        <NotificationComponent />
+      </div>
       {!noChatPages.includes(location.pathname) && <ChatList />}
     </div>
   );
