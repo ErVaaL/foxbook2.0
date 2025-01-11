@@ -1,7 +1,7 @@
 class Api::V1::FriendsController < ApplicationController
   skip_before_action :authorize_request, only: [ :show ]
+  before_action :set_service, except: [ :show ]
   before_action :set_user
-  before_action :set_service, only: [ :destroy ]
 
   def show
     render json: { friends: @user.friends.map { |id| UserSerializer.new(User.find(id)).serializable_hash[:data][:attributes] } }, status: :ok
