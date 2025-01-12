@@ -9,12 +9,14 @@ export const API_ENDPOINTS = {
     `/users/${userId}/friends/sent_friend_requests`,
   FRIEND_REQUESTS_RECEIVED: (userId: string) =>
     `/users/${userId}/friends/recieved_friend_requests`,
+  FRIEND_REQUEST_ACTION: (friendId: string) => `/friends/${friendId}`,
   USER_EDIT: (userId: string) => `/users/${userId}`,
   USER_POSTS: (userId: string) => `/users/${userId}/posts`,
   USER_GROUPS: (userId: string) => `/users/${userId}/groups`,
   USER_EVENTS: (userId: string) => `/users/${userId}/events`,
   USER_NOTIFICATIONS: "/notifications",
-  USER_SENT_REQUESTS: (userId: string) => `/users/${userId}/friends/sent_friend_requests`,
+  USER_SENT_REQUESTS: (userId: string) =>
+    `/users/${userId}/friends/sent_friend_requests`,
   POSTS: "/posts",
   USER_FRIENDS: (userId: string) => `/users/${userId}/friends`,
   SEND_FRIEND_REQUEST: "/friends",

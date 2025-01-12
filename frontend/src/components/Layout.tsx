@@ -3,8 +3,11 @@ import { Outlet, useLocation } from "react-router-dom";
 import ChatList from "./chatList/ChatList";
 import HeaderSidebar from "./headerSidebar/HeaderSidebar";
 import NotificationComponent from "./NotificationComponent";
+import { RootState } from "../store";
+import { useSelector } from "react-redux";
 
 const Layout: React.FC = () => {
+  const { isLoggedIn } = useSelector((state: RootState) => state.auth);
   const location = useLocation();
 
   const noChatPages = ["/login", "/register"];
@@ -20,7 +23,7 @@ const Layout: React.FC = () => {
       </main>
       <div className="absolute top-4 right-72 z-50"></div>
       {!noChatPages.includes(location.pathname) && <ChatList />}
-      <NotificationComponent />
+      {isLoggedIn && <NotificationComponent />}
     </div>
   );
 };

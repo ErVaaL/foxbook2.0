@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store";
-import { fetchNotifications, markAsSeen } from "../store/notificationSlice";
-import { FaBell } from "react-icons/fa";
+import {
+  fetchNotifications,
+  toggleNotificationSeen,
+} from "../store/notificationSlice";
+import { FaBell, FaEye, FaEyeSlash } from "react-icons/fa";
+import NotificationItem from "./notificationSubComponents/NotificationItem";
 
 const NotificationComponent: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -22,17 +26,17 @@ const NotificationComponent: React.FC = () => {
     (state: RootState) => state.notifications,
   );
 
+  const { token } = useSelector((state: RootState) => state.auth);
+
   const toggleDropdown = () => {
     if (!dragged) {
       setIsOpen(!isOpen);
-      if (!isOpen) {
-        dispatch(fetchNotifications());
+      if (!isOpen && token) {
+        dispatch(fetchNotifications(token));
       }
     }
     setDragged(false);
   };
-
-  const handleMarkAsSeen = (id: string) => dispatch(markAsSeen(id));
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setDragging(true);
@@ -113,6 +117,10 @@ const NotificationComponent: React.FC = () => {
     };
   };
 
+  const toggleSeen = (id: string) => {
+    if (token) dispatch(toggleNotificationSeen({ id, token }));
+  };
+
   return (
     <div
       style={{
@@ -128,8 +136,8 @@ const NotificationComponent: React.FC = () => {
         className="w-10 h-10 rounded-full bg-orange-600 hover:bg-orange-500 text-white dark:bg-gray-600 dark:hover:bg-darkgoldenrod flex items-center justify-center relative cursor-move"
       >
         <FaBell />
-        {notifications.some((n) => !n.was_seen) && (
-          <span className="absolute top-0 right-0 w-3 h-3 rounded-full bg-red-500"></span>
+        {notifications.some((n) => !n.attributes.was_seen) && (
+          <span className="absolute top-0 right-0 w-3 h-3 rounded-full bg-blue-500 dark:bg-red-500"></span>
         )}
       </button>
 
@@ -145,24 +153,12 @@ const NotificationComponent: React.FC = () => {
               <p>You don&apos;t have any notifications</p>
             ) : (
               notifications.map((notification) => (
-                <div
+                <NotificationItem
                   key={notification.id}
-                  className={`p-3 border-b ${
-                    notification.was_seen
-                      ? "bg-gray-100"
-                      : "bg-blue-100 font-bold"
-                  }`}
-                >
-                  <p>{notification.content.message}</p>
-                  {!notification.was_seen && (
-                    <button
-                      onClick={() => handleMarkAsSeen(notification.id)}
-                      className="text-blue-500 text-sm mt-2"
-                    >
-                      Mark as seen
-                    </button>
-                  )}
-                </div>
+                  notification={notification}
+                  token={token}
+                  toggleSeen={toggleSeen}
+                />
               ))
             )}
           </div>

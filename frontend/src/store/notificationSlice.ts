@@ -5,9 +5,11 @@ import { API_BASE_URL, API_ENDPOINTS } from "../config";
 interface Notification {
   id: string;
   type: string;
-  was_seen: boolean;
-  created_at: string;
-  content: Record<string, any>;
+  attributes: {
+    was_seen: boolean;
+    created_at: string;
+    content: Record<string, any>;
+  };
 }
 
 interface NotificationsState {
@@ -24,15 +26,43 @@ const initialState: NotificationsState = {
 
 export const fetchNotifications = createAsyncThunk(
   "notifications/fetchNotifications",
-  async (_, { rejectWithValue }) => {
+  async (token: string, { rejectWithValue }) => {
     try {
       const response = await axios.get(
         `${API_BASE_URL}${API_ENDPOINTS.USER_NOTIFICATIONS}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
-      if (!response.data) throw new Error("Error fetching user notifications");
-      return response.data.notifications;
+      if (!response.data || !response.data.notifications.data)
+        throw new Error("Error fetching user notifications");
+      return response.data.notifications.data;
     } catch (error: any) {
       return rejectWithValue(error.response.data);
+    }
+  },
+);
+export const toggleNotificationSeen = createAsyncThunk(
+  "notifications/toggleNotificationSeen",
+  async ({ id, token }: { id: string; token: string }, { rejectWithValue }) => {
+    try {
+      const response = await axios.patch(
+        `${API_BASE_URL}${API_ENDPOINTS.USER_NOTIFICATIONS}/${id}/switch_read_status`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      return response.data.notification;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data || "Failed to toggle notification seen status",
+      );
     }
   },
 );
@@ -44,7 +74,17 @@ const notificationsSlice = createSlice({
     markAsSeen(state, action) {
       const id = action.payload;
       const notification = state.notifications.find((n) => n.id === id);
-      if (notification) notification.was_seen = true;
+      if (notification) notification.attributes.was_seen = true;
+    },
+    updateNotificationContent(state, action) {
+      const { id, content } = action.payload;
+      const notification = state.notifications.find((n) => n.id === id);
+      if (notification) {
+        notification.attributes.content = {
+          ...notification.attributes.content,
+          ...content,
+        };
+      }
     },
   },
   extraReducers: (builder) => {
@@ -55,14 +95,40 @@ const notificationsSlice = createSlice({
       })
       .addCase(fetchNotifications.fulfilled, (state, action) => {
         state.loading = false;
-        state.notifications = action.payload;
+        state.notifications = action.payload.map((notification) => ({
+          ...notification,
+          attributes: {
+            ...notification.attributes,
+            content: {
+              ...notification.attributes.content,
+              action_taken:
+                notification.attributes.content.action_taken || false,
+            },
+          },
+        }));
       })
       .addCase(fetchNotifications.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+      .addCase(toggleNotificationSeen.fulfilled, (state, action) => {
+        if (!action.payload || !action.payload.data) {
+          console.error("Invalid notification data:", action.payload);
+          return;
+        }
+        const updatedNotification = action.payload.data.attributes;
+        const notifiationId = action.payload.data.id;
+        const notificationIndex = state.notifications.findIndex(
+          (n) => n.id === notifiationId,
+        );
+        if (notificationIndex !== -1) {
+          state.notifications[notificationIndex].attributes.was_seen =
+            updatedNotification.was_seen;
+        }
       });
   },
 });
 
-export const { markAsSeen } = notificationsSlice.actions;
+export const { markAsSeen, updateNotificationContent } =
+  notificationsSlice.actions;
 export default notificationsSlice.reducer;
