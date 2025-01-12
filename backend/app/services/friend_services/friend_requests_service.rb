@@ -31,6 +31,8 @@ module FriendServices
       @friend.add_friend(@current_user.id)
       @friend.remove_sent_request(@current_user.id)
 
+      update_notification_on_action(@current_user.id, @friend.id, "friend_request")
+
       @notification_service.create_notification(
         user_id: @friend.id,
         type: "friend_request_accepted",
@@ -42,10 +44,11 @@ module FriendServices
 
     def decline_request
       return { success: false, error: "No friend request found", status: :not_found } unless @current_user.recieved_friend_request?(@friend.id)
-      return { success: false, error: "Not friends", status: :bad_request } unless @current_user.friends.include?(@friend.id)
 
       @current_user.remove_recieved_request(@friend.id)
       @friend.remove_sent_request(@current_user.id)
+
+      update_notification_on_action(@current_user.id, @friend.id, "friend_request")
 
       { success: true, message: "Friend request declined", status: :ok }
     end
@@ -54,6 +57,15 @@ module FriendServices
 
       def request_already_exists?
         @current_user.sent_friend_request?(@friend.id) || @current_user.recieved_friend_request?(@friend.id)
+      end
+
+      def update_notification_on_action(user_id, sender_id, type)
+        notification = Notification.find_by(
+          user_id: user_id,
+          "content.sender_id" => sender_id,
+          type: type
+        )
+        notification.update!(content: notification.content.merge("action_taken" => true)) if notification
       end
   end
 end
