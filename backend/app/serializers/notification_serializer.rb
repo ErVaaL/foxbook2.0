@@ -10,7 +10,8 @@ class NotificationSerializer
       {
         sender_id: notification.content["sender_id"],
         sender_name: sender&.username || "No user/Deleted user",
-        message: notification.content["message"]
+        message: notification.content["message"],
+        action_taken: notification.content["action_taken"]
       }
     when "friend_request_accepted"
       {

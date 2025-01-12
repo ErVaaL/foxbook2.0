@@ -6,11 +6,11 @@ class NotificationsServices::NotificationsService < ApplicationService
     { success: false, error: e.message, status: :internal_server_error }
   end
 
-  def mark_as_seen(notification_id)
+  def switch_was_seen(notification_id)
     notification = Notification.find(notification_id)
     return { success: false, error: "Not authorized to interact with this notification", status: :unauthorized } unless notification.user_id == @current_user.id
     notification.switch_was_seen
-    { success: true, message: "Notification marked as seen", status: :ok }
+    { success: true, notification: NotificationSerializer.new(notification).serializable_hash, status: :ok }
   rescue Mongoid::Errors::DocumentNotFound
     { success: false, error: "Notification not found", status: :not_found }
   rescue StandardError => e
