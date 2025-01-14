@@ -22,6 +22,8 @@
     "react-router-dom": "^7.1.1",
     "react-spinners": "^0.15.0",
     "react-switch": "^7.1.0",
+    "react-window": "^1.8.11",
+    "use-debounce": "^10.0.4",
     "yup": "^1.6.1"
   },
   "devDependencies": {
