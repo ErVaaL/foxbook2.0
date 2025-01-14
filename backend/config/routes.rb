@@ -44,6 +44,7 @@ Rails.application.routes.draw do
         get :members
         post :members, to: "groups#add_member", as: :add_member
         delete "members/:user_id", to: "groups#remove_member", as: :remove_member
+        get :member_count, on: :member
       end
 
       # Post routes

@@ -43,6 +43,11 @@ module GroupServices
       { success: true, details: memberships.map { |membership| MembershipSerializer.new(membership).serializable_hash }, status: :ok }
     end
 
+    def get_member_count(group)
+      return no_group_error if group.nil?
+      { success: true, details: group.memberships.count, status: :ok }
+    end
+
     def add_group_member(group, user)
       return no_group_error if group.nil?
       return user_not_found_error if user.nil?
