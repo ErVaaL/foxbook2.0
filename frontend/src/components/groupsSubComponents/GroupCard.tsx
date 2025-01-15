@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 interface Group {
   id: string;
@@ -16,9 +17,15 @@ interface Group {
 }
 
 const GroupCard: React.FC<{ group: Group }> = React.memo(({ group }) => {
+  const navigate = useNavigate();
   return (
     <div className="border h-36 border-gray-200 dark:border-gray-700 rounded-md p-2 dark:text-gray-300">
-      <h1 className="text-lg font-semibold">{group.attributes.name}</h1>
+      <h1
+        onClick={() => navigate(`/groups/${group.id}`)}
+        className="text-lg font-semibold"
+      >
+        {group.attributes.name}
+      </h1>
       <p>Owner: {group.attributes.owner.username}</p>
     </div>
   );

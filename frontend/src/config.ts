@@ -21,6 +21,9 @@ export const API_ENDPOINTS = {
   SEND_FRIEND_REQUEST: "/friends",
   POSTS: "/posts",
   GROUPS: "/groups",
+  GROUP_POSTS: (groupId: string) => `/groups/${groupId}/member_posts`,
+  GROUP_EVENTS: (groupId: string) => `/groups/${groupId}/member_events`,
+  GROUP_MEMBERS: (groupId: string) => `/groups/${groupId}/members`,
   EVENTS: "/events",
 };
 

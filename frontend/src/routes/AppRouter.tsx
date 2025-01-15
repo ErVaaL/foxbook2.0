@@ -7,6 +7,7 @@ import Register from "../pages/Register";
 import Profile from "../pages/Profile";
 import Groups from "../pages/Groups";
 import Create from "../pages/Create";
+import GroupDetails from "../pages/GroupDetails";
 
 const AppRouter: React.FC = () => {
   return (
@@ -19,6 +20,7 @@ const AppRouter: React.FC = () => {
           <Route path="/users/profile/:userId" element={<Profile />} />
           <Route path="/groups" element={<Groups />} />
           <Route path="/create" element={<Create />} />
+          <Route path="/groups/:id" element={<GroupDetails />} />
         </Route>
       </Routes>
     </Router>
