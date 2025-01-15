@@ -2,48 +2,53 @@ import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
-import { API_BASE_URL, API_ENDPOINTS } from "../config";
 import { useSelector } from "react-redux";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { RootState } from "../store";
+import { API_BASE_URL, API_ENDPOINTS } from "../config";
 
-export type GroupFormValues = {
-  name: string;
+export type EventFormValues = {
+  title: string;
   description: string;
-  is_public: boolean;
+  event_date: string;
 };
 
-const GroupCreation: React.FC = () => {
+const EventCreation: React.FC = () => {
   const { token } = useSelector((state: RootState) => state.auth);
   const { id } = useParams<{ id?: string }>();
-  const navigate = useNavigate();
   const isEditing = !!id;
+  const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const validationSchema = Yup.object({
-    name: Yup.string()
-      .required("Group name is required")
-      .min(3, "Group name must be at least 3 characters")
-      .max(30, "Group name must not exceed 30 characters"),
+    title: Yup.string()
+      .required("Title is required")
+      .min(5, "Title must be at least 5 characters")
+      .max(50, "Title must not exceed 50 characters"),
     description: Yup.string()
       .required("Description is required")
       .min(10, "Description must be at least 10 characters")
-      .max(300, "Description must not exceed 300 characters"),
-    is_public: Yup.boolean(),
+      .max(200, "Description must not exceed 200 characters"),
+    event_date: Yup.date()
+      .required("Event date is required")
+      .min(
+        new Date(new Date().setDate(new Date().getDate() + 1)),
+        "Event date must be at least 1 day in the future",
+      ),
   });
 
-  const handleSubmit = async (values: GroupFormValues) => {
+  const handleSubmit = async (values: EventFormValues) => {
     try {
       const url = isEditing
-        ? `${API_BASE_URL}${API_ENDPOINTS.GROUPS}/${id}`
-        : `${API_BASE_URL}${API_ENDPOINTS.GROUPS}`;
+        ? `${API_BASE_URL}${API_ENDPOINTS.EVENTS}/${id}`
+        : `${API_BASE_URL}${API_ENDPOINTS.EVENTS}`;
 
       const method = isEditing ? "PATCH" : "POST";
 
       const response = await axios({
         method,
         url,
-        data: { group: values },
+        data: { event: values },
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -52,20 +57,20 @@ const GroupCreation: React.FC = () => {
 
       if (![202, 201].includes(response.status)) {
         throw new Error(
-          isEditing ? "Failed to update group" : "Failed to create group",
+          isEditing ? "Failed to update event" : "Failed to create event",
         );
       }
 
       setSuccessMessage(
         isEditing
-          ? "Group updated successfully!"
-          : "Group created successfully!",
+          ? "Event updated successfully!"
+          : "Event created successfully!",
       );
 
-      setTimeout(() => navigate("/groups"), 2000);
+      setTimeout(() => navigate("/"), 2000);
     } catch (error) {
       console.error(
-        isEditing ? "Error updating group:" : "Error creating group:",
+        isEditing ? "Error updating event:" : "Error creating event:",
         error,
       );
     }
@@ -74,7 +79,7 @@ const GroupCreation: React.FC = () => {
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4 dark:text-gray-200">
-        {isEditing ? "Edit Group" : "Create Group"}
+        {isEditing ? "Edit Event" : "Create Event"}
       </h2>
 
       {successMessage && (
@@ -84,7 +89,7 @@ const GroupCreation: React.FC = () => {
       )}
 
       <Formik
-        initialValues={{ name: "", description: "", is_public: true }}
+        initialValues={{ title: "", description: "", event_date: "" }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
@@ -92,19 +97,19 @@ const GroupCreation: React.FC = () => {
           <Form className="space-y-4">
             <div>
               <label
-                htmlFor="name"
+                htmlFor="title"
                 className="block text-sm font-medium dark:text-gray-300"
               >
-                Group Name
+                Event Title
               </label>
               <Field
-                id="name"
-                name="name"
+                id="title"
+                name="title"
                 className="w-full p-2 border rounded"
-                placeholder="Enter group name"
+                placeholder="Enter event title"
               />
               <ErrorMessage
-                name="name"
+                name="title"
                 component="div"
                 className="text-red-500 text-sm"
               />
@@ -123,7 +128,7 @@ const GroupCreation: React.FC = () => {
                 name="description"
                 rows={4}
                 className="w-full p-2 border rounded"
-                placeholder="Enter group description (max 300 characters)"
+                placeholder="Enter event description"
               />
               <ErrorMessage
                 name="description"
@@ -132,16 +137,24 @@ const GroupCreation: React.FC = () => {
               />
             </div>
 
-            <div className="flex items-center space-x-2">
-              <Field
-                id="is_public"
-                name="is_public"
-                type="checkbox"
-                className="h-5 w-5 rounded border-gray-300 focus:ring-0 checked:bg-orange-500 dark:checked:bg-darkgoldenrod"
-              />
-              <label htmlFor="is_public" className="text-sm dark:text-gray-300">
-                Public Group
+            <div>
+              <label
+                htmlFor="event_date"
+                className="block text-sm font-medium dark:text-gray-300"
+              >
+                Event Date
               </label>
+              <Field
+                id="event_date"
+                name="event_date"
+                type="date"
+                className="w-full p-2 border rounded"
+              />
+              <ErrorMessage
+                name="event_date"
+                component="div"
+                className="text-red-500 text-sm"
+              />
             </div>
 
             <div className="flex space-x-4">
@@ -153,13 +166,13 @@ const GroupCreation: React.FC = () => {
                 {isSubmitting
                   ? "Saving..."
                   : isEditing
-                    ? "Save Group"
-                    : "Create Group"}
+                    ? "Save Event"
+                    : "Create Event"}
               </button>
 
               <button
                 type="button"
-                onClick={() => navigate("/groups")}
+                onClick={() => navigate("/")}
                 className="px-4 py-2 bg-red-500 hover:bg-red-800 text-white rounded"
               >
                 Go Back
@@ -172,4 +185,4 @@ const GroupCreation: React.FC = () => {
   );
 };
 
-export default GroupCreation;
+export default EventCreation;

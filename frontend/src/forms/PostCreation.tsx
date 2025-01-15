@@ -159,7 +159,7 @@ const GroupCreation: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => navigate("/groups")}
+                onClick={() => navigate("/")}
                 className="px-4 py-2 bg-red-500 hover:bg-red-800 text-white rounded"
               >
                 Go Back

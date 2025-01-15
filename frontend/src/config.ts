@@ -17,10 +17,11 @@ export const API_ENDPOINTS = {
   USER_NOTIFICATIONS: "/notifications",
   USER_SENT_REQUESTS: (userId: string) =>
     `/users/${userId}/friends/sent_friend_requests`,
-  POSTS: "/posts",
   USER_FRIENDS: (userId: string) => `/users/${userId}/friends`,
   SEND_FRIEND_REQUEST: "/friends",
+  POSTS: "/posts",
   GROUPS: "/groups",
+  EVENTS: "/events",
 };
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
