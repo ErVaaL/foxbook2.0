@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Post } from "./PostsComponent";
 
@@ -8,21 +8,28 @@ type PostItemProps = {
 
 const PostItem: React.FC<PostItemProps> = ({ post }) => {
   const navigate = useNavigate();
-  const formattedDate = new Date(post.created_at).toLocaleDateString("en-UK", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+
+  const formattedDate = useMemo(
+    () =>
+      new Date(post.created_at).toLocaleDateString("en-UK", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+    [post.created_at],
+  );
+
   const handleClicked = () => {
     navigate(`/users/profile/${post.author_id}`);
   };
+
   return (
     <div className="p-2 rounded-lg flex">
       <img
         src={post.author_avatar}
         onClick={handleClicked}
         className="w-10 h-10 rounded-full hover:cursor-pointer"
-      ></img>
+      />
       <div className="grid grid-cols-1 p-1 w-full">
         <h1
           onClick={handleClicked}
@@ -38,8 +45,6 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
         </h3>
         <p className="p-0 text-xs dark:text-gray-400">{post.content}</p>
       </div>
-      {/* TODO: Add conditional div for photo or video */}
-      {/* TODO: Footer div with likes and comments */}
     </div>
   );
 };

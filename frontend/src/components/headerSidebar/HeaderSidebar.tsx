@@ -71,10 +71,13 @@ const HeaderSidebar: React.FC = () => {
 
     return (
       <>
-        <button className="hover:text-white bg-orange-400 dark:bg-[#2e2e2e] hover:bg-orange-700 hover:dark:bg-[#b8860b]">
+        <button
+          onClick={() => navigate("/groups")}
+          className="hover:text-white bg-orange-400 dark:bg-[#2e2e2e] hover:bg-orange-700 hover:dark:bg-darkgoldenrod"
+        >
           <FaUsers size={24} />
         </button>
-        <button className="hover:text-white bg-orange-400 dark:bg-[#2e2e2e] hover:bg-orange-700 hover:dark:bg-[#b8860b]">
+        <button className="hover:text-white bg-orange-400 dark:bg-[#2e2e2e] hover:bg-orange-700 hover:dark:bg-darkgoldenrod">
           <FaComments size={24} />
         </button>
       </>

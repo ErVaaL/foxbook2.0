@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { API_BASE_URL } from "../config";
 import Loader from "./Loader";
 import PostItem from "./PostItem";
@@ -40,7 +40,7 @@ type PostData = {
 };
 
 const PostsComponent: React.FC<PostsComponentProps> = ({ endpoint }) => {
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [postsData, setPostsData] = useState<PostData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -57,32 +57,38 @@ const PostsComponent: React.FC<PostsComponentProps> = ({ endpoint }) => {
         if (!response.ok) throw new Error("Failed to fetch posts");
 
         const data = await response.json();
-        var posts = data.posts.data;
+        const posts = data.posts.data;
 
         if (!Array.isArray(posts)) throw new Error("Invalid response data");
 
-        const mappedPosts: Post[] = posts.map((post: PostData) => ({
-          id: post.id,
-          title: post.attributes.title,
-          content: post.attributes.contents,
-          likes_count: post.attributes.likes_count,
-          comments_count: post.attributes.comments_count,
-          created_at: post.attributes.created_at,
-          author_id: post.attributes.author.id,
-          author_avatar: post.attributes.author.avatar,
-          author_firstName: post.attributes.author.first_name,
-          author_lastName: post.attributes.author.last_name,
-          author_username: post.attributes.author.username,
-        }));
-        setPosts(mappedPosts);
+        setPostsData(posts);
       } catch (error) {
         setError(`An error occurred: ${error}`);
       } finally {
         setLoading(false);
       }
     };
+
     fetchPosts();
   }, [endpoint]);
+
+  const posts = useMemo(
+    () =>
+      postsData.map((post: PostData) => ({
+        id: post.id,
+        title: post.attributes.title,
+        content: post.attributes.contents,
+        likes_count: post.attributes.likes_count,
+        comments_count: post.attributes.comments_count,
+        created_at: post.attributes.created_at,
+        author_id: post.attributes.author.id,
+        author_avatar: post.attributes.author.avatar,
+        author_firstName: post.attributes.author.first_name,
+        author_lastName: post.attributes.author.last_name,
+        author_username: post.attributes.author.username,
+      })),
+    [postsData],
+  );
 
   if (loading) return <Loader color="#4a90e2" size={60} />;
   if (error) return <div className="text-red-500">{error}</div>;
