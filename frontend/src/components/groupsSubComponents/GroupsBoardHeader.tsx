@@ -1,11 +1,13 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const GroupsBoardHeader: React.FC = () => {
+  const navigate = useNavigate();
   const handleInviteToGroup = () => {
     console.log("Invite To Group");
   };
   const handleCreateGroup = () => {
-    console.log("Create Group");
+    navigate("/create?item=group");
   };
 
   return (

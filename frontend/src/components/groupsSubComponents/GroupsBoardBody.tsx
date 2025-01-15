@@ -39,7 +39,11 @@ const GroupsBoardBody: React.FC = () => {
         );
         if (response.data.success === false)
           throw new Error(`Error fetching groups: ${response}`);
-        setGroups(response.data.details.map((group: Group) => group.data));
+        setGroups(
+          response.data.details
+            .map((group: Group) => group.data)
+            .filter((group: Group) => group.attributes.is_public),
+        );
       } catch (error) {
         setError(`Error fetching groups: ${error}`);
       } finally {
@@ -61,7 +65,7 @@ const GroupsBoardBody: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-max p-4">
-      <div className="w-full">
+      <div className="w-full flex justify-center items-center">
         {loading ? (
           <Loader />
         ) : error ? (
@@ -72,7 +76,7 @@ const GroupsBoardBody: React.FC = () => {
             columnWidth={300}
             height={500}
             rowCount={Math.ceil(currentGroups.length / 3)}
-            rowHeight={120}
+            rowHeight={150}
             width={900}
           >
             {({ columnIndex, rowIndex, style }) => {
@@ -81,7 +85,7 @@ const GroupsBoardBody: React.FC = () => {
               if (!group) return null;
 
               return (
-                <div style={style}>
+                <div style={style} className="justify-center items-center p-2">
                   <GroupCard group={group} />
                 </div>
               );

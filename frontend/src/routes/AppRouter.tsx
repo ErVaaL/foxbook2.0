@@ -6,6 +6,7 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Profile from "../pages/Profile";
 import Groups from "../pages/Groups";
+import Create from "../pages/Create";
 
 const AppRouter: React.FC = () => {
   return (
@@ -17,6 +18,7 @@ const AppRouter: React.FC = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/users/profile/:userId" element={<Profile />} />
           <Route path="/groups" element={<Groups />} />
+          <Route path="/create" element={<Create />} />
         </Route>
       </Routes>
     </Router>
