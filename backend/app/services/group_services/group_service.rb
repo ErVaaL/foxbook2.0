@@ -12,9 +12,9 @@ module GroupServices
 
     def create_group(group_params)
       group = Group.new(group_params)
-      group.owner = user
+      group.owner = @current_user
 
-      Membership.create(group: group, user: user, role: "owner")
+      Membership.create(group: group, user: @current_user, role: "owner")
 
       return { success: false, error: "Failed to create group", details: group.errors.full_messages, status: :bad_request } unless group.save
 
