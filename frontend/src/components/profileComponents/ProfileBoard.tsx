@@ -6,7 +6,7 @@ import ProfileBoardFriends from "./profileBoardSubComponents/ProfileBoardFriends
 import ProfileBoardEvents from "./profileBoardSubComponents/ProfileBoardEvents";
 import ProfileBoardAbout from "./profileBoardSubComponents/ProfileBoardAbout";
 import { API_ENDPOINTS } from "../../config";
-import PostsComponent from "../PostsComponent";
+import PostsComponent from "../universal/PostsComponent";
 
 type Address = {
   country: string;

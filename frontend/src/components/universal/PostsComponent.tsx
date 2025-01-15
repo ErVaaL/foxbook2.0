@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { API_BASE_URL } from "../config";
-import Loader from "./Loader";
-import PostItem from "./PostItem";
+import Loader from "../Loader";
+import { API_BASE_URL } from "../../config";
+import PostItem from "../PostItem";
 
 type PostsComponentProps = {
   endpoint: string;
@@ -60,6 +60,7 @@ const PostsComponent: React.FC<PostsComponentProps> = ({ endpoint }) => {
         const posts = data.posts.data;
 
         if (!Array.isArray(posts)) throw new Error("Invalid response data");
+        console.log(posts);
 
         setPostsData(posts);
       } catch (error) {
