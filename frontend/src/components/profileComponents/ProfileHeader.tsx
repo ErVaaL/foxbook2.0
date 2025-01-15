@@ -1,8 +1,9 @@
 import React, { Suspense } from "react";
 import { RootState } from "../../store";
 import { useSelector } from "react-redux";
-import ProfileAddFriend from "./ProfileAddFriend";
-import ProfileFollowUser from "./ProfileFollowUser";
+
+const ProfileFollowUser = React.lazy(() => import("./ProfileFollowUser"));
+const ProfileAddFriend = React.lazy(() => import("./ProfileAddFriend"));
 
 type ProfileHeaderProps = {
   profileUserId: string;
