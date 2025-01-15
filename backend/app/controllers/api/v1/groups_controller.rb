@@ -1,5 +1,5 @@
 class Api::V1::GroupsController < ApplicationController
-  before_action :set_group, only: [ :show, :update, :destroy, :members, :add_member, :remove_member, :member_count ]
+  before_action :set_group, only: [ :show, :update, :destroy, :members, :add_member, :remove_member, :member_count, :member_posts, :member_events ]
   before_action :authorize_request, only: [ :create, :update, :destroy, :add_member, :remove_member ]
   before_action :set_service
 
@@ -32,6 +32,16 @@ class Api::V1::GroupsController < ApplicationController
 
   def members
     result = @service.get_members(@group)
+    render json: result.except(:status), status: result[:status]
+  end
+
+  def member_posts
+    result = @service.get_member_posts(@group)
+    render json: result.except(:status), status: result[:status]
+  end
+
+  def member_events
+    result = @service.get_member_events(@group)
     render json: result.except(:status), status: result[:status]
   end
 
