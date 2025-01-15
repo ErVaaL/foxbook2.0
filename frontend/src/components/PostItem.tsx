@@ -24,7 +24,7 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
   };
 
   return (
-    <div className="p-2 rounded-lg flex">
+    <div className="p-2 rounded-lg flex w-full border border-gray-400 shadow">
       <img
         src={post.author_avatar}
         onClick={handleClicked}
@@ -40,7 +40,7 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
         <p className="text-gray-600 dark:text-gray-500 text-xs">
           @{post.author_username} | {formattedDate}
         </p>
-        <h3 className="ml-8 text-xl p-2 font-bold dark:text-gray-300">
+        <h3 className="ml-24 mt-3 text-xl p-2 font-bold dark:text-gray-300">
           {post.title}
         </h3>
         <p className="p-0 text-xs dark:text-gray-400">{post.content}</p>

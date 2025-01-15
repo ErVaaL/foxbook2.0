@@ -94,7 +94,7 @@ const PostsComponent: React.FC<PostsComponentProps> = ({ endpoint }) => {
   if (error) return <div className="text-red-500">{error}</div>;
 
   return (
-    <div className="flex flex-col p-2 m-0">
+    <div className="flex flex-col p-2 m-0 gap-4 items-center">
       {posts.length ? (
         posts.map((post) => <PostItem key={post.id} post={post} />)
       ) : (
