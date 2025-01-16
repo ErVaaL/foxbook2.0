@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { RootState } from "../store";
 import { API_BASE_URL, API_ENDPOINTS } from "../config";
+import Loader from "../components/Loader";
 
 export type EventFormValues = {
   title: string;
@@ -13,12 +14,65 @@ export type EventFormValues = {
   event_date: string;
 };
 
-const EventCreation: React.FC = () => {
-  const { token } = useSelector((state: RootState) => state.auth);
+type EventCreationProps = {
+  toggleEditing?: () => void;
+  refreshEvent?: () => void;
+};
+
+const EventCreation: React.FC<EventCreationProps> = ({
+  toggleEditing,
+  refreshEvent,
+}) => {
+  const { token, userId } = useSelector((state: RootState) => state.auth);
   const { id } = useParams<{ id?: string }>();
   const isEditing = !!id;
   const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [hostId, setHostId] = useState<string | null>(null);
+  const [initialValues, setInitialValues] = useState<EventFormValues>({
+    title: "",
+    description: "",
+    event_date: "",
+  });
+  const [loading, setLoading] = useState<boolean>(isEditing);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!isEditing || !id) return;
+
+    const fetchEvent = async () => {
+      try {
+        const response = await axios.get(
+          `${API_BASE_URL}${API_ENDPOINTS.EVENT(id)}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+
+        if (response.status !== 200) throw new Error("Failed to fetch event");
+
+        const eventData = response.data.data.data.attributes;
+        setInitialValues({
+          title: eventData.title,
+          description: eventData.description,
+          event_date: new Date(eventData.event_date)
+            .toISOString()
+            .split("T")[0],
+        });
+
+        setHostId(eventData.host.id);
+      } catch (error) {
+        setErrorMessage(
+          error instanceof Error ? error.message : "Error fetching event data",
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvent();
+  }, [id, isEditing, token]);
 
   const validationSchema = Yup.object({
     title: Yup.string()
@@ -40,7 +94,7 @@ const EventCreation: React.FC = () => {
   const handleSubmit = async (values: EventFormValues) => {
     try {
       const url = isEditing
-        ? `${API_BASE_URL}${API_ENDPOINTS.EVENTS}/${id}`
+        ? `${API_BASE_URL}${API_ENDPOINTS.EVENT(id)}`
         : `${API_BASE_URL}${API_ENDPOINTS.EVENTS}`;
 
       const method = isEditing ? "PATCH" : "POST";
@@ -67,14 +121,50 @@ const EventCreation: React.FC = () => {
           : "Event created successfully!",
       );
 
-      setTimeout(() => navigate("/"), 2000);
+      setTimeout(() => {
+        if (isEditing) {
+          toggleEditing?.();
+          refreshEvent?.();
+        } else {
+          navigate(`/events/${response.data.data.data.id}`);
+        }
+      }, 2000);
     } catch (error) {
-      console.error(
-        isEditing ? "Error updating event:" : "Error creating event:",
-        error,
+      setErrorMessage(
+        error instanceof Error ? error.message : "Error saving event",
       );
     }
   };
+
+  const handleDelete = async () => {
+    if (!id) return;
+    if (!window.confirm("Are you sure you want to delete this event?")) return;
+
+    try {
+      setIsDeleting(true);
+      const response = await axios.delete(
+        `${API_BASE_URL}${API_ENDPOINTS.EVENT(id)}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      if (response.status !== 204) throw new Error("Failed to delete event");
+
+      setSuccessMessage("Event deleted successfully!");
+      setTimeout(() => {
+        navigate("/events");
+      }, 2000);
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : "Error deleting event",
+      );
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  if (loading) return <Loader color="#4a90e2" size={60} />;
 
   return (
     <div className="p-4">
@@ -88,8 +178,15 @@ const EventCreation: React.FC = () => {
         </div>
       )}
 
+      {errorMessage && (
+        <div className="bg-red-100 text-red-700 p-4 rounded mb-4">
+          {errorMessage}
+        </div>
+      )}
+
       <Formik
-        initialValues={{ title: "", description: "", event_date: "" }}
+        initialValues={initialValues}
+        enableReinitialize={true}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
@@ -172,11 +269,24 @@ const EventCreation: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => navigate("/")}
-                className="px-4 py-2 bg-red-500 hover:bg-red-800 text-white rounded"
+                onClick={() =>
+                  isEditing ? toggleEditing?.() : navigate("/events")
+                }
+                className="px-4 py-2 bg-gray-700 hover:bg-gray-900 text-white rounded"
               >
-                Go Back
+                {isEditing ? "Cancel" : "Go Back"}
               </button>
+
+              {isEditing && userId === hostId && (
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="px-4 py-2 bg-red-500 hover:bg-red-800 text-white rounded"
+                >
+                  {isDeleting ? "Deleting..." : "Delete Event"}
+                </button>
+              )}
             </div>
           </Form>
         )}

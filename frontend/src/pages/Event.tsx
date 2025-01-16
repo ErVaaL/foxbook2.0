@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import AttendEvent from "../components/eventsSubComponents/AttendEvent";
 import UnattendEvent from "../components/eventsSubComponents/UnattendEvent";
+import EventCreation from "../forms/EventCreation";
 
 const DEFAULT_AVATAR = DefaultAvatar;
 
@@ -40,26 +41,36 @@ const Event: React.FC = () => {
   const [event, setEvent] = useState<EventData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+
+  const toggleEditing = () => setIsEditing((prev) => !prev);
+
+  const fetchEvent = useCallback(async () => {
+    try {
+      if (!id) throw new Error("No event ID provided");
+      const response = await axios.get(
+        `${API_BASE_URL}${API_ENDPOINTS.EVENT(id)}`,
+      );
+
+      if (response.status !== 200) throw new Error("Failed to fetch event");
+      if (!response.data.data) throw new Error("Event not found");
+
+      setEvent(response.data.data.data);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
+  const refreshEvent = () => {
+    setLoading(true);
+    fetchEvent();
+  };
 
   useEffect(() => {
-    const fetchEvent = async () => {
-      try {
-        if (!id) throw new Error("No event ID provided");
-        const response = await axios.get(
-          `${API_BASE_URL}${API_ENDPOINTS.EVENT(id)}`,
-        );
-        if (response.status !== 200) throw new Error("Failed to fetch event");
-        if (!response.data.data) throw new Error("Event not found");
-
-        setEvent(response.data.data.data);
-      } catch (error) {
-        setError(error instanceof Error ? error.message : "An error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchEvent();
-  }, [id]);
+  }, [fetchEvent]);
 
   const renderGridItem = useCallback(
     ({ columnIndex, rowIndex, style }: GridChildComponentProps) => {
@@ -95,6 +106,10 @@ const Event: React.FC = () => {
       (attendee) => attendee.id === userId,
     );
   }, [event, userId]);
+
+  const canEditEvent = useMemo(() => {
+    return isLoggedIn && userId === event?.attributes.host.id;
+  }, [isLoggedIn, userId, event]);
 
   const sections = useMemo(() => {
     const attendees = event?.attributes.attendees ?? [];
@@ -159,21 +174,42 @@ const Event: React.FC = () => {
 
   return (
     <div className="max-w-5xl mx-auto p-0 min-h-screen bg-gray-300 dark:bg-[#242424] transition-colors duration-200">
-      <UniversalHeader
-        title={event.attributes.title}
-        additionalInfo={`Date: ${new Date(event.attributes.event_date).toLocaleDateString()}`}
-        description={event.attributes.description}
-        actions={
-          isLoggedIn &&
-          userId !== event.attributes.host.id &&
-          (isAttending ? (
-            <UnattendEvent eventId={event.id} setEvent={setEvent} />
-          ) : (
-            <AttendEvent eventId={event.id} setEvent={setEvent} />
-          ))
-        }
-      />
-      <UniversalBoard sections={sections} />
+      {!isEditing ? (
+        <>
+          <UniversalHeader
+            title={event.attributes.title}
+            additionalInfo={`Date: ${new Date(event.attributes.event_date).toLocaleDateString()}`}
+            description={event.attributes.description}
+            actions={
+              <>
+                {isLoggedIn && userId !== event.attributes.host.id && (
+                  <>
+                    {isAttending ? (
+                      <UnattendEvent eventId={event.id} setEvent={setEvent} />
+                    ) : (
+                      <AttendEvent eventId={event.id} setEvent={setEvent} />
+                    )}
+                  </>
+                )}
+                {canEditEvent && (
+                  <button
+                    onClick={toggleEditing}
+                    className="px-4 py-2 bg-orange-500 hover:bg-orange-600 dark:bg-darkgoldenrod dark:hover:bg-goldenrodhover text-white rounded"
+                  >
+                    Edit Event
+                  </button>
+                )}
+              </>
+            }
+          />
+          <UniversalBoard sections={sections} />
+        </>
+      ) : (
+        <EventCreation
+          toggleEditing={toggleEditing}
+          refreshEvent={refreshEvent}
+        />
+      )}
     </div>
   );
 };
