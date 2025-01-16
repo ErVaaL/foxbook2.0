@@ -18,7 +18,7 @@ const UniversalHeader: React.FC<UniversalHeaderProps> = ({
   actions,
 }) => {
   return (
-    <div className="w-full flex justify-between items-center h-40 p-4">
+    <div className="w-full flex justify-between items-start h-40 p-4">
       <div>
         <h1 className="text-2xl font-bold text-black dark:text-white">
           {title}
@@ -35,13 +35,13 @@ const UniversalHeader: React.FC<UniversalHeaderProps> = ({
           ))}
         </div>
       </div>
-      <div className="flex-grow m-4 items-start h-full">
-        <p className="text-gray-500 dark:text-gray-300 self-start">About:</p>
+      <div className="flex-grow mx-4 items-start h-full">
+        <p className="text-gray-700 dark:text-gray-300 self-start text-center">About:</p>
         <p className="px-4 text-gray-600 dark:text-gray-400 self-start">
           {description}
         </p>
       </div>
-      <div className="flex space-x-2">{actions}</div>
+      <div className="flex space-x-2 self-end">{actions}</div>
     </div>
   );
 };
