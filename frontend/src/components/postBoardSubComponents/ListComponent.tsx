@@ -27,9 +27,21 @@ const ListComponent: React.FC<{
     }
   };
 
-  const handleNavigate = (userId: string) => {
+  const handleNavigate = (id: string, item: string) => {
     closeResults();
-    navigate(`/users/profile/${userId}`);
+    switch (item) {
+      case "users":
+        navigate(`/users/profile/${id}`);
+        break;
+      case "groups":
+        navigate(`/groups/${id}`);
+        break;
+      case "events":
+        navigate(`/events/${id}`);
+        break;
+      default:
+        break;
+    }
   };
 
   const renderResultItem = (result: SearchResult) => {
@@ -39,7 +51,7 @@ const ListComponent: React.FC<{
       return (
         <div
           key={result.id}
-          onClick={() => handleNavigate(result.id)}
+          onClick={() => handleNavigate(result.id, "users")}
           className="p-2 flex items-center gap-3 hover:cursor-pointer hover:bg-gray-300 rounded-lg dark:text-gray-300 dark:hover:text-gray-900"
         >
           <img
@@ -57,6 +69,7 @@ const ListComponent: React.FC<{
       return (
         <div
           key={result.id}
+          onClick={() => handleNavigate(result.id, "groups")}
           className="p-2 flex items-center gap-3 hover:cursor-pointer hover:bg-gray-300 rounded-lg dark:text-gray-300 dark:hover:text-gray-900"
         >
           <p className="font-bold">[G] {attributes.name}</p>
@@ -66,6 +79,7 @@ const ListComponent: React.FC<{
       return (
         <div
           key={result.id}
+          onClick={() => handleNavigate(result.id, "events")}
           className="p-2 flex items-center gap-3 hover:cursor-pointer hover:bg-gray-300 rounded-lg dark:text-gray-300 dark:hover:text-gray-900"
         >
           <p className="font-bold">[E] {attributes.title}</p>
