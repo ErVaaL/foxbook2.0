@@ -58,9 +58,7 @@ const GroupDetails: React.FC = () => {
       const response = await axios.get(
         `${API_BASE_URL}${API_ENDPOINTS.GROUP_IS_MEMBER(id)}`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         },
       );
       if (![200, 202].includes(response.status))
@@ -209,7 +207,10 @@ const GroupDetails: React.FC = () => {
           <UniversalBoard sections={sections} />
         </>
       ) : (
-        <GroupCreation />
+        <GroupCreation
+          toggleEditing={toggleEditing}
+          refreshGroup={fetchGroup}
+        />
       )}
 
       {showInviteModal && (

@@ -14,19 +14,29 @@ export type GroupFormValues = {
   is_public: boolean;
 };
 
-const GroupCreation: React.FC = () => {
-  const { token } = useSelector((state: RootState) => state.auth);
+type GroupCreationProps = {
+  toggleEditing?: () => void;
+  refreshGroup?: () => void;
+};
+
+const GroupCreation: React.FC<GroupCreationProps> = ({
+  toggleEditing,
+  refreshGroup,
+}) => {
+  const { token, userId } = useSelector((state: RootState) => state.auth);
   const { id } = useParams<{ id?: string }>();
-  const navigate = useNavigate();
   const isEditing = !!id;
+  const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [ownerId, setOwnerId] = useState<string | null>(null);
   const [initialValues, setInitialValues] = useState<GroupFormValues>({
     name: "",
     description: "",
     is_public: true,
   });
   const [loading, setLoading] = useState<boolean>(isEditing);
-  const [error, setError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   useEffect(() => {
     if (!isEditing || !id) return;
@@ -36,9 +46,7 @@ const GroupCreation: React.FC = () => {
         const response = await axios.get(
           `${API_BASE_URL}${API_ENDPOINTS.GROUPS}/${id}`,
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           },
         );
 
@@ -50,8 +58,10 @@ const GroupCreation: React.FC = () => {
           description: groupData.description,
           is_public: groupData.is_public,
         });
+
+        setOwnerId(groupData.owner.id);
       } catch (error) {
-        setError(
+        setErrorMessage(
           error instanceof Error ? error.message : "Error fetching group data",
         );
       } finally {
@@ -104,17 +114,50 @@ const GroupCreation: React.FC = () => {
           : "Group created successfully!",
       );
 
-      setTimeout(() => navigate("/groups"), 2000);
+      setTimeout(() => {
+        if (isEditing) {
+          toggleEditing?.();
+          refreshGroup?.();
+        } else {
+          navigate(`/groups/${response.data.data.data.id}`);
+        }
+      }, 2000);
     } catch (error) {
-      console.error(
-        isEditing ? "Error updating group:" : "Error creating group:",
-        error,
+      setErrorMessage(
+        error instanceof Error ? error.message : "Error saving group",
       );
     }
   };
 
+  const handleDelete = async () => {
+    if (!id) return;
+    if (!window.confirm("Are you sure you want to delete this group?")) return;
+
+    try {
+      setIsDeleting(true);
+      const response = await axios.delete(
+        `${API_BASE_URL}${API_ENDPOINTS.GROUPS}/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      if (response.status !== 204) throw new Error("Failed to delete group");
+
+      setSuccessMessage("Group deleted successfully!");
+      setTimeout(() => {
+        navigate("/groups");
+      }, 2000);
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : "Error deleting group",
+      );
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   if (loading) return <Loader color="#4a90e2" size={60} />;
-  if (error) return <p className="text-red-500">{error}</p>;
 
   return (
     <div className="p-4">
@@ -125,6 +168,12 @@ const GroupCreation: React.FC = () => {
       {successMessage && (
         <div className="bg-green-100 text-green-700 p-4 rounded mb-4">
           {successMessage}
+        </div>
+      )}
+
+      {errorMessage && (
+        <div className="bg-red-100 text-red-700 p-4 rounded mb-4">
+          {errorMessage}
         </div>
       )}
 
@@ -147,7 +196,6 @@ const GroupCreation: React.FC = () => {
                 id="name"
                 name="name"
                 className="w-full p-2 border rounded"
-                placeholder="Enter group name"
               />
               <ErrorMessage
                 name="name"
@@ -167,9 +215,7 @@ const GroupCreation: React.FC = () => {
                 as="textarea"
                 id="description"
                 name="description"
-                rows={4}
                 className="w-full p-2 border rounded"
-                placeholder="Enter group description (max 300 characters)"
               />
               <ErrorMessage
                 name="description"
@@ -183,7 +229,7 @@ const GroupCreation: React.FC = () => {
                 id="is_public"
                 name="is_public"
                 type="checkbox"
-                className="h-5 w-5 rounded border-gray-300 focus:ring-0 checked:bg-orange-500 dark:checked:bg-darkgoldenrod"
+                className="h-5 w-5"
               />
               <label htmlFor="is_public" className="text-sm dark:text-gray-300">
                 Public Group
@@ -194,7 +240,7 @@ const GroupCreation: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-4 py-2 bg-orange-500 hover:bg-orange-600 dark:bg-darkgoldenrod text-white rounded dark:hover:bg-goldenrodhover"
+                className="px-4 py-2 bg-orange-500 hover:bg-orange-600 dark:bg-darkgoldenrod dark:hover:bg-goldenrodhover text-white rounded"
               >
                 {isSubmitting
                   ? "Saving..."
@@ -205,11 +251,24 @@ const GroupCreation: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => navigate("/groups")}
-                className="px-4 py-2 bg-red-500 hover:bg-red-800 text-white rounded"
+                onClick={() =>
+                  isEditing ? toggleEditing?.() : navigate("/groups")
+                }
+                className="px-4 py-2 bg-gray-700 hover:bg-gray-900 text-white rounded"
               >
-                Go Back
+                {isEditing ? "Cancel" : "Go Back"}
               </button>
+
+              {isEditing && userId === ownerId && (
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="px-4 py-2 bg-red-500 hover:bg-red-800 text-white rounded"
+                >
+                  {isDeleting ? "Deleting..." : "Delete Group"}
+                </button>
+              )}
             </div>
           </Form>
         )}
