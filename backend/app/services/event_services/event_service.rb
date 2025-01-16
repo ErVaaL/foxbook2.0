@@ -13,6 +13,7 @@ module EventServices
     def create_event(event_params)
       event = Event.new(event_params)
       event.user = @current_user
+      event.attend(@current_user)
       return { success: false, data: { errors: event.errors.full_messages }, status: :unprocessable_entity } unless event.save
       { success: true, data: EventSerializer.new(event).serializable_hash, status: :created }
     end
@@ -22,7 +23,7 @@ module EventServices
       return { success: false, data: { errors: "Event not found" }, status: :not_found } if event.nil?
       return not_the_same_user_error unless event.user_id == @current_user.id || @current_user.admin?
       return { success: false, data: { errors: event.errors.full_messages }, status: :unprocessable_entity } unless event.update(event_params)
-      { success: true, data: EventSerializer.new(event).serializable_hash, status: :ok }
+      { success: true, data: EventSerializer.new(event).serializable_hash, status: :accepted }
     rescue Mongoid::Errors::DocumentNotFound
       { success: false, data: { errors: "Event not found" }, status: :not_found }
     end
