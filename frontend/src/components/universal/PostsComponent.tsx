@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import Loader from "../Loader";
 import { API_BASE_URL } from "../../config";
 import PostItem from "../PostItem";
+import axios from "axios";
 
 type PostsComponentProps = {
   endpoint: string;
@@ -44,34 +45,28 @@ const PostsComponent: React.FC<PostsComponentProps> = ({ endpoint }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchPosts = useCallback(async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}${endpoint}`);
+      if (![200, 202].includes(response.status))
+        throw new Error("Failed to fetch posts");
+      
+      setPostsData(response.data.posts.data?.map((p: PostData) => p));
+    } catch (error) {
+      setError(`An error occurred: ${error}`);
+    } finally {
+      setLoading(false);
+    }
+  }, [endpoint]);
+
   useEffect(() => {
     if (!endpoint) {
       setError(`Invalid user ID`);
       setLoading(false);
       return;
     }
-
-    const fetchPosts = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`);
-        if (!response.ok) throw new Error("Failed to fetch posts");
-
-        const data = await response.json();
-        const posts = data.posts.data;
-
-        if (!Array.isArray(posts)) throw new Error("Invalid response data");
-        console.log(posts);
-
-        setPostsData(posts);
-      } catch (error) {
-        setError(`An error occurred: ${error}`);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchPosts();
-  }, [endpoint]);
+  }, [endpoint, fetchPosts]);
 
   const posts = useMemo(
     () =>

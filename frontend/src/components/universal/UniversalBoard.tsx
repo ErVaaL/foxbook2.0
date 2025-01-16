@@ -22,8 +22,8 @@ const UniversalBoard: React.FC<UniversalBoardProps> = ({ sections }) => {
             onClick={() => setActiveSection(section.label)}
             className={`px-4 py-2 rounded ${
               activeSection === section.label
-                ? "bg-blue-500 text-white dark:bg-blue-600"
-                : "bg-gray-200 text-black dark:bg-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700"
+                ? "bg-orange-500 text-white dark:bg-darkgoldenrod"
+                : "bg-gray-200 text-black dark:bg-[#2e2e2e] dark:text-white hover:bg-orange-600 dark:hover:bg-goldenrodhover"
             }`}
           >
             {section.label}
