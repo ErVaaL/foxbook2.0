@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Loader from "../../Loader";
 import { API_BASE_URL, API_ENDPOINTS } from "../../../config";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 type ProfileBoardGroupsProps = {
   userId: string;
@@ -8,9 +10,11 @@ type ProfileBoardGroupsProps = {
 
 type Group = {
   id: string;
-  name: string;
-  description: string;
-  isPublic: boolean;
+  attributes: {
+    name: string;
+    description: string;
+    is_public: boolean;
+  };
 };
 
 const ProfileBoardGroups: React.FC<ProfileBoardGroupsProps> = ({ userId }) => {
@@ -27,14 +31,10 @@ const ProfileBoardGroups: React.FC<ProfileBoardGroupsProps> = ({ userId }) => {
 
     const fetchGroups = async () => {
       try {
-        const response = await fetch(
+        const response = await axios.get(
           `${API_BASE_URL}${API_ENDPOINTS.USER_GROUPS(userId)}`,
         );
-        if (!response.ok) throw new Error("Failed to fetch groups");
-        const data = await response.json();
-        const groups = data.groups;
-        if (!Array.isArray(groups)) throw new Error("Invalid response data");
-        setGroups(groups);
+        setGroups(response.data.groups.map((group: Group) => group.data));
       } catch (error) {
         setError(`An error occurred: ${error}`);
       } finally {
@@ -49,11 +49,13 @@ const ProfileBoardGroups: React.FC<ProfileBoardGroupsProps> = ({ userId }) => {
 
   return (
     <div className="w-full p-4 m-0 text-center">
-      {groups.filter((group) => group.isPublic).length ? (
-        <div className="grid grid-cols-3 h-full gap-4 space-y-4">
+      {groups.filter((group) => group.attributes.is_public).length ? (
+        <div className="grid grid-cols-3 h-full gap-4 ">
           {groups.map(
             (group) =>
-              group.isPublic && <GroupItem key={group.id} {...group} />,
+              group.attributes.is_public && (
+                <GroupItem key={group.id} {...group} />
+              ),
           )}
         </div>
       ) : (
@@ -65,11 +67,15 @@ const ProfileBoardGroups: React.FC<ProfileBoardGroupsProps> = ({ userId }) => {
   );
 };
 
-const GroupItem: React.FC<Group> = ({ id, name, description }) => {
+const GroupItem: React.FC<Group> = ({ id, attributes: { name } }) => {
+  const navigate = useNavigate();
   return (
-    <div key={id} className="bg-white dark:bg-gray-800 p-4">
-      <h3 className="text-lg font-semibold">{name}</h3>
-      <p className="text-gray-500">{description}</p>
+    <div
+      key={id}
+      onClick={() => navigate(`/groups/${id}`)}
+      className="border rounded-lg border-gray-500 p-4 hover:cursor-pointer"
+    >
+      <h3 className="text-lg font-semibold text-gray-300">{name}</h3>
     </div>
   );
 };
