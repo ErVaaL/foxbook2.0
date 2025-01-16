@@ -1,6 +1,6 @@
 class Api::V1::GroupsController < ApplicationController
-  before_action :set_group, only: [ :show, :update, :destroy, :members, :add_member, :remove_member, :member_count, :member_posts, :member_events ]
-  before_action :authorize_request, only: [ :create, :update, :destroy, :add_member, :remove_member ]
+  before_action :set_group, except: [ :index, :create ]
+  before_action :authorize_request, except: [ :index, :show, :members, :member_posts, :member_events, :member_count ]
   before_action :set_service
 
 
@@ -45,13 +45,22 @@ class Api::V1::GroupsController < ApplicationController
     render json: result.except(:status), status: result[:status]
   end
 
+  def is_member
+    result = @service.is_member(@group, @current_user.id)
+    render json: result.except(:status), status: result[:status]
+  end
+
   def member_count
     result = @service.get_member_count(@group)
     render json: result.except(:status), status: result[:status]
   end
 
   def add_member
-    user = User.find(params[:user_id])
+    begin
+      user = User.find(params[:user_id])
+    rescue Mongoid::Errors::DocumentNotFound
+      render json: { success: false, error: "User not found" }, status: :not_found
+    end
     result = @service.add_group_member(@group, user)
     render json: result.except(:status), status: result[:status]
   end

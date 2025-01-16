@@ -43,11 +43,20 @@ module GroupServices
       { success: true, details: memberships.map { |membership| MembershipSerializer.new(membership).serializable_hash }, status: :ok }
     end
 
+    def is_member(group, user_id)
+      return no_group_error if group.nil?
+      user = User.find_by(id: user_id)
+      return user_not_found_error if user.nil?
+
+      membership = Membership.where(group: group, user: user).first
+      { success: true, details: MembershipSerializer.new(membership).serializable_hash, status: :ok }
+    end
+
     def get_member_posts(group)
       return no_group_error if group.nil?
       member_ids = group.memberships.pluck(:user_id)
       posts = Post.where(user_id: { "$in": member_ids })
-      { success: true, details: posts.map { |post| PostSerializer.new(post).serializable_hash }, status: :ok }
+      { success: true, posts: PostSerializer.new(posts).serializable_hash, status: :ok }
     end
 
     def get_member_events(group)

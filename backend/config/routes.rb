@@ -41,12 +41,15 @@ Rails.application.routes.draw do
 
       # Group routes
       resources :groups, only: [ :index, :show, :create, :update, :destroy ] do
-        get :members
-        post :members, to: "groups#add_member", as: :add_member
-        delete "members/:user_id", to: "groups#remove_member", as: :remove_member
-        get :member_count, on: :member
-        get :member_posts, on: :member
-        get :member_events, on: :member
+        member do
+          get :members
+          post :add_member
+          delete "members/:user_id", to: "groups#remove_member", as: :remove_member
+          get :member_count
+          get :member_posts
+          get :member_events
+          get :is_member
+        end
       end
 
       # Post routes
