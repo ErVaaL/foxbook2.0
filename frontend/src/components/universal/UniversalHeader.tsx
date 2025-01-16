@@ -4,6 +4,7 @@ type UniversalHeaderProps = {
   title: string;
   subtitle?: string;
   additionalInfo: string;
+  description: string;
   metaInfo?: Array<{ label: string; value: string }>;
   actions?: React.ReactNode;
 };
@@ -12,6 +13,7 @@ const UniversalHeader: React.FC<UniversalHeaderProps> = ({
   title,
   subtitle,
   additionalInfo,
+  description,
   metaInfo = [],
   actions,
 }) => {
@@ -32,6 +34,12 @@ const UniversalHeader: React.FC<UniversalHeaderProps> = ({
             </p>
           ))}
         </div>
+      </div>
+      <div className="flex-grow m-4 items-start h-full">
+        <p className="text-gray-500 dark:text-gray-300 self-start">About:</p>
+        <p className="px-4 text-gray-600 dark:text-gray-400 self-start">
+          {description}
+        </p>
       </div>
       <div className="flex space-x-2">{actions}</div>
     </div>

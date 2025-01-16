@@ -82,7 +82,7 @@ const InviteModal: React.FC<InviteModalProps> = ({ groupId, onClose }) => {
           ))}
         </ul>
         <button
-          className="mt-4 w-full bg-gray-400 p-2 rounded-lg"
+          className="mt-4 w-full bg-gray-200 hover:bg-gray-400 dark:bg-gray-400 dark:hover:bg-gray-500 p-2 rounded-lg"
           onClick={onClose}
         >
           Close

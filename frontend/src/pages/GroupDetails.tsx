@@ -146,12 +146,12 @@ const GroupDetails: React.FC = () => {
         title={group.attributes.name}
         subtitle={`Owner: ${group.attributes.owner.username}`}
         additionalInfo={`Email: ${group.attributes.owner.email}`}
+        description={group.attributes.description}
         metaInfo={[
           {
             label: "Visibility",
             value: group.attributes.is_public ? "Public" : "Private",
           },
-          { label: "About", value: group.attributes.description },
         ]}
         actions={
           <>
