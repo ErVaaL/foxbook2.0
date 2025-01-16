@@ -97,9 +97,19 @@ const EventItem: React.FC<Event> = ({ id, title, eventDate, host, hostId }) => {
   const navigate = useNavigate();
   return (
     <div className="bg-gray-200 dark:bg-gray-700 shadow-md rounded-lg p-4 text-left">
-      <h3 className="text-lg font-semibold dark:text-gray-200">Event: {title}</h3>
+      <h3
+        onClick={() => navigate(`/events/${id}`)}
+        className="text-lg font-semibold dark:text-gray-200 hover:cursor-pointer"
+      >
+        Event: {title}
+      </h3>
       <p className="text-gray-500 dark:text-gray-400">Time: {eventDate}</p>
-      <p className="text-gray-500 dark:text-gray-400 hover:cursor-pointer" onClick={()=>navigate(`/users/profile/${hostId}`)}>Hosted by: {host}</p>
+      <p
+        className="text-gray-500 dark:text-gray-400 hover:cursor-pointer"
+        onClick={() => navigate(`/users/profile/${hostId}`)}
+      >
+        Hosted by: {host}
+      </p>
     </div>
   );
 };
