@@ -29,6 +29,10 @@ export const API_ENDPOINTS = {
   GROUP_LEAVE: (groupId: string, userId: string) =>
     `/groups/${groupId}/members/${userId}`,
   EVENTS: "/events",
+  EVENT: (eventId: string) => `/events/${eventId}`,
+  EVENT_ATTEND: (eventId: string) => `/events/${eventId}/attendees`,
+  EVENT_UNATTEND: (eventId: string, userId: string) =>
+    `/events/${eventId}/attendees/${userId}`,
 };
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;

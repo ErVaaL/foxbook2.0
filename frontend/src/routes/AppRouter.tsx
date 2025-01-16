@@ -8,6 +8,7 @@ import Profile from "../pages/Profile";
 import Groups from "../pages/Groups";
 import Create from "../pages/Create";
 import GroupDetails from "../pages/GroupDetails";
+import Event from "../pages/Event";
 
 const AppRouter: React.FC = () => {
   return (
@@ -21,6 +22,7 @@ const AppRouter: React.FC = () => {
           <Route path="/groups" element={<Groups />} />
           <Route path="/create" element={<Create />} />
           <Route path="/groups/:id" element={<GroupDetails />} />
+          <Route path="/events/:id" element={<Event />} />
         </Route>
       </Routes>
     </Router>
