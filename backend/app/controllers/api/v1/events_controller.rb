@@ -1,5 +1,5 @@
 class Api::V1::EventsController < ApplicationController
-  before_action :authorize_request
+  before_action :authorize_request, except: [ :index, :show ]
   before_action :set_event, only: [ :show, :update, :destroy, :attendees, :attend, :unattend ]
   before_action :set_service
 

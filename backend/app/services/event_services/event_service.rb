@@ -53,7 +53,7 @@ module EventServices
     def unattend_event(user_id, event)
       return event_not_found_error if event.nil?
       return no_such_attendee_error unless event.attendees.include?(@current_user)
-      return not_the_same_user_error unless user_id == @current_user.id
+      return not_the_same_user_error unless user_id === @current_user.id.to_s
       event.unattend(@current_user)
       { success: true, data: { message: "User no longer attending event" }, status: :no_content }
     end
