@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
@@ -6,6 +6,7 @@ import { API_BASE_URL, API_ENDPOINTS } from "../config";
 import { useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import { RootState } from "../store";
+import Loader from "../components/Loader";
 
 export type GroupFormValues = {
   name: string;
@@ -19,6 +20,47 @@ const GroupCreation: React.FC = () => {
   const navigate = useNavigate();
   const isEditing = !!id;
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [initialValues, setInitialValues] = useState<GroupFormValues>({
+    name: "",
+    description: "",
+    is_public: true,
+  });
+  const [loading, setLoading] = useState<boolean>(isEditing);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isEditing || !id) return;
+
+    const fetchGroup = async () => {
+      try {
+        const response = await axios.get(
+          `${API_BASE_URL}${API_ENDPOINTS.GROUPS}/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        if (response.status !== 200) throw new Error("Failed to fetch group");
+
+        const groupData = response.data.data.attributes;
+        setInitialValues({
+          name: groupData.name,
+          description: groupData.description,
+          is_public: groupData.is_public,
+        });
+      } catch (error) {
+        setError(
+          error instanceof Error ? error.message : "Error fetching group data",
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGroup();
+  }, [id, isEditing, token]);
 
   const validationSchema = Yup.object({
     name: Yup.string()
@@ -71,6 +113,9 @@ const GroupCreation: React.FC = () => {
     }
   };
 
+  if (loading) return <Loader color="#4a90e2" size={60} />;
+  if (error) return <p className="text-red-500">{error}</p>;
+
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4 dark:text-gray-200">
@@ -84,7 +129,8 @@ const GroupCreation: React.FC = () => {
       )}
 
       <Formik
-        initialValues={{ name: "", description: "", is_public: true }}
+        initialValues={initialValues}
+        enableReinitialize={true}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >

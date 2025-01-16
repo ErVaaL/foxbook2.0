@@ -10,6 +10,7 @@ import { RootState } from "../store";
 import { useSelector } from "react-redux";
 import JoinGroup from "../components/groupsSubComponents/JoinGroup";
 import LeaveGroup from "../components/groupsSubComponents/LeaveGroup";
+import GroupCreation from "../forms/GroupCreation";
 
 const PostsComponent = React.lazy(
   () => import("../components/universal/PostsComponent"),
@@ -46,6 +47,9 @@ const GroupDetails: React.FC = () => {
   const { isLoggedIn, userId, token } = useSelector(
     (state: RootState) => state.auth,
   );
+  const [isEditing, setIsEditing] = useState(false);
+
+  const toggleEditing = () => setIsEditing((prev) => !prev);
 
   const fetchUserRole = useCallback(async () => {
     if (!id || !userId) return;
@@ -62,15 +66,8 @@ const GroupDetails: React.FC = () => {
       if (![200, 202].includes(response.status))
         throw new Error("Failed to fetch group members");
 
-      if (response.data.details.data === null) {
-        setUserRole(null);
-        return;
-      }
-
-      const member = response.data.details.data.attributes.role;
-      if (!member) throw new Error("You are not a member of this group");
-
-      setUserRole(member);
+      const memberData = response.data.details.data;
+      setUserRole(memberData ? memberData.attributes.role : null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     }
@@ -131,6 +128,14 @@ const GroupDetails: React.FC = () => {
     ];
   }, [group]);
 
+  const canEditGroup = useMemo(() => {
+    if (!group || !isLoggedIn || !userRole) return false;
+    return (
+      ["owner", "admin"].includes(userRole) ||
+      userId === group.attributes.owner.id
+    );
+  }, [group, isLoggedIn, userRole, userId]);
+
   const canInviteFriends = useMemo(() => {
     if (!group || !isLoggedIn || !userRole) return false;
     return group.attributes.is_public || ["owner", "admin"].includes(userRole);
@@ -140,48 +145,72 @@ const GroupDetails: React.FC = () => {
   if (error) return <p className="text-red-500">{error}</p>;
   if (!group) return <p>Group not found</p>;
 
+  const renderActions = () => {
+    if (!isLoggedIn) return null;
+
+    return (
+      <div className="flex space-x-3">
+        {canEditGroup && (
+          <button
+            onClick={toggleEditing}
+            className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded"
+          >
+            Edit Group
+          </button>
+        )}
+
+        {userRole === null && (
+          <JoinGroup
+            refreshGroupData={() => {
+              fetchGroup();
+              fetchUserRole();
+            }}
+          />
+        )}
+
+        {userRole !== null && userId !== group.attributes.owner.id && (
+          <LeaveGroup
+            refreshGroupData={() => {
+              fetchGroup();
+              fetchUserRole();
+            }}
+          />
+        )}
+
+        {canInviteFriends && (
+          <button
+            onClick={() => setShowInviteModal(true)}
+            className="px-4 py-2 bg-orange-500 hover:bg-orange-600 dark:bg-darkgoldenrod dark:hover:bg-goldenrodhover text-white rounded"
+          >
+            Invite Friend
+          </button>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="max-w-5xl mx-auto p-0 min-h-screen bg-gray-300 dark:bg-[#242424] transition-colors duration-200">
-      <UniversalHeader
-        title={group.attributes.name}
-        subtitle={`Owner: ${group.attributes.owner.username}`}
-        additionalInfo={`Email: ${group.attributes.owner.email}`}
-        description={group.attributes.description}
-        metaInfo={[
-          {
-            label: "Visibility",
-            value: group.attributes.is_public ? "Public" : "Private",
-          },
-        ]}
-        actions={
-          <>
-            {userRole === null ? (
-              <JoinGroup
-                refreshGroupData={() => {
-                  fetchGroup();
-                  fetchUserRole();
-                }}
-              />
-            ) : (
-              <LeaveGroup
-                refreshGroupData={() => {
-                  fetchGroup();
-                  fetchUserRole();
-                }}
-              />
-            )}
-            {canInviteFriends && (
-              <button
-                onClick={() => setShowInviteModal(true)}
-                className="px-4 py-2 bg-orange-500 hover:bg-orange-600 dark:bg-darkgoldenrod dark:hover:bg-goldenrodhover text-white rounded"
-              >
-                Invite Friend
-              </button>
-            )}
-          </>
-        }
-      />
-      <UniversalBoard sections={sections} />
+      {!isEditing ? (
+        <>
+          <UniversalHeader
+            title={group.attributes.name}
+            subtitle={`Owner: ${group.attributes.owner.username}`}
+            additionalInfo={`Email: ${group.attributes.owner.email}`}
+            description={group.attributes.description}
+            metaInfo={[
+              {
+                label: "Visibility",
+                value: group.attributes.is_public ? "Public" : "Private",
+              },
+            ]}
+            actions={renderActions()}
+          />
+          <UniversalBoard sections={sections} />
+        </>
+      ) : (
+        <GroupCreation />
+      )}
 
       {showInviteModal && (
         <InviteModal
