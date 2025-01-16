@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import axios from "axios";
 import Loader from "../Loader";
 import { API_BASE_URL } from "../../config";
+import { useNavigate } from "react-router-dom";
 
 type Member = {
   id: string;
@@ -24,6 +25,8 @@ const MembersComponent: React.FC<MembersComponentProps> = ({ endpoint }) => {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  const navigate = useNavigate();
 
   const fetchMembers = useCallback(async () => {
     setLoading(true);
@@ -53,6 +56,7 @@ const MembersComponent: React.FC<MembersComponentProps> = ({ endpoint }) => {
         username: member.attributes.user.username,
         email: member.attributes.user.email,
         role: member.attributes.role,
+        userId: member.attributes.user.id,
         joinedDate: new Date(member.attributes.created_at).toLocaleDateString(
           "en-UK",
         ),
@@ -78,7 +82,10 @@ const MembersComponent: React.FC<MembersComponentProps> = ({ endpoint }) => {
           className="p-2 rounded-lg w-full border border-gray-400 shadow"
         >
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-black dark:text-white">
+            <h3
+              onClick={() => navigate(`/users/profile/${member.userId}`)}
+              className="text-lg font-bold text-black dark:text-white hover:cursor-pointer"
+            >
               {member.username}
             </h3>
             <span className="text-sm text-gray-500 dark:text-gray-300">

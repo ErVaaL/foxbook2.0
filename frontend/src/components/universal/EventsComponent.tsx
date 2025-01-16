@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import axios from "axios";
 import Loader from "../Loader";
 import { API_BASE_URL } from "../../config";
+import { useNavigate } from "react-router-dom";
 
 type Event = {
   id: string;
@@ -28,6 +29,8 @@ const EventsComponent: React.FC<EventsComponentProps> = ({ endpoint }) => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  const navigate = useNavigate();
 
   const fetchEvents = useCallback(async () => {
     setLoading(true);
@@ -75,7 +78,10 @@ const EventsComponent: React.FC<EventsComponentProps> = ({ endpoint }) => {
           key={event.id}
           className="p-2 rounded-lg w-full border border-gray-400 shadow"
         >
-          <h3 className="text-lg font-bold text-black dark:text-white">
+          <h3
+            onClick={() => navigate(`/events/${event.id}`)}
+            className="text-lg font-bold text-black dark:text-white hover:cursor-pointer"
+          >
             {event.title}
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
