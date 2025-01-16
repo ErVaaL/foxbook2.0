@@ -24,6 +24,10 @@ export const API_ENDPOINTS = {
   GROUP_POSTS: (groupId: string) => `/groups/${groupId}/member_posts`,
   GROUP_EVENTS: (groupId: string) => `/groups/${groupId}/member_events`,
   GROUP_MEMBERS: (groupId: string) => `/groups/${groupId}/members`,
+  GROUP_IS_MEMBER: (groupId: string) => `/groups/${groupId}/is_member`,
+  GROUP_JOIN: (groupId: string) => `/groups/${groupId}/add_member`,
+  GROUP_LEAVE: (groupId: string, userId: string) =>
+    `/groups/${groupId}/members/${userId}`,
   EVENTS: "/events",
 };
 
