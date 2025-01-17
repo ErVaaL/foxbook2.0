@@ -6,6 +6,8 @@ import { FixedSizeGrid as Grid } from "react-window";
 import Loader from "../Loader";
 import GroupCard from "./GroupCard";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
 
 interface Group {
   id: string;
@@ -27,25 +29,25 @@ const GroupsBoardBody: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const { token } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
   const itemsPerPage = 12;
 
-  //TODO when user is member of group show it with (private) tag next to name
   useEffect(() => {
     const fetchGroups = async () => {
       setLoading(true);
       setError(null);
 
       try {
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
         const response = await axios.get(
           `${API_BASE_URL}${API_ENDPOINTS.GROUPS}`,
+          { headers },
         );
-        if (response.data.success === false)
+        if (response.status !== 200)
           throw new Error(`Error fetching groups: ${response}`);
         setGroups(
-          response.data.details
-            .map((group: Group) => group.data)
-            .filter((group: Group) => group.attributes.is_public),
+          response.data.details.map((group: { data: Group }) => group.data),
         );
       } catch (error) {
         setError(`Error fetching groups: ${error}`);
@@ -54,7 +56,7 @@ const GroupsBoardBody: React.FC = () => {
       }
     };
     fetchGroups();
-  }, []);
+  }, [token]);
 
   const currentGroups = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
