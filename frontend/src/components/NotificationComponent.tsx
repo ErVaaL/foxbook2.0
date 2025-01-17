@@ -5,7 +5,7 @@ import {
   fetchNotifications,
   toggleNotificationSeen,
 } from "../store/notificationSlice";
-import { FaBell, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaBell } from "react-icons/fa";
 import NotificationItem from "./notificationSubComponents/NotificationItem";
 
 const NotificationComponent: React.FC = () => {

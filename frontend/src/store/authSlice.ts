@@ -2,13 +2,13 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface AuthState {
   isLoggedIn: boolean;
-  token: string | null;
+  token: string;
   userId: string | null;
 }
 
 const initialState: AuthState = {
   isLoggedIn: false,
-  token: null,
+  token: "",
   userId: null,
 };
 
@@ -38,7 +38,7 @@ const authSlice = createSlice({
     logout: (state) => {
       sessionStorage.removeItem("authToken");
       state.isLoggedIn = false;
-      state.token = null;
+      state.token = "";
       state.userId = null;
     },
     validateToken: (state) => {
@@ -54,18 +54,18 @@ const authSlice = createSlice({
           } else {
             sessionStorage.removeItem("authToken");
             state.isLoggedIn = false;
-            state.token = null;
+            state.token = "";
             state.userId = null;
           }
         } catch {
           sessionStorage.removeItem("authToken");
           state.isLoggedIn = false;
-          state.token = null;
+          state.token = "";
           state.userId = null;
         }
       } else {
         state.isLoggedIn = false;
-        state.token = null;
+        state.token = "";
         state.userId = null;
       }
     },

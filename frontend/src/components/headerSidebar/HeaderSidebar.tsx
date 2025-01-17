@@ -3,11 +3,10 @@ import { FaHome, FaCog, FaUser, FaUsers, FaComments } from "react-icons/fa";
 import "./HeaderSidebar.module.css";
 import { useNavigate } from "react-router-dom";
 import ThemeSwitcher from "./ThemeSwitcher";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 
 const HeaderSidebar: React.FC = () => {
-  const dispatch = useDispatch();
   const { isLoggedIn, token } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
 

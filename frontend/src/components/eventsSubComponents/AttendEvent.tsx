@@ -4,9 +4,16 @@ import { API_BASE_URL, API_ENDPOINTS } from "../../config";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 
+export interface Event {
+  id: string;
+  attributes: {
+    attendees: { id: string; username: string }[];
+  };
+}
+
 type AttendEventProps = {
   eventId: string;
-  setEvent: React.Dispatch<React.SetStateAction<any>>;
+  setEvent: React.Dispatch<React.SetStateAction<Event>>;
 };
 
 const AttendEvent: React.FC<AttendEventProps> = ({ eventId, setEvent }) => {
@@ -14,13 +21,14 @@ const AttendEvent: React.FC<AttendEventProps> = ({ eventId, setEvent }) => {
 
   const handleAttend = async () => {
     try {
+      if (!userId || !token) throw new Error("User not logged in");
       await axios.post(
         `${API_BASE_URL}${API_ENDPOINTS.EVENT_ATTEND(eventId)}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
-      setEvent((prev) => ({
+      setEvent((prev: Event) => ({
         ...prev,
         attributes: {
           ...prev.attributes,

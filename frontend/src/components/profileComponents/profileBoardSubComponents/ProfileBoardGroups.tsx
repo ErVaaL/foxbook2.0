@@ -42,7 +42,9 @@ const ProfileBoardGroups: React.FC<ProfileBoardGroupsProps> = ({ userId }) => {
         );
         if (response.status !== 200)
           throw new Error(`Error fetching groups: ${response}`);
-        setGroups(response.data.groups.map((group: Group) => group.data));
+        setGroups(
+          response.data.groups.map((group: { data: Group }) => group.data),
+        );
       } catch (error) {
         setError(`An error occurred: ${error}`);
       } finally {

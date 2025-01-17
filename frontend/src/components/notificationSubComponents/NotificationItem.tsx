@@ -17,7 +17,7 @@ interface NotificationItemProps {
       type: string;
       was_seen: boolean;
       created_at: string;
-      content: Record<string, any>;
+      content: Record<string, unknown>;
     };
   };
   token: string;
@@ -29,11 +29,11 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 }) => {
   const dispatch: AppDispatch = useDispatch();
 
-  const acceptFriendRequest = async () => {
+  const acceptFriendRequest = async (senderId: string) => {
     if (!token) return;
     try {
       const response = await axios.patch(
-        `${API_BASE_URL}${API_ENDPOINTS.FRIEND_REQUEST_ACTION(notification.attributes.content.sender_id)}`,
+        `${API_BASE_URL}${API_ENDPOINTS.FRIEND_REQUEST_ACTION(senderId)}`,
         {},
         {
           headers: {
@@ -54,11 +54,11 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       console.error(error);
     }
   };
-  const rejectFriendRequest = async () => {
+  const rejectFriendRequest = async (senderId: string) => {
     if (!token) return;
     try {
       const response = await axios.delete(
-        `${API_BASE_URL}${API_ENDPOINTS.FRIEND_REQUEST_ACTION(notification.attributes.content.sender_id)}`,
+        `${API_BASE_URL}${API_ENDPOINTS.FRIEND_REQUEST_ACTION(senderId)}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -84,6 +84,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       dispatch(toggleNotificationSeen({ id: notification.id, token }));
     }
   };
+  const senderId = String(notification.attributes.content.sender_id);
 
   return (
     <div
@@ -94,19 +95,19 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
           : "bg-blue-100 font-bold"
       }`}
     >
-      <p>{notification.attributes.content.message}</p>
+      <p>{String(notification.attributes.content.message)}</p>
       <div className="flex gap-2 mt-2">
         {notification.attributes.type === "friend_request" &&
           !notification.attributes.content.action_taken && (
             <>
               <button
-                onClick={acceptFriendRequest}
+                onClick={() => acceptFriendRequest(senderId)}
                 className="text-green-500 text-sm"
               >
                 Accept
               </button>
               <button
-                onClick={rejectFriendRequest}
+                onClick={() => rejectFriendRequest(senderId)}
                 className="text-red-500 text-sm"
               >
                 Reject

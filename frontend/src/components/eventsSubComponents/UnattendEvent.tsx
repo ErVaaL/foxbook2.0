@@ -3,18 +3,19 @@ import axios from "axios";
 import { API_BASE_URL, API_ENDPOINTS } from "../../config";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
+import { Event } from "./AttendEvent";
 
 type UnattendEventProps = {
   eventId: string;
-  setEvent: React.Dispatch<React.SetStateAction<any>>;
+  setEvent: React.Dispatch<React.SetStateAction<Event>>;
 };
 
 const UnattendEvent: React.FC<UnattendEventProps> = ({ eventId, setEvent }) => {
   const { token, userId } = useSelector((state: RootState) => state.auth);
 
   const handleUnattend = async () => {
-    if (!token || !userId) return;
     try {
+      if (!token || !userId) throw new Error("User not logged in");
       await axios.delete(
         `${API_BASE_URL}${API_ENDPOINTS.EVENT_UNATTEND(eventId, userId)}`,
         {
@@ -22,7 +23,7 @@ const UnattendEvent: React.FC<UnattendEventProps> = ({ eventId, setEvent }) => {
         },
       );
 
-      setEvent((prev) => ({
+      setEvent((prev: Event) => ({
         ...prev,
         attributes: {
           ...prev.attributes,

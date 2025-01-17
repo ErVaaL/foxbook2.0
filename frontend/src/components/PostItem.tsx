@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Post } from "./PostsComponent";
+import { Post } from "./universal/PostsComponent";
 
 type PostItemProps = {
   post: Post;

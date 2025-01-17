@@ -36,6 +36,7 @@ export default [
       "@typescript-eslint/no-unused-vars": ["warn"], // Warn for unused variables
       "react-hooks/rules-of-hooks": "error", // Enforce hook rules
       "react-hooks/exhaustive-deps": "warn", // Warn for missing dependencies in hooks
+      "react/prop-types": "off", // Not needed with TypeScript
     },
     settings: {
       react: {

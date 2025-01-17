@@ -8,7 +8,7 @@ interface Notification {
   attributes: {
     was_seen: boolean;
     created_at: string;
-    content: Record<string, any>;
+    content: Record<string, unknown>;
   };
 }
 
@@ -39,8 +39,12 @@ export const fetchNotifications = createAsyncThunk(
       if (!response.data || !response.data.notifications.data)
         throw new Error("Error fetching user notifications");
       return response.data.notifications.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response.data);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(
+          error.response?.data || "Failed to fetch notifications",
+        );
+      }
     }
   },
 );
@@ -59,10 +63,12 @@ export const toggleNotificationSeen = createAsyncThunk(
       );
 
       return response.data.notification;
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data || "Failed to toggle notification seen status",
-      );
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(
+          error.response?.data || "Failed to update notification status",
+        );
+      }
     }
   },
 );
@@ -95,17 +101,19 @@ const notificationsSlice = createSlice({
       })
       .addCase(fetchNotifications.fulfilled, (state, action) => {
         state.loading = false;
-        state.notifications = action.payload.map((notification) => ({
-          ...notification,
-          attributes: {
-            ...notification.attributes,
-            content: {
-              ...notification.attributes.content,
-              action_taken:
-                notification.attributes.content.action_taken || false,
+        state.notifications = (action.payload as Notification[]).map(
+          (notification) => ({
+            ...notification,
+            attributes: {
+              ...notification.attributes,
+              content: {
+                ...notification.attributes.content,
+                action_taken:
+                  notification.attributes.content.action_taken || false,
+              },
             },
-          },
-        }));
+          }),
+        );
       })
       .addCase(fetchNotifications.rejected, (state, action) => {
         state.loading = false;

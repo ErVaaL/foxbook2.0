@@ -60,21 +60,25 @@ const PostBoardHeader: React.FC = () => {
 
       const flattenedResults = {
         users: (response.data.results.users || [])
-          .map((user: SearchResult) => (user.data ? user.data : null))
+          .map((user: { data: SearchResult }) => (user.data ? user.data : null))
           .filter(Boolean),
         groups: (response.data.results.groups || [])
-          .map((group: SearchResult) => (group.data ? group.data : null))
+          .map((group: { data: SearchResult }) =>
+            group.data ? group.data : null,
+          )
           .filter(Boolean),
         events: (response.data.results.events || [])
-          .map((event: SearchResult) => (event.data ? event.data : null))
+          .map((event: { data: SearchResult }) =>
+            event.data ? event.data : null,
+          )
           .filter(Boolean),
       };
 
       setResults(flattenedResults);
       setNoMatches(false);
       setShowResults(true);
-    } catch (error: any) {
-      if (error.response?.status === 404) {
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
         setResults({ users: [], groups: [], events: [] });
         setNoMatches(true);
       }
