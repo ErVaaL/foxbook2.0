@@ -48,6 +48,24 @@ class ApplicationController < ActionController::API
     end
   end
 
+  def set_optional_user
+    header = request.headers["Authorization"]
+    token = header&.split(" ")&.last
+
+    return unless token.present?
+
+    begin
+      decoded = JWT.decode(token, SECRET_KEY, true, { algorithm: "HS256" })[0]
+      unless BlackListedToken.exists?(token: token)
+        @current_user = User.find_by(id: decoded["user_id"])
+      end
+    rescue JWT::ExpiredSignature
+      nil
+    rescue JWT::DecodeError
+      nil
+    end
+  end
+
   def authorize_admin
     unless @current_user&.role == "admin" || @current_user&.role == "superadmin"
       render json: { error: "Must be admin to perforn this operation" }, status: :forbidden

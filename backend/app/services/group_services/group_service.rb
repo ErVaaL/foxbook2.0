@@ -1,7 +1,12 @@
 module GroupServices
   class GroupService < ApplicationService
-    def get_all_groups
-      groups = Group.all
+    def get_all_groups(user = nil)
+      if user
+        groups = Group.or({ is_public: true }, { id: { "$in": user.memberships.pluck(:group_id) } })
+      else
+        groups = Group.where(is_public: true)
+      end
+
       { success: true, details: groups.map { |group| GroupSerializer.new(group).serializable_hash }, status: :ok }
     end
 

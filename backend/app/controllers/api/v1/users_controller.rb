@@ -20,7 +20,8 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def groups
-    result = @service.get_user_groups(params[:id])
+    set_optional_user
+    result = @service.get_user_groups(params[:id], @current_user)
     render json: result.except(:status), status: result[:status]
   end
 

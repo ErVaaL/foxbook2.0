@@ -37,10 +37,20 @@ module UserServices
       { success: false, error: "User not found", status: :not_found }
     end
 
-    def get_user_groups(user_id)
+    def get_user_groups(user_id, current_user = nil)
       { success: false, error: "User not found", status: :not_found } unless User.find_by(id: user_id)
-      group_ids = Membership.where(user_id: user_id).pluck(:group_id)
-      groups = Group.where(id: { "$in": group_ids })
+      user_group_ids = Membership.where(user_id: user_id).pluck(:group_id)
+      if current_user.nil?
+        groups = Group.where(id: { "$in": user_group_ids }, is_public: true)
+      else
+        shared_private_group_ids = Membership.where(
+          user_id: current_user.id, group_id: { "$in": user_group_ids }
+        ).pluck(:group_id)
+        groups = Group.or(
+          { id: { "$in": user_group_ids }, is_public: true },
+          { id: { "$in": shared_private_group_ids } }
+        )
+      end
       { success: true, groups: groups.map { |group| GroupSerializer.new(group).serializable_hash }, status: :ok }
     rescue Mongoid::Errors::DocumentNotFound
       { success: false, error: "User not found", status: :not_found }
