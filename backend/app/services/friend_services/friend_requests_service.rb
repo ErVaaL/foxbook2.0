@@ -63,9 +63,13 @@ module FriendServices
         notification = Notification.find_by(
           user_id: user_id,
           "content.sender_id" => sender_id,
-          type: type
+          type: type,
+          "$or" => [ { "content.action_taken" => { "$exists" => false } }, { "content.action_taken" => false } ]
         )
-        notification.update!(content: notification.content.merge("action_taken" => true)) if notification
+
+        notification.update!(content: notification.content.merge("action_taken" => true), was_seen: true) if notification
+      rescue Mongoid::Errors::DocumentNotFound
+        nil
       end
   end
 end
