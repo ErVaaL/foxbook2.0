@@ -103,7 +103,7 @@ export const handleSubmit = async (
     };
 
     const userResponse = await fetch(
-      `${API_BASE_URL}${API_ENDPOINTS.USER_EDIT(userId)}`,
+      `${API_BASE_URL}${API_ENDPOINTS.USER(userId)}`,
       {
         method: "PUT",
         headers: {
