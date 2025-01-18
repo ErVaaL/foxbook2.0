@@ -5,9 +5,14 @@ import { useNavigate } from "react-router-dom";
 import ThemeSwitcher from "./ThemeSwitcher";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
+import DefaultAvatar from "../../assets/default-profile.png";
+
+const DEFAULT_PROFILE_AVATAR = DefaultAvatar;
 
 const HeaderSidebar: React.FC = () => {
-  const { isLoggedIn, token } = useSelector((state: RootState) => state.auth);
+  const { isLoggedIn, token, user } = useSelector(
+    (state: RootState) => state.auth,
+  );
   const navigate = useNavigate();
 
   const getUserIdFromToken = (): string | null => {
@@ -31,15 +36,20 @@ const HeaderSidebar: React.FC = () => {
     if (isLoggedIn) {
       return (
         <>
-          <button className="hover:text-white bg-orange-400 dark:bg-[#2e2e2e] hover:bg-orange-700 hover:dark:bg-[#b8860b]">
+          <button className="hover:text-white bg-orange-400 dark:bg-[#2e2e2e] hover:bg-orange-700 hover:dark:bg-darkgoldenrod">
             <FaCog size={24} />
           </button>
 
           <button
             onClick={() => handleProfileNavigation()}
-            className="hover:text-white bg-orange-400 dark:bg-[#2e2e2e] hover:bg-orange-700 hover:dark:bg-[#b8860b]"
+            className="hover:text-white bg-orange-400 dark:bg-[#2e2e2e] hover:bg-orange-700 hover:dark:bg-darkgoldenrod w-12 h-12 flex items-center justify-center"
           >
-            <FaUser size={24} />
+            <FaUser size={24} className="text-white" />
+            <img
+              src={user?.avatar}
+              alt={DEFAULT_PROFILE_AVATAR}
+              className="absolute w-10 h-10 rounded-full object-cover"
+            />
           </button>
         </>
       );
@@ -48,13 +58,13 @@ const HeaderSidebar: React.FC = () => {
     return (
       <div className="flex flex-col space-y-4">
         <a
-          className="text-center text-white no-underline dark:hover:text-[#b8860b] hover:text-orange-700 hover:cursor-pointer"
+          className="text-center text-white no-underline dark:hover:text-darkgoldenrod hover:text-orange-700 hover:cursor-pointer"
           onClick={() => navigate("/login")}
         >
           Sign In
         </a>
         <a
-          className="text-center text-white no-underline dark:hover:text-[#b8860b] hover:text-orange-700 hover:cursor-pointer"
+          className="text-center text-white no-underline dark:hover:text-darkgoldenrod hover:text-orange-700 hover:cursor-pointer"
           onClick={() => navigate("/register")}
         >
           Sign Up
@@ -92,7 +102,7 @@ const HeaderSidebar: React.FC = () => {
       <nav className="flex flex-col items-center space-y-6">
         <button
           onClick={() => navigate("/")}
-          className="hover:text-white bg-orange-400 dark:bg-[#2e2e2e] hover:bg-orange-700 hover:dark:bg-[#b8860b]"
+          className="hover:text-white bg-orange-400 dark:bg-[#2e2e2e] hover:bg-orange-700 hover:dark:bg-darkgoldenrod"
         >
           <FaHome size={24} />
         </button>

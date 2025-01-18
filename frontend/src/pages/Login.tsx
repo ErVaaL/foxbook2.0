@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../store";
-import { login } from "../store/authSlice";
+import { AppDispatch, RootState } from "../store";
+import { fetchUserData, login } from "../store/authSlice";
 import { API_BASE_URL, API_ENDPOINTS } from "../config";
 
 const Login: React.FC = () => {
@@ -11,7 +11,7 @@ const Login: React.FC = () => {
   const [error, setError] = useState<string>("");
 
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -40,6 +40,7 @@ const Login: React.FC = () => {
 
       const { token } = await response.json();
       dispatch(login({ token }));
+      await dispatch(fetchUserData(token));
       navigate("/");
     } catch (error) {
       setError(`An error occurred. ${error}`);
@@ -55,7 +56,7 @@ const Login: React.FC = () => {
           </h1>
           <button
             onClick={() => navigate("/")}
-            className="mt-4 bg-orange-600 hover:bg-orange-700 dark:bg-[#b8860b] dark:hover:bg-[#ae7c01] text-white py-2 px-4 rounded"
+            className="mt-4 bg-orange-600 hover:bg-orange-700 dark:bg-darkgoldenrod dark:hover:bg-goldenrodhover text-white py-2 px-4 rounded"
           >
             Go to Home
           </button>
@@ -105,7 +106,7 @@ const Login: React.FC = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-orange-600 hover:bg-orange-700 dark:bg-[#b8860b] dark:hover:bg-[#ae7c01] text-white py-2 rounded"
+            className="w-full bg-orange-600 hover:bg-orange-700 dark:bg-darkgoldenrod dark:hover:bg-goldenrodhover text-white py-2 rounded"
           >
             Log In
           </button>
@@ -113,7 +114,7 @@ const Login: React.FC = () => {
             Don&apos;t have an account?{" "}
             <a
               href="/register"
-              className="text-orange-600 hover:text-orange-700 dark:text-[#b8860b] dark:hover:text-[#ae7c01]"
+              className="text-orange-600 hover:text-orange-700 dark:text-darkgoldenrod dark:hover:text-goldenrodhover"
             >
               Sign Up
             </a>
