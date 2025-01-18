@@ -5,7 +5,6 @@ import { AppDispatch } from "../../store";
 import {
   markAsSeen,
   toggleNotificationSeen,
-  updateNotificationContent,
 } from "../../store/notificationSlice";
 import axios from "axios";
 import { API_BASE_URL, API_ENDPOINTS } from "../../config";
@@ -44,12 +43,6 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       );
       if (response.data.success) {
         console.log(`Friend request accepted, ${response.data}`);
-        dispatch(
-          updateNotificationContent({
-            id: notification.id,
-            content: { action_taken: true },
-          }),
-        );
         dispatch(markAsSeen(notification.id));
       }
     } catch (error) {
@@ -69,12 +62,6 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       );
       if (response.data.success) {
         console.log(`Friend request rejected, ${response.data}`);
-        dispatch(
-          updateNotificationContent({
-            id: notification.id,
-            content: { action_taken: true },
-          }),
-        );
         dispatch(markAsSeen(notification.id));
       }
     } catch (error) {

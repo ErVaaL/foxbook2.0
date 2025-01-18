@@ -84,7 +84,10 @@ const NotificationComponent: React.FC = () => {
 
   const dispatch: AppDispatch = useDispatch();
   const { token, user } = useSelector((state: RootState) => state.auth);
-  const { unreadNotifications, loading } = useUnreadNotifications();
+  const { notifications, loading } = useSelector(
+    (state: RootState) => state.notifications,
+  );
+  const { unreadNotifications } = useUnreadNotifications(notifications);
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -117,6 +120,12 @@ const NotificationComponent: React.FC = () => {
     };
   };
 
+  useEffect(() => {
+    if (token && unreadNotifications.length === 0) {
+      dispatch(fetchNotifications(token));
+    }
+  }, [token, dispatch, unreadNotifications.length]);
+
   const toggleSeen = (id: string) => {
     if (token) dispatch(toggleNotificationSeen({ id, token }));
   };
@@ -129,8 +138,6 @@ const NotificationComponent: React.FC = () => {
   const showNotificationDot =
     user?.notifications &&
     unreadNotifications.some((n) => !n.attributes.was_seen);
-
-  console.log(user?.notifications);
 
   return (
     <div
