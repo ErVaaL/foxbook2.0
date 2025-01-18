@@ -19,9 +19,22 @@ class NotificationsServices::NotificationsService < ApplicationService
 
   def create_notification(user_id:, type:, content:)
     notification = Notification.new(user_id: user_id, type: type, content: content)
-    { success: false, error: notification.errors.full_messages, status: :bad_request } unless notification.save
-    { success: true, message: NotificationSerializer.new(notification).serializable_hash, status: :created }
-  rescue StandardError => e
-    { success: false, error: e.message, status: :internal_server_error }
+
+    if notification.save!
+      notification.reload
+
+      serialized_notification = NotificationSerializer.new(notification).serializable_hash
+      formatted_notification = {
+        id: serialized_notification[:data][:id],  # Ensure single `id`
+        type: serialized_notification[:data][:type],
+        attributes: serialized_notification[:data][:attributes]
+      }
+
+      NotificationChannel.broadcast_to(User.find(user_id), formatted_notification)
+
+      { success: true, message: serialized_notification, status: :created }
+    else
+      { success: false, error: notification.errors.full_messages, status: :bad_request }
+    end
   end
 end
