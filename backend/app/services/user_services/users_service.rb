@@ -13,6 +13,13 @@ module UserServices
       end
     end
 
+    def get_user(user_id)
+      user = User.find(user_id)
+      { success: true, user: UserSerializer.new(user).serializable_hash, status: :ok }
+    rescue Mongoid::Errors::DocumentNotFound
+      { success: false, error: "User not found", status: :not_found }
+    end
+
     def update_user(user_id, user_params)
       user = User.find_by(id: user_id)
       return { success: false, error: "User not found", status: :not_found } unless user
