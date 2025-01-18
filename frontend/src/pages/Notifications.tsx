@@ -26,6 +26,12 @@ const Notifications: React.FC = () => {
     }
   }, [isLoggedIn, token, dispatch]);
 
+  const pendingCount = useMemo(
+    () =>
+      notifications.filter((n) => !n.attributes.content.action_taken).length,
+    [notifications],
+  );
+
   const unreadCount = useMemo(
     () => notifications.filter((n) => !n.attributes.was_seen).length,
     [notifications],
@@ -105,7 +111,8 @@ const Notifications: React.FC = () => {
     <div className="max-w-5xl mx-auto p-4 min-h-screen bg-gray-300 dark:bg-[#242424] transition-colors duration-200">
       <UniversalHeader
         title="Notifications"
-        additionalInfo={`Unread: ${unreadCount}`}
+        subtitle={`Unread: ${unreadCount}`}
+        additionalInfo={`Pending: ${pendingCount}`}
         description="Manage and view your notifications."
       />
       <UniversalBoard sections={sections} />

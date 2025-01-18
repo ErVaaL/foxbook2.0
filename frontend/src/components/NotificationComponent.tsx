@@ -7,9 +7,10 @@ import {
 } from "../store/notificationSlice";
 import { FaBell } from "react-icons/fa";
 import NotificationItem from "./notificationSubComponents/NotificationItem";
+import useUnreadNotifications from "../hooks/useUnreadNotifications";
+import { useNavigate } from "react-router-dom";
 
 const NotificationComponent: React.FC = () => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [position, setPosition] = useState<{ x: number; y: number }>({
     x: 1550,
     y: 20,
@@ -20,23 +21,6 @@ const NotificationComponent: React.FC = () => {
     y: 0,
   });
   const [dragged, setDragged] = useState(false);
-
-  const dispatch: AppDispatch = useDispatch();
-  const { notifications, loading } = useSelector(
-    (state: RootState) => state.notifications,
-  );
-
-  const { token } = useSelector((state: RootState) => state.auth);
-
-  const toggleDropdown = () => {
-    if (!dragged) {
-      setIsOpen(!isOpen);
-      if (!isOpen && token) {
-        dispatch(fetchNotifications(token));
-      }
-    }
-    setDragged(false);
-  };
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setDragging(true);
@@ -66,7 +50,6 @@ const NotificationComponent: React.FC = () => {
     },
     [dragging, dragStart],
   );
-
   const handleMouseUp = () => {
     setDragging(false);
   };
@@ -76,6 +59,13 @@ const NotificationComponent: React.FC = () => {
     const adjustedY = Math.min(position.y, window.innerHeight - 40);
     setPosition({ x: adjustedX, y: adjustedY });
   }, [position]);
+
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [handleResize]);
 
   useEffect(() => {
     if (dragging) {
@@ -92,12 +82,22 @@ const NotificationComponent: React.FC = () => {
     };
   }, [dragging, handleMouseMove]);
 
-  useEffect(() => {
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [handleResize]);
+  const dispatch: AppDispatch = useDispatch();
+  const { token } = useSelector((state: RootState) => state.auth);
+  const { unreadNotifications, loading } = useUnreadNotifications();
+
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const navigate = useNavigate();
+
+  const toggleDropdown = () => {
+    if (!dragged) {
+      setIsOpen(!isOpen);
+      if (!isOpen && token) {
+        dispatch(fetchNotifications(token));
+      }
+    }
+    setDragged(false);
+  };
 
   const getDropdownPosition = () => {
     const dropdownWidth = 320;
@@ -121,6 +121,11 @@ const NotificationComponent: React.FC = () => {
     if (token) dispatch(toggleNotificationSeen({ id, token }));
   };
 
+  const handleGoToNotifications = () => {
+    setIsOpen(false);
+    navigate("/notifications");
+  };
+
   return (
     <div
       style={{
@@ -136,7 +141,7 @@ const NotificationComponent: React.FC = () => {
         className="w-10 h-10 rounded-full bg-orange-600 hover:bg-orange-500 text-white dark:bg-gray-600 dark:hover:bg-darkgoldenrod flex items-center justify-center relative cursor-move"
       >
         <FaBell />
-        {notifications.some((n) => !n.attributes.was_seen) && (
+        {unreadNotifications.some((n) => !n.attributes.was_seen) && (
           <span className="absolute top-0 right-0 w-3 h-3 rounded-full bg-blue-500 dark:bg-red-500"></span>
         )}
       </button>
@@ -146,13 +151,23 @@ const NotificationComponent: React.FC = () => {
           className="absolute mt-2 bg-gray-400 dark:bg-gray-300 shadow-lg rounded-lg max-h-96 overflow-y-auto z-50 w-80"
           style={getDropdownPosition()}
         >
-          <div className="p-4">
+          <h3
+            onClick={handleGoToNotifications}
+            className="text-center p-1 font-bold hover:text-orange-300 dark:hover:text-goldenrodhover hover:cursor-pointer"
+          >
+            Go to your notifications
+          </h3>
+          <div className="p-4 transition-colors duration-200">
             {loading ? (
-              <p>Loading notifications...</p>
-            ) : notifications.length === 0 ? (
-              <p>You don&apos;t have any notifications</p>
+              <p className="text-white dark:text-gray-800">
+                Loading notifications...
+              </p>
+            ) : unreadNotifications.length === 0 ? (
+              <p className="text-white dark:text-gray-800">
+                You don&apos;t have any notifications
+              </p>
             ) : (
-              notifications.map((notification) => (
+              unreadNotifications.map((notification) => (
                 <NotificationItem
                   key={notification.id}
                   notification={notification}
