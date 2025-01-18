@@ -8,6 +8,8 @@ interface User {
   username: string;
   avatar?: string;
   friends?: string[];
+  notifications?: boolean;
+  privacy?: "public" | "private" | "friends_only";
 }
 
 interface AuthState {
@@ -62,6 +64,8 @@ export const fetchUserData = createAsyncThunk(
         username: userData.username || "",
         avatar: userData.avatar || "",
         friends: userData.friends || [],
+        notifications: userData.settings?.notifications ?? true,
+        privacy: userData.settings?.privacy ?? "private",
       };
     } catch (error) {
       if (axios.isAxiosError(error)) {

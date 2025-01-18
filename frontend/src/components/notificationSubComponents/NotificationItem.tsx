@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { AppDispatch } from "../../store";
 import {
+  markAsSeen,
   toggleNotificationSeen,
   updateNotificationContent,
 } from "../../store/notificationSlice";
@@ -49,6 +50,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
             content: { action_taken: true },
           }),
         );
+        dispatch(markAsSeen(notification.id));
       }
     } catch (error) {
       console.error(error);
@@ -73,6 +75,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
             content: { action_taken: true },
           }),
         );
+        dispatch(markAsSeen(notification.id));
       }
     } catch (error) {
       console.error(error);

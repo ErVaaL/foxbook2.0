@@ -83,7 +83,7 @@ const NotificationComponent: React.FC = () => {
   }, [dragging, handleMouseMove]);
 
   const dispatch: AppDispatch = useDispatch();
-  const { token } = useSelector((state: RootState) => state.auth);
+  const { token, user } = useSelector((state: RootState) => state.auth);
   const { unreadNotifications, loading } = useUnreadNotifications();
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -126,6 +126,12 @@ const NotificationComponent: React.FC = () => {
     navigate("/notifications");
   };
 
+  const showNotificationDot =
+    user?.notifications &&
+    unreadNotifications.some((n) => !n.attributes.was_seen);
+
+  console.log(user?.notifications);
+
   return (
     <div
       style={{
@@ -141,7 +147,7 @@ const NotificationComponent: React.FC = () => {
         className="w-10 h-10 rounded-full bg-orange-600 hover:bg-orange-500 text-white dark:bg-gray-600 dark:hover:bg-darkgoldenrod flex items-center justify-center relative cursor-move"
       >
         <FaBell />
-        {unreadNotifications.some((n) => !n.attributes.was_seen) && (
+        {showNotificationDot && (
           <span className="absolute top-0 right-0 w-3 h-3 rounded-full bg-blue-500 dark:bg-red-500"></span>
         )}
       </button>
