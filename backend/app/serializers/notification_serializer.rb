@@ -1,7 +1,7 @@
 class NotificationSerializer
   include JSONAPI::Serializer
 
-  attributes :id, :type, :was_seen, :created_at
+  attributes :type, :was_seen, :created_at, :user_id
 
   attribute :content do |notification|
     case notification.type
