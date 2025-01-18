@@ -23,4 +23,8 @@ class ProfileSerializer
       avatar: profile.user.avatar
     }
   end
+
+  attribute :privacy do |profile|
+    profile.user.settings&.privacy || "private"
+  end
 end
