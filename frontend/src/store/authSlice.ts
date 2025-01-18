@@ -7,6 +7,7 @@ interface User {
   email: string;
   username: string;
   avatar?: string;
+  friends?: string[];
 }
 
 interface AuthState {
@@ -60,6 +61,7 @@ export const fetchUserData = createAsyncThunk(
         email: userData.email || "",
         username: userData.username || "",
         avatar: userData.avatar || "",
+        friends: userData.friends || [],
       };
     } catch (error) {
       if (axios.isAxiosError(error)) {

@@ -19,6 +19,9 @@ type ProfileBoardProps = {
   phone: string;
   birthday: string;
   address: Address;
+  privacy: "public" | "private" | "friends_only";
+  isFriend: boolean;
+  isOwner: boolean;
 };
 
 const ProfileBoard: React.FC<ProfileBoardProps> = ({
@@ -26,10 +29,17 @@ const ProfileBoard: React.FC<ProfileBoardProps> = ({
   phone,
   birthday,
   address,
+  privacy,
+  isFriend,
+  isOwner,
 }) => {
   const [activeSession, setActiveSession] = useState<string>("Posts");
   const { userId } = useParams<{ userId: string }>();
   if (!userId) return <div>Invalid user ID</div>;
+
+  // ✅ Define what should be visible
+  const canViewDetails =
+    privacy === "public" || isOwner || (privacy === "friends_only" && isFriend);
 
   return (
     <div className="flex-grow">
@@ -45,19 +55,35 @@ const ProfileBoard: React.FC<ProfileBoardProps> = ({
       <div className="relative w-full h-12">
         <span className="absolute top-7 left-0 right-0 h-px bg-gradient-to-r from-transparent dark:via-gray-400 via-gray-500 to-transparent"></span>
       </div>
-      {activeSession === "Posts" && (
-        <PostsComponent endpoint={API_ENDPOINTS.USER_POSTS(userId)} />
-      )}
-      {activeSession === "Groups" && <ProfileBoardGroups userId={userId} />}
-      {activeSession === "Friends" && <ProfileBoardFriends userId={userId} />}
-      {activeSession === "Events" && <ProfileBoardEvents userId={userId} />}
-      {activeSession === "About" && (
-        <ProfileBoardAbout
-          email={email}
-          phone={phone}
-          birthday={birthday}
-          address={address}
-        />
+
+      {canViewDetails ? (
+        <>
+          {activeSession === "Posts" && (
+            <PostsComponent endpoint={API_ENDPOINTS.USER_POSTS(userId)} />
+          )}
+          {activeSession === "Groups" && <ProfileBoardGroups userId={userId} />}
+          {activeSession === "Friends" && (
+            <ProfileBoardFriends userId={userId} />
+          )}
+          {activeSession === "Events" && <ProfileBoardEvents userId={userId} />}
+          {activeSession === "About" && (
+            <ProfileBoardAbout
+              email={email}
+              phone={phone}
+              birthday={birthday}
+              address={address}
+            />
+          )}
+        </>
+      ) : (
+        <div className="text-center text-gray-700 dark:text-gray-300">
+          <p>This profile is private.</p>
+          <p>
+            {privacy === "friends_only"
+              ? "Only friends can see full details."
+              : "Only the profile owner can see full details."}
+          </p>
+        </div>
       )}
     </div>
   );
