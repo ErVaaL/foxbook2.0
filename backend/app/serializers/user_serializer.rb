@@ -5,7 +5,7 @@ class UserSerializer
   attribute :settings do |user|
     {
       privacy: user.settings&.privacy || "private",
-      notifications: user.settings&.notifications || true
+      notifications: user.settings&.notifications.nil? ? true : user.settings.notifications
     }
   end
 end

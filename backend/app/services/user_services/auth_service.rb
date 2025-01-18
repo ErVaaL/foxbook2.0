@@ -4,7 +4,7 @@ module UserServices
       user = User.find_by(email: auth_params[:email])
       if user && user.authenticate(auth_params[:password])
         token = issue_token(user)
-        { success: true, message: "User logged in successfully", user: user, token: token, status: :accepted }
+        { success: true, message: "User logged in successfully", user: UserSerializer.new(user).serializable_hash, token: token, status: :accepted }
       else
         { success: false, error: "Invalid email or password", status: :unauthorized }
       end
