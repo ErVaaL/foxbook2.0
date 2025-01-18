@@ -9,8 +9,8 @@ class Api::V1::SettingsController < ApplicationController
   end
 
   def update
-    preferences_params = needed_params(:settings, [ :theme, :language, :notifications, :privacy ])
-    result = @service.update(preferences_params)
+    settings_params = needed_params(:settings, [ :theme, :language, :notifications, :privacy ])
+    result = @service.update(@current_user, settings_params)
     render json: result.except(:status), status: result[:status]
   end
 
