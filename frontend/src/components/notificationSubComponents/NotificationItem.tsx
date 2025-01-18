@@ -84,21 +84,21 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       dispatch(toggleNotificationSeen({ id: notification.id, token }));
     }
   };
-  const senderId = String(notification.attributes.content.sender_id);
+  const senderId = String(notification.attributes.content?.sender_id || "");
 
   return (
     <div
       key={notification.id}
-      className={`p-3 border-b rounded-lg ${
+      className={`p-3 rounded-lg ${
         notification.attributes.was_seen
-          ? "bg-gray-100"
-          : "bg-blue-100 font-bold"
+          ? "bg-gray-100 dark:bg-[#3c3c3c] dark:text-gray-300"
+          : "bg-orange-100 dark:bg-[#fcdc8d] font-bold"
       }`}
     >
-      <p>{String(notification.attributes.content.message)}</p>
+      <p>{String(notification.attributes.content?.message || "No message")}</p>
       <div className="flex gap-2 mt-2">
         {notification.attributes.type === "friend_request" &&
-          !notification.attributes.content.action_taken && (
+          !notification.attributes.content?.action_taken && (
             <>
               <button
                 onClick={() => acceptFriendRequest(senderId)}
@@ -114,9 +114,11 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
               </button>
             </>
           )}
-        <button onClick={toggleSeen} className="text-blue-500 text-sm">
-          {notification.attributes.was_seen ? <FaEyeSlash /> : <FaEye />}
-        </button>
+        {!notification.attributes.content?.action_taken && (
+          <button onClick={toggleSeen} className="text-blue-500 text-sm">
+            {notification.attributes.was_seen ? <FaEyeSlash /> : <FaEye />}
+          </button>
+        )}
       </div>
     </div>
   );

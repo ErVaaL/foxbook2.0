@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { API_BASE_URL, API_ENDPOINTS } from "../config";
 
-interface Notification {
+export interface Notification {
   id: string;
   type: string;
   attributes: {
