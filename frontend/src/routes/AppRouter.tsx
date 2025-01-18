@@ -10,6 +10,7 @@ import Create from "../pages/Create";
 import GroupDetails from "../pages/GroupDetails";
 import Event from "../pages/Event";
 import Notifications from "../pages/Notifications";
+import Settings from "../pages/Settings";
 
 const AppRouter: React.FC = () => {
   return (
@@ -25,6 +26,7 @@ const AppRouter: React.FC = () => {
           <Route path="/groups/:id" element={<GroupDetails />} />
           <Route path="/events/:id" element={<Event />} />
           <Route path="/notifications" element={<Notifications />} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
       </Routes>
     </Router>
