@@ -27,7 +27,7 @@ const PostsComponent: React.FC<PostsComponentProps> = ({ userId, groupId }) => {
   if (!posts.length) return <p>No posts available.</p>;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-4">
       {posts.map((post) => (
         <PostItem key={post.id} postId={post.id} />
       ))}
