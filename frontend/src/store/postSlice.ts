@@ -91,11 +91,23 @@ const getErrorMessage = (error: unknown): string => {
 
 export const fetchPosts = createAsyncThunk(
   "posts/fetchPosts",
-  async ({ userId }: { userId?: string }, { rejectWithValue }) => {
+  async (
+    { userId, groupId }: { userId?: string; groupId?: string },
+    { rejectWithValue },
+  ) => {
     try {
-      const endpoint = userId
-        ? `${API_BASE_URL}${API_ENDPOINTS.USER_POSTS(userId)}`
-        : `${API_BASE_URL}${API_ENDPOINTS.POSTS}`;
+      let endpoint;
+
+      switch (true) {
+        case !!groupId:
+          endpoint = `${API_BASE_URL}${API_ENDPOINTS.GROUP_POSTS(groupId!)}`;
+          break;
+        case !!userId:
+          endpoint = `${API_BASE_URL}${API_ENDPOINTS.USER_POSTS(userId!)}`;
+          break;
+        default:
+          endpoint = `${API_BASE_URL}${API_ENDPOINTS.POSTS}`;
+      }
 
       const response = await axios.get(endpoint);
       const rawPosts: RawPost[] = response.data.posts.data || [];

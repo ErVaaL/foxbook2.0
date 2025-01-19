@@ -103,9 +103,7 @@ const GroupDetails: React.FC = () => {
     return [
       {
         label: "Posts",
-        component: (
-          <PostsComponent endpoint={`${API_ENDPOINTS.GROUP_POSTS(group.id)}`} />
-        ),
+        component: <PostsComponent groupId={group.id}/>,
       },
       {
         label: "Events",

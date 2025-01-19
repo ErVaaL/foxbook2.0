@@ -1,44 +1,36 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
-import {
-  fetchPosts,
-  selectAllPosts,
-  selectLoading,
-  selectError,
-} from "../../store/postSlice";
+import { fetchPosts, selectAllPosts } from "../../store/postSlice";
 import Loader from "../Loader";
 import PostItem from "../PostItem";
 
-type PostsComponentProps = {
+interface PostsComponentProps {
   userId?: string;
-};
+  groupId?: string;
+}
 
-const PostsComponent: React.FC<PostsComponentProps> = ({ userId }) => {
+const PostsComponent: React.FC<PostsComponentProps> = ({ userId, groupId }) => {
   const dispatch = useDispatch<AppDispatch>();
-
   const posts = useSelector((state: RootState) =>
     selectAllPosts(state, userId),
   );
-  const loading = useSelector(selectLoading);
-  const error = useSelector(selectError);
+  const loading = useSelector((state: RootState) => state.posts.loading);
+  const error = useSelector((state: RootState) => state.posts.error);
 
   useEffect(() => {
-    dispatch(fetchPosts({ userId }));
-  }, [dispatch, userId]);
+    dispatch(fetchPosts({ userId, groupId }));
+  }, [dispatch, userId, groupId]);
 
-  if (loading) return <Loader color="#4a90e2" size={60} />;
-  if (error) return <div className="text-red-500">{error}</div>;
+  if (loading) return <Loader size={50} />;
+  if (error) return <p className="text-red-500">{error}</p>;
+  if (!posts.length) return <p>No posts available.</p>;
 
   return (
-    <div className="flex flex-col p-2 m-0 gap-4 items-center">
-      {posts.length ? (
-        posts.map((post) => <PostItem key={post.id} postId={post.id} />)
-      ) : (
-        <div className="text-center text-gray-500 place-self-center">
-          <p>There are no posts to be shown</p>
-        </div>
-      )}
+    <div className="space-y-4">
+      {posts.map((post) => (
+        <PostItem key={post.id} postId={post.id} />
+      ))}
     </div>
   );
 };
