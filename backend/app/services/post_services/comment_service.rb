@@ -1,9 +1,20 @@
 module PostServices
   class CommentService < BasePostsService
-    def get_post_comments(post)
+    def get_post_comments(post, page, per_page)
       return post_not_found_error unless post
-      comemnts = post.comments.order(created_at: :desc)
-      { success: true, data: CommentSerializer.new(comemnts).serializable_hash, status: :ok }
+      comments = post.comments.order(created_at: :desc)
+        .skip((page - 1) * per_page).limit(per_page)
+
+      total_comments = post.comments.count
+      total_pages = (total_comments / per_page.to_f).ceil
+      { success: true,
+        data: CommentSerializer.new(comments).serializable_hash,
+        pagination: {
+          current_page: page,
+          per_page: per_page,
+          total_comments: total_comments,
+          total_pages: total_pages
+      }, status: :ok }
     end
 
     def get_comment(comment)

@@ -5,7 +5,10 @@ class Api::V1::CommentsController < ApplicationController
   before_action :set_service
 
   def index
-    result = @service.get_post_comments(@post)
+    page = params[:page].to_i > 0 ? params[:page].to_i : 1
+    per_page = (params[:per_page] || 10).to_i
+
+    result = @service.get_post_comments(@post, page, per_page)
     render json: result.except(:status), status: result[:status]
   end
 

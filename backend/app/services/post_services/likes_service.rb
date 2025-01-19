@@ -15,7 +15,7 @@ module PostServices
     def unlike_post(user_id, post)
       return post_not_found_error if post.nil?
       return post_not_liked_error unless post.liked_by?(@current_user.id)
-      return not_the_same_user_error unless user_id == @current_user.id
+      return not_the_same_user_error unless user_id == @current_user.id.to_s
       post.unlike!(@current_user)
       { success: true, message: "Post unliked successfully", status: :no_content }
     end
