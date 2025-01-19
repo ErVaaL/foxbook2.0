@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import axios from "axios";
 import Loader from "../Loader";
 import { API_BASE_URL } from "../../config";
-import { useNavigate } from "react-router-dom";
+import MemberCard from "./MemberCard";
 
 type Member = {
   id: string;
@@ -25,8 +25,6 @@ const MembersComponent: React.FC<MembersComponentProps> = ({ endpoint }) => {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  const navigate = useNavigate();
 
   const fetchMembers = useCallback(async () => {
     setLoading(true);
@@ -77,28 +75,7 @@ const MembersComponent: React.FC<MembersComponentProps> = ({ endpoint }) => {
         All members: {formattedMembers.length}
       </h3>
       {formattedMembers.map((member) => (
-        <div
-          key={member.id}
-          className="p-2 rounded-lg w-full border border-gray-400 shadow"
-        >
-          <div className="flex items-center justify-between">
-            <h3
-              onClick={() => navigate(`/users/profile/${member.userId}`)}
-              className="text-lg font-bold text-black dark:text-white hover:cursor-pointer"
-            >
-              {member.username}
-            </h3>
-            <span className="text-sm text-gray-500 dark:text-gray-300">
-              {member.role}
-            </span>
-          </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Email: {member.email}
-          </p>
-          <p className="text-xs text-gray-500 dark:text-gray-300">
-            Joined on: {member.joinedDate}
-          </p>
-        </div>
+        <MemberCard key={member.id} member={member} />
       ))}
     </div>
   );
