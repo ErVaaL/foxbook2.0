@@ -130,6 +130,51 @@ export const fetchPosts = createAsyncThunk(
   },
 );
 
+export const updatePost = createAsyncThunk(
+  "posts/updatePost",
+  async (
+    {
+      postId,
+      title,
+      contents,
+    }: { postId: string; title: string; contents: string },
+    { rejectWithValue, getState },
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const token = state.auth.token;
+
+      await axios.patch(
+        `${API_BASE_URL}${API_ENDPOINTS.POST(postId)}`,
+        { posts: { title, contents } },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      return { postId, title, contents };
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error));
+    }
+  },
+);
+
+export const deletePost = createAsyncThunk(
+  "posts/deletePost",
+  async (postId: string, { rejectWithValue, getState }) => {
+    try {
+      const state = getState() as RootState;
+      const token = state.auth.token;
+
+      await axios.delete(`${API_BASE_URL}${API_ENDPOINTS.POST(postId)}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      return postId;
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error));
+    }
+  },
+);
+
 export const likePost = createAsyncThunk(
   "posts/likeOrUnlike",
   async (postId: string, { rejectWithValue, getState }) => {
@@ -229,8 +274,61 @@ export const addComment = createAsyncThunk(
         },
       );
 
-      const comment = response.data?.comment ?? null;
-      return { postId, comment };
+      const newComment = response.data?.comment;
+      if (!newComment) throw new Error("Failed to add comment");
+
+      return { postId, newComment };
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error));
+    }
+  },
+);
+
+export const updateComment = createAsyncThunk(
+  "posts/updateComment",
+  async (
+    {
+      commentId,
+      postId,
+      content,
+    }: { commentId: string; postId: string; content: string },
+    { rejectWithValue, getState },
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const token = state.auth.token;
+
+      await axios.patch(
+        `${API_BASE_URL}${API_ENDPOINTS.POST_COMMENTS(postId)}/${commentId}`,
+        { comments: { content } },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      return { postId, commentId, content };
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error));
+    }
+  },
+);
+
+export const deleteComment = createAsyncThunk(
+  "posts/deleteComment",
+  async (
+    { commentId, postId }: { commentId: string; postId: string },
+    { rejectWithValue, getState },
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const token = state.auth.token;
+
+      await axios.delete(
+        `${API_BASE_URL}${API_ENDPOINTS.POST_COMMENTS(postId)}/${commentId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      return { postId, commentId };
     } catch (error) {
       return rejectWithValue(getErrorMessage(error));
     }
@@ -254,6 +352,15 @@ const postSlice = createSlice({
         };
       }
     },
+    updateCommentCount: (
+      state,
+      action: PayloadAction<{ postId: string; change: number }>,
+    ) => {
+      const { postId, change } = action.payload;
+      if (state.posts[postId]) {
+        state.posts[postId].comments_count += change;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -266,6 +373,26 @@ const postSlice = createSlice({
         state.posts = action.payload;
       })
       .addCase(fetchPosts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = getErrorMessage(action.payload);
+      })
+      .addCase(updatePost.fulfilled, (state, action) => {
+        const { postId, title, contents } = action.payload;
+        if (state.posts[postId]) {
+          state.posts[postId].title = title;
+          state.posts[postId].contents = contents;
+        }
+      })
+      .addCase(deletePost.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deletePost.fulfilled, (state, action) => {
+        const postId = action.payload;
+        delete state.posts[postId];
+        state.loading = false;
+      })
+      .addCase(deletePost.rejected, (state, action) => {
         state.loading = false;
         state.error = getErrorMessage(action.payload);
       })
@@ -285,6 +412,37 @@ const postSlice = createSlice({
       .addCase(fetchComments.fulfilled, (state, action) => {
         if (!isPayloadValid(action)) return;
         state.comments[action.payload.postId] = action.payload.comments;
+      })
+      .addCase(addComment.fulfilled, (state, action) => {
+        const { postId, newComment } = action.payload;
+
+        if (state.posts[postId]) state.posts[postId].comments_count += 1;
+
+        if (state.comments[postId]) {
+          state.comments[postId] = [newComment, ...state.comments[postId]];
+        } else {
+          state.comments[postId] = [newComment];
+        }
+      })
+      .addCase(updateComment.fulfilled, (state, action) => {
+        const { postId, commentId, content } = action.payload;
+        if (state.comments[postId]) {
+          const comment = state.comments[postId].find(
+            (c) => c.id === commentId,
+          );
+          if (comment) comment.content = content;
+        }
+      })
+      .addCase(deleteComment.fulfilled, (state, action) => {
+        const { postId, commentId } = action.payload;
+        if (state.comments[postId]) {
+          state.comments[postId] = state.comments[postId].filter(
+            (c) => c.id !== commentId,
+          );
+        }
+        if (state.posts[postId] && state.posts[postId].comments_count > 0) {
+          state.posts[postId].comments_count -= 1;
+        }
       });
   },
 });

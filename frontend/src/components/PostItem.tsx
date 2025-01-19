@@ -6,12 +6,15 @@ import {
   likePost,
   fetchComments,
   addComment,
+  updatePost,
   selectPostById,
   selectCommentsForPost,
   selectLoading,
   selectError,
+  deletePost,
 } from "../store/postSlice";
 import Loader from "./Loader";
+import CommentItem from "./CommentItem";
 import { formatDate } from "../utils/formatDate";
 
 type PostItemProps = {
@@ -29,37 +32,32 @@ const PostItem: React.FC<PostItemProps> = ({ postId }) => {
   const loading = useSelector(selectLoading);
   const error = useSelector(selectError);
   const userId = useSelector((state: RootState) => state.auth.userId);
+  const { isLoggedIn } = useSelector((state: RootState) => state.auth);
 
   const [showComments, setShowComments] = useState(false);
   const [commentInput, setCommentInput] = useState("");
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(post?.title || "");
+  const [editedContent, setEditedContent] = useState(post?.contents || "");
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
   const isLiked = userId ? (post?.like_ids.includes(userId) ?? false) : false;
-  const { isLoggedIn } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    dispatch(fetchComments({ postId, page: 1 }));
-  }, [dispatch, postId]);
+    if (showComments) dispatch(fetchComments({ postId, page: 1 }));
+  }, [dispatch, postId, showComments, post?.comments_count]);
 
   const formattedDate = useMemo(
-    () =>
-      new Date(post.created_at).toLocaleDateString("en-UK", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "numeric",
-        minute: "numeric",
-      }),
-    [post.created_at],
+    () => formatDate(post?.created_at),
+    [post?.created_at],
   );
 
-  const handleClicked = () => {
-    navigate(`/users/profile/${post.author.id}`);
-  };
+  const handleNavigate = (id: string) => navigate(`/users/profile/${id}`);
 
   const handleLike = () => {
-    if (!post) return;
-    if (!isLoggedIn) return;
-
+    if (!post || !isLoggedIn) return;
     const updatedLikeIds = isLiked
       ? post.like_ids.filter((id) => id !== userId)
       : [...post.like_ids, userId];
@@ -68,7 +66,6 @@ const PostItem: React.FC<PostItemProps> = ({ postId }) => {
       type: "posts/likeOptimisticUpdate",
       payload: { postId: post.id, like_ids: updatedLikeIds },
     });
-
     dispatch(likePost(post.id));
   };
 
@@ -79,63 +76,124 @@ const PostItem: React.FC<PostItemProps> = ({ postId }) => {
     }
   };
 
-  const handleAddComment = (e: React.FormEvent) => {
+  const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (commentInput.trim()) {
-      dispatch(addComment({ postId, content: commentInput }));
+      await dispatch(addComment({ postId, content: commentInput }));
       setCommentInput("");
+      dispatch({
+        type: "posts/updateCommentCount",
+        payload: { postId, change: 1 },
+      });
+      dispatch(fetchComments({ postId, page: 1 }));
     }
   };
 
-  const handleNavigate = (id: string) => {
-    navigate(`/users/profile/${id}`);
+  const handleEditPost = () => {
+    if (editedTitle.trim() && editedContent.trim() && post) {
+      dispatch(
+        updatePost({
+          postId: post.id,
+          title: editedTitle,
+          contents: editedContent,
+        }),
+      );
+    }
+    setIsEditing(false);
   };
 
-  if (!post) {
-    return (
-      <div className="p-4">
-        <Loader size={60} />
-      </div>
-    );
-  }
+  const handleDeletePost = () => {
+    dispatch(deletePost(postId));
+    setShowDeleteModal(false);
+  };
+
+  if (!post) return <Loader size={60} />;
+
   return (
     <div className="p-2 rounded-lg flex w-full border border-gray-400 shadow dark:bg-[#1a1a1a] bg-gray-100">
       <img
         src={post.author.avatar}
-        onClick={handleClicked}
+        onClick={() => handleNavigate(post.author.id)}
         className="w-10 h-10 rounded-full hover:cursor-pointer"
         alt="Author Avatar"
       />
       <div className="grid grid-cols-1 p-1 w-full">
         <h1
-          onClick={handleClicked}
+          onClick={() => handleNavigate(post.author.id)}
           className="text-xl pl-3 hover:cursor-pointer font-bold dark:text-gray-200"
         >
           {post.author.first_name} {post.author.last_name}
         </h1>
-        <p
-          className="text-gray-600 dark:text-gray-400 text-xs hover:cursor-pointer"
-          onClick={() => handleNavigate(post.author.id)}
-        >
+        <p className="text-gray-600 dark:text-gray-400 text-xs hover:cursor-pointer">
           @{post.author.username} | {formattedDate}
         </p>
-        <h3 className="ml-24 mt-3 text-xl p-2 font-bold dark:text-gray-300">
-          {post.title}
-        </h3>
-        <p className="p-0 text-xs dark:text-gray-400">{post.contents}</p>
 
-        <div className="flex items-center space-x-4 mt-3">
-          <button
-            onClick={handleLike}
-            className={`${isLiked ? "text-blue-400" : "dark:text-gray-300 text-gray-700 hover:cursor-default"}`}
-          >
-            👍 {post.likes_count}
-          </button>
-          <button onClick={handleToggleComments} className="text-gray-500">
-            <span className="dark:text-gray-200 text-gray-700">
+        {isEditing ? (
+          <div className="flex flex-col mt-3">
+            <input
+              type="text"
+              className="w-full p-2 border rounded text-xl font-bold"
+              value={editedTitle}
+              onChange={(e) => setEditedTitle(e.target.value)}
+            />
+            <textarea
+              className="w-full p-2 border rounded mt-2"
+              value={editedContent}
+              rows={4}
+              onChange={(e) => setEditedContent(e.target.value)}
+            />
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={handleEditPost}
+                className="text-green-600 hover:text-green-800 px-3 py-1 rounded"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => setIsEditing(false)}
+                className="text-red-500 hover:text-red-700 px-3 py-1 rounded"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <h3 className="ml-24 mt-3 text-xl p-2 font-bold dark:text-gray-300">
+              {post.title}
+            </h3>
+            <p className="p-0 text-xs dark:text-gray-400">{post.contents}</p>
+          </>
+        )}
+
+        <div className="flex space-x-4 mt-3">
+          <div className="flex flex-grow gap-4">
+            <button
+              onClick={handleLike}
+              className={`${isLiked ? "text-blue-400" : "dark:text-gray-300 text-gray-700 hover:cursor-default"}`}
+            >
+              👍 {post.likes_count}
+            </button>
+            <button onClick={handleToggleComments} className="text-gray-500">
               💬 {post.comments_count}
-            </span>
-          </button>
+            </button>
+          </div>
+          {post.author.id === userId && !isEditing && (
+            <div>
+              <button
+                onClick={() => setIsEditing(true)}
+                className="text-orange-500 dark:text-darkgoldenrod dark:hover:text-goldenrodhover hover:text-orange-700"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                className="text-red-500 hover:text-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          )}
         </div>
 
         {showComments && (
@@ -157,39 +215,46 @@ const PostItem: React.FC<PostItemProps> = ({ postId }) => {
                 </button>
               </form>
             )}
-            {loading && (
-              <p className="text-gray-500 text-sm">Loading comments...</p>
-            )}
+
+            {loading && <Loader size={60} />}
+
             {error && <p className="text-red-500 text-sm">{error}</p>}
-            <div className="mt-2 max-h-40 overflow-y-auto">
+
+            <div className="mt-2 max-h-[500px] overflow-y-auto">
               {comments.map((comment) => (
-                <div
+                <CommentItem
                   key={comment.id}
-                  className="text-sm p-4 border dark:text-gray-300 flex flex-col gap-2 rounded-lg bg-gray-200 dark:bg-gray-900"
-                >
-                  <div className="flex items-center gap-2">
-                    <img
-                      src={comment.avatar}
-                      className="w-7 h-7 rounded-full hover:cursor-pointer"
-                      alt=""
-                      onClick={() => handleNavigate(comment.userId)}
-                    />
-                    <strong
-                      className="hover:cursor-pointer"
-                      onClick={() => handleNavigate(comment.userId)}
-                    >
-                      @{comment.username}
-                    </strong>{" "}
-                    <span>•</span>
-                    {formatDate(comment.createdAt)}
-                  </div>
-                  <p className="px-6">{comment.content}</p>
-                </div>
+                  comment={comment}
+                  postId={post.id}
+                />
               ))}
             </div>
           </div>
         )}
       </div>
+      {showDeleteModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white dark:bg-[#2e2e2e] p-6 rounded-lg shadow-lg">
+            <p className="dark:text-gray-200">
+              Are you sure you want to delete this post?
+            </p>
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={handleDeletePost}
+                className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded"
+              >
+                Delete
+              </button>
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="bg-gray-300 hover:bg-gray-500 px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
