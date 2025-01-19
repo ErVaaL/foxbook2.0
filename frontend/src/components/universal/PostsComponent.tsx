@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch } from "../../store";
+import { AppDispatch, RootState } from "../../store";
 import {
   fetchPosts,
   selectAllPosts,
@@ -10,16 +10,22 @@ import {
 import Loader from "../Loader";
 import PostItem from "../PostItem";
 
-const PostsComponent: React.FC = () => {
+type PostsComponentProps = {
+  userId?: string;
+};
+
+const PostsComponent: React.FC<PostsComponentProps> = ({ userId }) => {
   const dispatch = useDispatch<AppDispatch>();
 
-  const posts = useSelector(selectAllPosts);
+  const posts = useSelector((state: RootState) =>
+    selectAllPosts(state, userId),
+  );
   const loading = useSelector(selectLoading);
   const error = useSelector(selectError);
 
   useEffect(() => {
-    dispatch(fetchPosts());
-  }, [dispatch]);
+    dispatch(fetchPosts({ userId }));
+  }, [dispatch, userId]);
 
   if (loading) return <Loader color="#4a90e2" size={60} />;
   if (error) return <div className="text-red-500">{error}</div>;

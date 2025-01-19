@@ -86,14 +86,18 @@ const getErrorMessage = (error: unknown): string => {
   if (typeof error === "string") return error;
   if (typeof error === "object" && error !== null && "message" in error)
     return String(error.message);
-  return "Unknown error";
+  return `Unknown error occurred: ${String(error)}`;
 };
 
 export const fetchPosts = createAsyncThunk(
   "posts/fetchPosts",
-  async (_, { rejectWithValue }) => {
+  async ({ userId }: { userId?: string }, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}${API_ENDPOINTS.POSTS}`);
+      const endpoint = userId
+        ? `${API_BASE_URL}${API_ENDPOINTS.USER_POSTS(userId)}`
+        : `${API_BASE_URL}${API_ENDPOINTS.POSTS}`;
+
+      const response = await axios.get(endpoint);
       const rawPosts: RawPost[] = response.data.posts.data || [];
 
       const posts = rawPosts.reduce(
@@ -289,8 +293,14 @@ export default postSlice.reducer;
 
 const selectPostsState = (state: RootState) => state.posts;
 
-export const selectAllPosts = createSelector([selectPostsState], (postsState) =>
-  Object.values(postsState.posts),
+export const selectAllPosts = createSelector(
+  [selectPostsState, (_state: RootState, userId?: string) => userId],
+  (postsState, userId) => {
+    const allPosts = Object.values(postsState.posts);
+    return userId
+      ? allPosts.filter((post) => post.author.id === userId)
+      : allPosts;
+  },
 );
 
 export const selectPostById = createSelector(

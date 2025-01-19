@@ -37,7 +37,6 @@ const ProfileBoard: React.FC<ProfileBoardProps> = ({
   const { userId } = useParams<{ userId: string }>();
   if (!userId) return <div>Invalid user ID</div>;
 
-  // ✅ Define what should be visible
   const canViewDetails =
     privacy === "public" || isOwner || (privacy === "friends_only" && isFriend);
 
@@ -58,9 +57,7 @@ const ProfileBoard: React.FC<ProfileBoardProps> = ({
 
       {canViewDetails ? (
         <>
-          {activeSession === "Posts" && (
-            <PostsComponent endpoint={API_ENDPOINTS.USER_POSTS(userId)} />
-          )}
+          {activeSession === "Posts" && <PostsComponent userId={userId} />}
           {activeSession === "Groups" && <ProfileBoardGroups userId={userId} />}
           {activeSession === "Friends" && (
             <ProfileBoardFriends userId={userId} />

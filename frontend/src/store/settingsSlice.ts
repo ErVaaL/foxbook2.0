@@ -33,8 +33,6 @@ export const fetchSettings = createAsyncThunk(
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
-      console.log("✅ User settings fetched:", response.data);
-
       if (!response.data || !response.data.settings) {
         throw new Error("Invalid settings data received");
       }
