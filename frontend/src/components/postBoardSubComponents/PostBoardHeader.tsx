@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { API_BASE_URL } from "../../config";
 import ListComponent from "./ListComponent";
+import NavigationButton from "../universal/NavigationButton";
 
 export type SearchResult = {
   id: string;
@@ -150,6 +151,8 @@ const PostBoardHeader: React.FC = () => {
           className="w-full p-2 border border-gray-300 rounded dark:bg-gray-600 dark:text-gray-100"
         />
       </div>
+      <NavigationButton text="Create Post" destination="/create?item=posts" />
+
       {showResults && !noMatches && (
         <div
           className="absolute z-50 w-full bg-white dark:bg-gray-700 shadow-lg rounded-md max-h-64 overflow-y-auto"

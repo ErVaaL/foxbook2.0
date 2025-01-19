@@ -7,13 +7,12 @@ import { useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import { RootState } from "../store";
 
-export type GroupFormValues = {
-  name: string;
-  description: string;
-  is_public: boolean;
+export type PostFormValues = {
+  title: string;
+  contents: string;
 };
 
-const GroupCreation: React.FC = () => {
+const PostCreation: React.FC = () => {
   const { token } = useSelector((state: RootState) => state.auth);
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
@@ -21,29 +20,28 @@ const GroupCreation: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const validationSchema = Yup.object({
-    name: Yup.string()
-      .required("Group name is required")
-      .min(3, "Group name must be at least 3 characters")
-      .max(30, "Group name must not exceed 30 characters"),
-    description: Yup.string()
-      .required("Description is required")
-      .min(10, "Description must be at least 10 characters")
-      .max(300, "Description must not exceed 300 characters"),
-    is_public: Yup.boolean(),
+    title: Yup.string()
+      .required("Post title is required")
+      .min(3, "Title must be at least 3 characters")
+      .max(100, "Title must not exceed 100 characters"),
+    contents: Yup.string()
+      .required("Content is required")
+      .min(10, "Content must be at least 10 characters")
+      .max(1000, "Content must not exceed 1000 characters"),
   });
 
-  const handleSubmit = async (values: GroupFormValues) => {
+  const handleSubmit = async (values: PostFormValues) => {
     try {
       const url = isEditing
-        ? `${API_BASE_URL}${API_ENDPOINTS.GROUPS}/${id}`
-        : `${API_BASE_URL}${API_ENDPOINTS.GROUPS}`;
+        ? `${API_BASE_URL}${API_ENDPOINTS.POSTS}/${id}`
+        : `${API_BASE_URL}${API_ENDPOINTS.POSTS}`;
 
       const method = isEditing ? "PATCH" : "POST";
 
       const response = await axios({
         method,
         url,
-        data: { group: values },
+        data: { posts: values },
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -52,20 +50,18 @@ const GroupCreation: React.FC = () => {
 
       if (![202, 201].includes(response.status)) {
         throw new Error(
-          isEditing ? "Failed to update group" : "Failed to create group",
+          isEditing ? "Failed to update post" : "Failed to create post",
         );
       }
 
       setSuccessMessage(
-        isEditing
-          ? "Group updated successfully!"
-          : "Group created successfully!",
+        isEditing ? "Post updated successfully!" : "Post created successfully!",
       );
 
-      setTimeout(() => navigate("/groups"), 2000);
+      setTimeout(() => navigate("/"), 2000);
     } catch (error) {
       console.error(
-        isEditing ? "Error updating group:" : "Error creating group:",
+        isEditing ? "Error updating post:" : "Error creating post:",
         error,
       );
     }
@@ -74,7 +70,7 @@ const GroupCreation: React.FC = () => {
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4 dark:text-gray-200">
-        {isEditing ? "Edit Group" : "Create Group"}
+        {isEditing ? "Edit Post" : "Create Post"}
       </h2>
 
       {successMessage && (
@@ -84,7 +80,7 @@ const GroupCreation: React.FC = () => {
       )}
 
       <Formik
-        initialValues={{ name: "", description: "", is_public: true }}
+        initialValues={{ title: "", contents: "" }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
@@ -92,19 +88,19 @@ const GroupCreation: React.FC = () => {
           <Form className="space-y-4">
             <div>
               <label
-                htmlFor="name"
+                htmlFor="title"
                 className="block text-sm font-medium dark:text-gray-300"
               >
-                Group Name
+                Post Title
               </label>
               <Field
-                id="name"
-                name="name"
+                id="title"
+                name="title"
                 className="w-full p-2 border rounded"
-                placeholder="Enter group name"
+                placeholder="Enter post title"
               />
               <ErrorMessage
-                name="name"
+                name="title"
                 component="div"
                 className="text-red-500 text-sm"
               />
@@ -112,36 +108,24 @@ const GroupCreation: React.FC = () => {
 
             <div>
               <label
-                htmlFor="description"
+                htmlFor="contents"
                 className="block text-sm font-medium dark:text-gray-300"
               >
-                Description
+                Content
               </label>
               <Field
                 as="textarea"
-                id="description"
-                name="description"
-                rows={4}
+                id="contents"
+                name="contents"
+                rows={5}
                 className="w-full p-2 border rounded"
-                placeholder="Enter group description (max 300 characters)"
+                placeholder="Enter post content (max 1000 characters)"
               />
               <ErrorMessage
-                name="description"
+                name="contents"
                 component="div"
                 className="text-red-500 text-sm"
               />
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Field
-                id="is_public"
-                name="is_public"
-                type="checkbox"
-                className="h-5 w-5 rounded border-gray-300 focus:ring-0 checked:bg-orange-500 dark:checked:bg-darkgoldenrod"
-              />
-              <label htmlFor="is_public" className="text-sm dark:text-gray-300">
-                Public Group
-              </label>
             </div>
 
             <div className="flex space-x-4">
@@ -153,8 +137,8 @@ const GroupCreation: React.FC = () => {
                 {isSubmitting
                   ? "Saving..."
                   : isEditing
-                    ? "Save Group"
-                    : "Create Group"}
+                    ? "Save Post"
+                    : "Create Post"}
               </button>
 
               <button
@@ -172,4 +156,4 @@ const GroupCreation: React.FC = () => {
   );
 };
 
-export default GroupCreation;
+export default PostCreation;
