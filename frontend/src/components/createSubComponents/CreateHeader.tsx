@@ -1,49 +1,47 @@
 import React from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
+type CreateHeaderButtonProps = {
+  type: "posts" | "group" | "event";
+  itemType?: string | null;
+  text: string;
+};
+
 const CreateHeader: React.FC = () => {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const itemType = searchParams.get("item");
 
-  const handleNavigation = (type: string) => {
-    navigate(`/create?item=${type}`);
-  };
-
   return (
     <div className="flex justify-around p-4">
-      <button
-        onClick={() => handleNavigation("posts")}
-        className={`px-4 py-2 rounded ${
-          itemType === "posts"
-            ? "bg-orange-500 dark:bg-darkgoldenrod text-white"
-            : "bg-gray-100 dark:bg-gray-400 dark:text-gray-100 hover:bg-orange-600 dark:hover:bg-goldenrodhover"
-        }`}
-      >
-        Post
-      </button>
-      <button
-        onClick={() => handleNavigation("group")}
-        className={`px-4 py-2 rounded ${
-          itemType === "group"
-            ? "bg-orange-500 dark:bg-darkgoldenrod text-white"
-            : "bg-gray-100 dark:bg-gray-400 dark:text-gray-100 hover:bg-orange-600 dark:hover:bg-goldenrodhover"
-        }`}
-      >
-        Group
-      </button>
-      <button
-        onClick={() => handleNavigation("event")}
-        className={`px-4 py-2 rounded ${
-          itemType === "event"
-            ? "bg-orange-500 dark:bg-darkgoldenrod text-white"
-            : "bg-gray-100 dark:bg-gray-400 dark:text-gray-100 hover:bg-orange-600 dark:hover:bg-goldenrodhover"
-        }`}
-      >
-        Event
-      </button>
+      <CreateHeaderButton type="posts" itemType={itemType} text="Post" />
+      <CreateHeaderButton type="group" itemType={itemType} text="Group" />
+      <CreateHeaderButton type="event" itemType={itemType} text="Event" />
     </div>
   );
 };
 
 export default CreateHeader;
+
+const CreateHeaderButton: React.FC<CreateHeaderButtonProps> = ({
+  type,
+  itemType,
+  text,
+}) => {
+  const navigate = useNavigate();
+
+  const handleNavigation = (type: string) => {
+    navigate(`/create?item=${type}`);
+  };
+  return (
+    <button
+      onClick={() => handleNavigation(type)}
+      className={`px-4 py-2 rounded ${
+        itemType === type
+          ? "bg-orange-500 dark:bg-darkgoldenrod text-white"
+          : "bg-gray-100 dark:bg-gray-400 dark:text-gray-100 hover:bg-orange-600 dark:hover:bg-goldenrodhover"
+      }`}
+    >
+      {text}
+    </button>
+  );
+};
