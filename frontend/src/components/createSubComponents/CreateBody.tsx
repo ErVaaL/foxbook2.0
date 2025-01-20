@@ -3,7 +3,7 @@ import GroupCreation from "../../forms/GroupCreation";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import EventCreation from "../../forms/EventCreation";
-import PostCreation from "../../forms/PostCreation";
+import PostCreation from "../../forms/postCreation/PostCreation";
 
 type CreateBodyProps = {
   itemType: string | null;
