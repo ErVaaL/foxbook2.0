@@ -148,13 +148,13 @@ const PostItem: React.FC<PostItemProps> = ({ postId }) => {
           <div className="flex flex-col mt-3">
             <input
               type="text"
-              className="w-full p-2 border rounded text-xl font-bold"
+              className="w-full p-2 border rounded text-xl font-bold dark:bg-[#1e1e1e] dark:text-gray-300"
               value={editedTitle}
               onChange={(e) => setEditedTitle(e.target.value)}
             />
             <textarea
               ref={textareaRef}
-              className="w-full p-2 border rounded mt-2"
+              className="w-full p-2 border rounded mt-2 dark:bg-[#1e1e1e] dark:text-gray-300"
               value={editedContent}
               rows={4}
               onChange={(e) =>

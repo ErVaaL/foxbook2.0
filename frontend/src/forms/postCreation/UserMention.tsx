@@ -36,8 +36,10 @@ const UserMention: React.FC<UserMentionProps> = ({
   return (
     <div
       ref={itemRef}
-      className={`flex items-center p-2 cursor-pointer ${
-        selectedMentionIndex === index ? "bg-gray-300" : "hover:bg-gray-100"
+      className={`dark:bg-[#1a1a1a] dark:text-gray-300 flex items-center p-2 cursor-pointer ${
+        selectedMentionIndex === index
+          ? "bg-gray-300 dark:bg-[#2e2e2e]"
+          : "hover:bg-gray-100 dark:hover:bg-[#3a3a3a] dark:hover:text-gray-300"
       }`}
       onClick={() => handleUserSelect(user, setFieldValue)}
       onMouseEnter={() => setSelectedMentionIndex(index)}
