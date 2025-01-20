@@ -24,7 +24,7 @@ const PostsComponent: React.FC<PostsComponentProps> = ({ userId, groupId }) => {
 
   if (loading) return <Loader size={50} />;
   if (error) return <p className="text-red-500">{error}</p>;
-  if (!posts.length) return <p>No posts available.</p>;
+  if (!posts.length) return <p className="dark:text-gray-300 text-center">No posts available.</p>;
 
   return (
     <div className="space-y-4 p-4">

@@ -211,7 +211,7 @@ const PostItem: React.FC<PostItemProps> = ({ postId }) => {
                   type="submit"
                   className="ml-2 bg-orange-500 hover:bg-orange-600 dark:bg-darkgoldenrod dark:hover:bg-goldenrodhover text-white px-3 py-1 rounded"
                 >
-                  Post
+                  Comment
                 </button>
               </form>
             )}
