@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import { RootState } from "../../store";
 import UserMention from "./UserMention";
+import { useUserMentions } from "../../hooks/useUserMentions";
 
 export type PostFormValues = {
   title: string;
@@ -27,62 +28,22 @@ const PostCreation: React.FC = () => {
   const navigate = useNavigate();
   const isEditing = !!id;
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [users, setUsers] = useState<{ data: User[] }>({ data: [] });
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [mentionIndex, setMentionIndex] = useState<number | null>(null);
-  const [dropdownPosition, setDropdownPosition] = useState<{
-    left: number;
-    top: number;
-  }>({ left: 0, top: 0 });
-  const [selectedMentionIndex, setSelectedMentionIndex] = useState<number>(0);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await axios.get(
-          `${API_BASE_URL}${API_ENDPOINTS.USERS}`,
-          { headers: { Authorization: `Bearer ${token}` } },
-        );
-        if (response.status !== 200 || !response.data.users) {
-          throw new Error("Failed to fetch users");
-        }
-        setUsers(response.data.users || []);
-      } catch (error) {
-        console.error("Failed to fetch users", error);
-        setUsers({ data: [] });
-      }
-    };
-    fetchUsers();
-  }, [token]);
+  const {
+    textareaRef,
+    filteredUsers,
+    selectedMentionIndex,
+    mentionIndex,
+    dropdownPosition,
+    handleTextChange,
+    handleKeyDown,
+    handleUserSelect,
+  } = useUserMentions();
 
   const validationSchema = Yup.object({
     title: Yup.string().required("Post title is required").min(3).max(100),
     contents: Yup.string().required("Content is required").min(10).max(1000),
   });
-
-  const handleKeyDown = (
-    e: React.KeyboardEvent<HTMLTextAreaElement>,
-    setFieldValue: FormikHelpers<PostFormValues>["setFieldValue"],
-  ) => {
-    if (filteredUsers.length === 0) return;
-
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setSelectedMentionIndex((prev) => (prev + 1) % filteredUsers.length);
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setSelectedMentionIndex((prev) =>
-        prev === 0 ? filteredUsers.length - 1 : prev - 1,
-      );
-    } else if (e.key === "Enter") {
-      e.preventDefault();
-      if (mentionIndex !== null) {
-        const selectedUser = filteredUsers[selectedMentionIndex];
-        handleUserSelect(selectedUser, setFieldValue);
-      }
-    }
-  };
 
   const handleSubmit = async (
     values: PostFormValues,
@@ -121,71 +82,6 @@ const PostCreation: React.FC = () => {
       );
     } finally {
       actions.setSubmitting(false);
-    }
-  };
-  const handleUserSelect = (
-    user: User,
-    setFieldValue: FormikHelpers<PostFormValues>["setFieldValue"],
-  ) => {
-    if (mentionIndex === null || !textareaRef.current) return;
-
-    const currentValue = textareaRef.current.value;
-    const textBeforeMention = currentValue.slice(0, mentionIndex);
-    const textAfterMention = currentValue
-      .slice(mentionIndex)
-      .replace(/^@\w*/, "");
-
-    const newText = `${textBeforeMention}@${user.attributes.username} ${textAfterMention}`;
-
-    setFieldValue("contents", newText);
-
-    setFilteredUsers([]);
-    setMentionIndex(null);
-
-    setTimeout(() => {
-      if (textareaRef.current) {
-        textareaRef.current.focus();
-        textareaRef.current.selectionStart = textareaRef.current.selectionEnd =
-          mentionIndex + user.attributes.username.length + 2;
-      }
-    }, 0);
-  };
-
-  const handleTextChange = (
-    e: React.ChangeEvent<HTMLTextAreaElement>,
-    setFieldValue: FormikHelpers<PostFormValues>["setFieldValue"],
-  ) => {
-    let value = e.target.value;
-    setFieldValue("contents", value);
-
-    const cursorPosition = e.target.selectionStart;
-    const textBeforeCursor = value.slice(0, cursorPosition);
-
-    if (textBeforeCursor.endsWith(" ")) {
-      setFilteredUsers([]);
-      setMentionIndex(null);
-      return;
-    }
-
-    const match = textBeforeCursor.match(/@(\w+)$/);
-    if (match) {
-      const searchTerm = match[1].toLowerCase();
-      setFilteredUsers(
-        users.data.filter((user: User) =>
-          user.attributes.username.toLowerCase().includes(searchTerm),
-        ),
-      );
-      setMentionIndex(cursorPosition - match[0].length);
-      setSelectedMentionIndex(0);
-
-      const textareaRect = e.target.getBoundingClientRect();
-      setDropdownPosition({
-        left: textareaRect.left + window.scrollX + 20,
-        top: textareaRect.top + window.scrollY + 40,
-      });
-    } else {
-      setFilteredUsers([]);
-      setMentionIndex(null);
     }
   };
 
@@ -244,10 +140,16 @@ const PostCreation: React.FC = () => {
                 placeholder="Enter post content (max 1000 characters)"
                 innerRef={textareaRef}
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                  handleTextChange(e, setFieldValue)
+                  handleTextChange(e, (content) =>
+                    setFieldValue("contents", content),
+                  )
                 }
                 onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) =>
-                  handleKeyDown(e, setFieldValue)
+                  handleKeyDown(e, (user) =>
+                    handleUserSelect(user, (content) =>
+                      setFieldValue("contents", content),
+                    ),
+                  )
                 }
               />
               <ErrorMessage
@@ -270,12 +172,11 @@ const PostCreation: React.FC = () => {
                       index={index}
                       selectedMentionIndex={selectedMentionIndex}
                       user={user}
-                      setFieldValue={setFieldValue}
-                      setSelectedMentionIndex={setSelectedMentionIndex}
-                      setFilteredUsers={setFilteredUsers}
-                      setMentionIndex={setMentionIndex}
-                      textareaRef={textareaRef}
-                      handleUserSelect={handleUserSelect}
+                      handleUserSelect={(user) =>
+                        handleUserSelect(user, (content) =>
+                          setFieldValue("contents", content),
+                        )
+                      }
                     />
                   ))}
                 </div>
@@ -286,7 +187,7 @@ const PostCreation: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded"
+                className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded dark:bg-darkgoldenrod dark:hover:bg-goldenrodhover"
               >
                 {isSubmitting
                   ? "Saving..."

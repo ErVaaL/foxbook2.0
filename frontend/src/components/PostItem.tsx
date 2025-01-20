@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../store";
@@ -16,10 +16,8 @@ import {
 import Loader from "./Loader";
 import CommentItem from "./CommentItem";
 import { formatDate } from "../utils/formatDate";
-import { API_BASE_URL, API_ENDPOINTS } from "../config";
-import axios from "axios";
-import { User } from "../forms/postCreation/PostCreation";
 import UserMention from "../forms/postCreation/UserMention";
+import { useUserMentions } from "../hooks/useUserMentions";
 
 type PostItemProps = {
   postId: string;
@@ -48,13 +46,17 @@ const PostItem: React.FC<PostItemProps> = ({ postId }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const isLiked = userId ? (post?.like_ids.includes(userId) ?? false) : false;
-  const { token } = useSelector((state: RootState) => state.auth);
 
-  const [users, setUsers] = useState<{ data: User[] }>({ data: [] });
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [mentionIndex, setMentionIndex] = useState<number | null>(null);
-  const [selectedMentionIndex, setSelectedMentionIndex] = useState(0);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const {
+    textareaRef,
+    filteredUsers,
+    selectedMentionIndex,
+    mentionIndex,
+    dropdownPosition,
+    handleTextChange,
+    handleKeyDown,
+    handleUserSelect,
+  } = useUserMentions();
 
   useEffect(() => {
     if (showComments) dispatch(fetchComments({ postId, page: 1 }));
@@ -64,24 +66,6 @@ const PostItem: React.FC<PostItemProps> = ({ postId }) => {
     () => formatDate(post?.created_at),
     [post?.created_at],
   );
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      if (!token) return;
-      try {
-        const response = await axios.get(
-          `${API_BASE_URL}${API_ENDPOINTS.USERS}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
-        setUsers(response.data.users || []);
-      } catch (error) {
-        console.error("Failed to fetch users", error);
-      }
-    };
-    fetchUsers();
-  }, [token]);
 
   const handleNavigate = (id: string) => navigate(`/users/profile/${id}`);
 
@@ -136,77 +120,6 @@ const PostItem: React.FC<PostItemProps> = ({ postId }) => {
     setShowDeleteModal(false);
   };
 
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    let value = e.target.value;
-    setEditedContent(value);
-
-    const cursorPosition = e.target.selectionStart;
-    const textBeforeCursor = value.slice(0, cursorPosition);
-
-    if (textBeforeCursor.endsWith(" ")) {
-      setFilteredUsers([]);
-      setMentionIndex(null);
-      return;
-    }
-
-    const match = textBeforeCursor.match(/@(\w+)$/);
-    if (match) {
-      const searchTerm = match[1].toLowerCase();
-      setFilteredUsers(
-        users.data.filter((user) =>
-          user.attributes.username.toLowerCase().includes(searchTerm),
-        ),
-      );
-      setMentionIndex(cursorPosition - match[0].length);
-      setSelectedMentionIndex(0);
-    } else {
-      setFilteredUsers([]);
-      setMentionIndex(null);
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (filteredUsers.length === 0) return;
-
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setSelectedMentionIndex((prev) => (prev + 1) % filteredUsers.length);
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setSelectedMentionIndex((prev) =>
-        prev === 0 ? filteredUsers.length - 1 : prev - 1,
-      );
-    } else if (e.key === "Enter") {
-      e.preventDefault();
-      if (mentionIndex !== null) {
-        const selectedUser = filteredUsers[selectedMentionIndex];
-        handleUserSelect(selectedUser);
-      }
-    }
-  };
-
-  const handleUserSelect = (user: User) => {
-    if (mentionIndex === null) return;
-
-    const textBeforeMention = editedContent.slice(0, mentionIndex);
-    const textAfterMention = editedContent
-      .slice(mentionIndex)
-      .replace(/^@\w*/, "");
-
-    const newText = `${textBeforeMention}@${user.attributes.username} ${textAfterMention}`;
-    setEditedContent(newText);
-    setFilteredUsers([]);
-    setMentionIndex(null);
-
-    setTimeout(() => {
-      if (textareaRef.current) {
-        textareaRef.current.focus();
-        textareaRef.current.selectionStart = textareaRef.current.selectionEnd =
-          mentionIndex + user.attributes.username.length + 2;
-      }
-    }, 0);
-  };
-
   if (!post) return <Loader size={60} />;
 
   return (
@@ -244,19 +157,36 @@ const PostItem: React.FC<PostItemProps> = ({ postId }) => {
               className="w-full p-2 border rounded mt-2"
               value={editedContent}
               rows={4}
-              onChange={handleTextChange}
-              onKeyDown={handleKeyDown}
+              onChange={(e) =>
+                handleTextChange(e, (content) => setEditedContent(content))
+              }
+              onKeyDown={(e) =>
+                handleKeyDown(e, (user) =>
+                  handleUserSelect(user, (content) =>
+                    setEditedContent(content),
+                  ),
+                )
+              }
             />
             {filteredUsers.length > 0 && mentionIndex !== null && (
-              <div className="absolute bg-white border rounded shadow-lg max-w-xs mt-1 z-50">
+              <div
+                style={{
+                  left: dropdownPosition.left,
+                  top: dropdownPosition.top,
+                }}
+                className="absolute bg-white border rounded shadow-lg max-w-xs mt-1 z-50"
+              >
                 {filteredUsers.map((user, index) => (
                   <UserMention
                     key={user.id}
                     index={index}
                     selectedMentionIndex={selectedMentionIndex}
                     user={user}
-                    setSelectedMentionIndex={setSelectedMentionIndex}
-                    handleUserSelect={handleUserSelect}
+                    handleUserSelect={(user) =>
+                      handleUserSelect(user, (content) =>
+                        setEditedContent(content),
+                      )
+                    }
                   />
                 ))}
               </div>
