@@ -20,6 +20,7 @@ module PostServices
       return { success: false, error: "Failed to create post", status: :bad_request } unless post.save
 
       mentioned_users = extract_mentioned_users(post.contents)
+      Rails.logger.info("\n Mentioned users: #{mentioned_users.map(&:username)}\n")
       create_notifications(mentioned_users, post, @notification_service)
 
       { success: true, data: PostSerializer.new(post).serializable_hash, status: :created }
@@ -41,9 +42,9 @@ module PostServices
 
     private
 
-      def extract_mentioned_users(users, post)
-        usernames = users.scan(/@\w+/).flatten
-        User.in(username: usernames)
+      def extract_mentioned_users(contents)
+        usernames = contents.scan(/@(\w+)/).flatten
+        User.where(:username.in => usernames).to_a
       end
 
       def create_notifications(users, post, service)
