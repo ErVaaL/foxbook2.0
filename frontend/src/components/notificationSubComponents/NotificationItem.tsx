@@ -71,7 +71,8 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
     }
   };
 
-  const toggleSeen = () => {
+  const toggleSeen = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (token) {
       dispatch(toggleNotificationSeen({ id: notification.id, token }));
     }

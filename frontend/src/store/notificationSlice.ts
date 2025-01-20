@@ -157,7 +157,8 @@ const notificationsSlice = createSlice({
     markAsSeen(state, action) {
       const id = action.payload;
       const notification = state.notifications.find((n) => n.id === id);
-      if (notification) notification.attributes.was_seen = true;
+      if (notification)
+        notification.attributes.was_seen = !notification.attributes.was_seen;
     },
     setSubscription(state, action) {
       state.subscription = action.payload.identifier;

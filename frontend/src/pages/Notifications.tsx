@@ -28,7 +28,11 @@ const Notifications: React.FC = () => {
 
   const pendingCount = useMemo(
     () =>
-      notifications.filter((n) => !n.attributes.content.action_taken).length,
+      notifications.filter(
+        (n) =>
+          "action_taken" in n.attributes.content &&
+          n.attributes.content.action_taken !== true,
+      ).length,
     [notifications],
   );
 
