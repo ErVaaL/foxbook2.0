@@ -8,6 +8,7 @@ import {
 } from "../../store/notificationSlice";
 import axios from "axios";
 import { API_BASE_URL, API_ENDPOINTS } from "../../config";
+import { useNavigate } from "react-router-dom";
 
 interface NotificationItemProps {
   notification: {
@@ -28,6 +29,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   token,
 }) => {
   const dispatch: AppDispatch = useDispatch();
+  const navigate = useNavigate();
 
   const acceptFriendRequest = async (senderId: string) => {
     if (!token) return;
@@ -76,9 +78,18 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   };
   const senderId = String(notification.attributes.content?.sender_id || "");
 
+  const handleNotificationClick = () => {
+    if (notification.attributes.type === "mentioned_in_post") {
+      const postId = String(notification.attributes.content?.post_id || "");
+      if (!postId) return;
+      navigate(`/`, { state: { postId } });
+    }
+  };
+
   return (
     <div
       key={notification.id}
+      onClick={handleNotificationClick}
       className={`p-3 rounded-lg ${
         notification.attributes.was_seen
           ? "bg-gray-100 dark:bg-[#3c3c3c] dark:text-gray-300"
