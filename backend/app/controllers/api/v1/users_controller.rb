@@ -2,6 +2,11 @@ class Api::V1::UsersController < ApplicationController
   skip_before_action :authorize_request, only: [ :create, :posts, :groups, :events ]
   before_action :set_service
 
+  def index
+    result = @service.get_users
+    render json: result.except(:status), status: result[:status]
+  end
+
   def show
     result = @service.get_user(params[:id])
     render json: result.except(:status), status: result[:status]

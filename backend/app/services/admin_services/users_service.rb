@@ -4,7 +4,8 @@ class AdminServices::UsersService < ApplicationService
     @user_service = initialize_service(UserServices::UsersService)
   end
   def get_users
-    { success: true, users: users, status: :ok }
+    users = User.all
+    { success: true, users: UserSerializer.new(users).serializable_hash, status: :ok }
   end
 
   def get_user(user_id)

@@ -14,9 +14,14 @@ module PostServices
     end
 
     def create_post(post_params)
+      @notification_service = initialize_service(NotificationsServices::NotificationsService)
       post = Post.new(post_params)
       post.user = @current_user
       return { success: false, error: "Failed to create post", status: :bad_request } unless post.save
+
+      mentioned_users = extract_mentioned_users(post.contents)
+      create_notifications(mentioned_users, post, @notification_service)
+
       { success: true, data: PostSerializer.new(post).serializable_hash, status: :created }
     end
 
@@ -33,5 +38,25 @@ module PostServices
       post.destroy
       { success: true, data: "Post deleted successfully", status: :no_content }
     end
+
+    private
+
+      def extract_mentioned_users(users, post)
+        usernames = users.scan(/@\w+/).flatten
+        User.in(username: usernames)
+      end
+
+      def create_notifications(users, post, service)
+        users.each do |user|
+          service.create_notification(
+            user_id: user.id,
+            type: "mentioned_in_post",
+            content: {
+              post_id: post.id,
+              message: "You were mentioned in a post by #{post.user.username}"
+            }
+          )
+        end
+      end
   end
 end

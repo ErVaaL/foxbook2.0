@@ -1,5 +1,10 @@
 module UserServices
   class UsersService < BaseUsersService
+    def get_users
+      users = User.all
+      { success: true, users: UserSerializer.new(users).serializable_hash, status: :ok }
+    end
+
     def create_user(user_params)
       existing_user = User.where(email: user_params[:email]).first
       return { success: false, error: "User already exists", details: [ "Email is already taken" ], status: :conflict } if existing_user
