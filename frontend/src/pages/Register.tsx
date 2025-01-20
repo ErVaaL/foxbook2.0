@@ -167,15 +167,15 @@ const Register: React.FC = () => {
         <button
           type="submit"
           disabled={formik.isSubmitting}
-          className="w-full bg-orange-600 hover:bg-orange-700 dark:bg-[#b8860b] dark:hover:bg-[#ae7c01] text-white py-2 rounded"
+          className="w-full bg-orange-600 hover:bg-orange-700 dark:bg-darkgoldenrod dark:hover:bg-goldenrodhover text-white py-2 rounded"
         >
           Register
         </button>
         <p className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
           Already have an account?{" "}
           <a
-            href="/login"
-            className="text-orange-600 hover:text-orange-700 dark:text-[#b8860b] dark:hover:text-[#ae7c01]"
+            onClick={() => navigate("/login")}
+            className="text-orange-600 hover:text-orange-700 dark:text-darkgoldenrod dark:hover:text-goldenrodhover hover:cursor-pointer"
           >
             Log In
           </a>
