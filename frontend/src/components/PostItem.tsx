@@ -110,7 +110,10 @@ const PostItem: React.FC<PostItemProps> = ({ postId }) => {
   if (!post) return <Loader size={60} />;
 
   return (
-    <div className="p-2 rounded-lg flex w-full border border-gray-400 shadow dark:bg-[#1a1a1a] bg-gray-100">
+    <div
+      id={`post-${post.id}`}
+      className="p-2 rounded-lg flex w-full border border-gray-400 shadow dark:bg-[#1a1a1a] bg-gray-100"
+    >
       <img
         src={post.author.avatar}
         onClick={() => handleNavigate(post.author.id)}
