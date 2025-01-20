@@ -1,10 +1,11 @@
 import React, { useLayoutEffect } from "react";
 import PostBoard from "../components/PostBoard";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Home: React.FC = () => {
   const location = useLocation();
   const postId = location.state?.postId || null;
+  const navigate = useNavigate();
 
   useLayoutEffect(() => {
     if (!postId) return;
@@ -17,8 +18,10 @@ const Home: React.FC = () => {
       setTimeout(() => {
         postElement.classList.remove("border-2", "border-blue-500");
       }, 2000);
+
+      navigate("/", { replace: true, state: { postId: null } });
     }, 500);
-  }, [postId]);
+  }, [navigate, postId]);
 
   return (
     <div className="max-w-5xl mx-auto p-0 min-h-screen bg-gray-300 dark:bg-[#242424] transition-colors duration-200">
