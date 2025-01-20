@@ -80,7 +80,7 @@ const ProfileAddFriend: React.FC<ProfileAddFriendProps> = ({
         !isRequestSent && (
           <button
             onClick={handleAddFriend}
-            className={`bg-blue-500 font-bold text-white px-4 py-2 rounded hover:bg-blue-600 ${
+            className={`bg-orange-500 dark:bg-darkgoldenrod font-bold text-white px-4 py-2 rounded hover:bg-orange-600 dark:hover:bg-goldenrodhover ${
               isLoading ? "opacity-50 cursor-not-allowed" : ""
             }`}
             disabled={isLoading}

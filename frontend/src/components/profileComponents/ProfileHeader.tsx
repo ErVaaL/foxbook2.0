@@ -32,8 +32,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const { userId } = useSelector((state: RootState) => state.auth);
   const isOwner = userId === profileUserId;
 
-  const canViewFullName =
-    isOwner || privacy === "public" || (privacy === "friends_only" && isFriend);
   const canViewAvatar =
     isOwner || privacy === "public" || (privacy === "friends_only" && isFriend);
 
