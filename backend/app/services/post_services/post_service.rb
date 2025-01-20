@@ -20,7 +20,6 @@ module PostServices
       return { success: false, error: "Failed to create post", status: :bad_request } unless post.save
 
       mentioned_users = extract_mentioned_users(post.contents)
-      Rails.logger.info("\n Mentioned users: #{mentioned_users.map(&:username)}\n")
       create_notifications(mentioned_users, post, @notification_service)
 
       { success: true, data: PostSerializer.new(post).serializable_hash, status: :created }
@@ -29,6 +28,16 @@ module PostServices
     def update_post(post, post_params)
       return { success: false, error: "Unauthorized to update post", status: :unauthorized } unless post.user == @current_user || @current_user.admin?
       return { success: false, error: "Failed to update post", messages: post.errors.full_messages, status: :bad_request } unless post.update(post_params)
+      @notification_service = initialize_service(NotificationsServices::NotificationsService)
+
+      new_mentioned_users = extract_mentioned_users(post.contents)
+      old_mentioned_users = extract_mentioned_users(post.changes.dig("contents", 0) || "")
+
+      users_to_notify = new_mentioned_users - old_mentioned_users
+
+      Rails.logger.info("\n Newly mentioned users: #{users_to_notify.map(&:username)}\n")
+
+      create_notifications(users_to_notify, post, @notification_service) unless users_to_notify.empty?
       { success: true, data: PostSerializer.new(post).serializable_hash, status: :ok }
     end
 
