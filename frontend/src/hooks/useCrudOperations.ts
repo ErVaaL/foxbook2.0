@@ -1,5 +1,7 @@
 import { useReducer, useEffect } from "react";
 import axios from "axios";
+import { AdminUserFromAPI } from "../types/userTypes";
+
 interface Identifiable {
   id: string;
 }
@@ -52,7 +54,7 @@ export const useCrudOperations = <T extends Identifiable>(
           headers: header,
         });
         const responseData: T[] =
-          response.data?.users?.data?.map((user: any) => ({
+          response.data?.users?.data?.map((user: AdminUserFromAPI) => ({
             id: user.id,
             ...user.attributes,
           })) || [];
@@ -72,17 +74,37 @@ export const useCrudOperations = <T extends Identifiable>(
 
   const editItem = async (id: string, updatedData: Partial<T>) => {
     try {
-      await axios.put(`${endpoint}/${id}`, updatedData, {
+      const filteredData = Object.fromEntries(
+        Object.entries(updatedData).filter(
+          ([key, value]) => value !== "" && value !== undefined,
+        ),
+      );
+
+      if (Object.keys(filteredData).length === 0) {
+        console.warn("No valid data provided for update.");
+        return;
+      }
+
+      const payload = { user: filteredData };
+
+      await axios.patch(`${endpoint}/${id}`, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      dispatch({
-        type: "SET_DATA",
-        payload: state.data.map((item) =>
-          item.id === id ? { ...item, ...updatedData } : item,
-        ),
+
+      const response = await axios.get(endpoint, {
+        headers: { Authorization: `Bearer ${token}` },
       });
+
+      const updatedUsers = response.data.users.data.map(
+        (user: AdminUserFromAPI) => ({
+          id: user.id,
+          ...user.attributes,
+        }),
+      );
+
+      dispatch({ type: "SET_DATA", payload: updatedUsers });
     } catch (error) {
       if (axios.isAxiosError(error)) {
         dispatch({

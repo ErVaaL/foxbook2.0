@@ -47,7 +47,6 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const { token } = useSelector((state: RootState) => state.auth);
-  console.log("token", token);
 
   const { state, editItem, deleteItem } = useCrudOperations<User>(
     `${API_BASE_URL}${API_ENDPOINTS.ADMIN_USERS}`,

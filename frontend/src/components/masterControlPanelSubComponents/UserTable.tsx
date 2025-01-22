@@ -9,17 +9,21 @@ import {
   TablePagination,
   Paper,
   IconButton,
+  Dialog,
 } from "@mui/material";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { User } from "../../contexts/masterControlContext/subMasterContext/MasterUsersContext";
+import EditUserForm from "../../forms/masterForms/UserEditForm";
 
 interface Props {
   data: User[];
+  editItem: (id: string, updatedData: Partial<User>) => Promise<void>;
 }
 
-const UserTable: React.FC<Props> = ({ data }) => {
+const UserTable: React.FC<Props> = ({ data, editItem }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage);
@@ -31,6 +35,10 @@ const UserTable: React.FC<Props> = ({ data }) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  const handleEditClick = (user: User) => setSelectedUser(user);
+
+  const handleEditClose = () => setSelectedUser(null);
 
   return (
     <Paper
@@ -96,7 +104,7 @@ const UserTable: React.FC<Props> = ({ data }) => {
                     {user.role}
                   </TableCell>
                   <TableCell>
-                    <IconButton>
+                    <IconButton onClick={() => handleEditClick(user)}>
                       <FaEdit className="text-orange-400 hover:text-orange-600 dark:text-darkgoldenrod dark:hover:text-goldenrodhover" />
                     </IconButton>
                     <IconButton>
@@ -127,6 +135,15 @@ const UserTable: React.FC<Props> = ({ data }) => {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
+      <Dialog open={!!selectedUser} onClose={handleEditClose}>
+        {selectedUser && (
+          <EditUserForm
+            user={selectedUser}
+            onSave={editItem}
+            onClose={handleEditClose}
+          />
+        )}
+      </Dialog>
     </Paper>
   );
 };

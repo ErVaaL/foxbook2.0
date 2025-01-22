@@ -2,7 +2,7 @@ import React from "react";
 import { useUsers } from "../../contexts/masterControlContext/subMasterContext/MasterUsersContext";
 import UserTable from "./UserTable";
 const UsersManagement: React.FC = () => {
-  const { state } = useUsers();
+  const { state, editItem } = useUsers();
   const { data: users, loading, error } = state;
 
   return (
@@ -15,7 +15,9 @@ const UsersManagement: React.FC = () => {
 
       {error && <p className="text-red-500">{error}</p>}
 
-      {!loading && !error && users.length > 0 && <UserTable data={users} />}
+      {!loading && !error && users.length > 0 && (
+        <UserTable data={users} editItem={editItem} />
+      )}
 
       {!loading && !error && users.length === 0 && (
         <p className="text-gray-600">No users found.</p>
