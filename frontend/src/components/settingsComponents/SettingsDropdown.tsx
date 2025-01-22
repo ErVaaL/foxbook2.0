@@ -40,7 +40,7 @@ const SettingsDropdown: React.FC<SettingsDropdownProps> = ({
             onSettings();
             closeDropdown();
           }}
-          className="cursor-pointer px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-600"
+          className="cursor-pointer px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-600 text-black dark:text-white"
         >
           Settings
         </li>
