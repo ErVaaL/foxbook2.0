@@ -27,6 +27,8 @@ gem "bcrypt"
 
 gem "jsonapi-serializer"
 
+gem "kaminari-mongoid"
+
 gem "jwt"
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible

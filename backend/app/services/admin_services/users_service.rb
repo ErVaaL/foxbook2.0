@@ -3,9 +3,14 @@ class AdminServices::UsersService < ApplicationService
     super(current_user)
     @user_service = initialize_service(UserServices::UsersService)
   end
-  def get_users
-    users = User.all
-    { success: true, users: UserSerializer.new(users).serializable_hash, status: :ok }
+  def get_users(page = 1, per_page = 10)
+    users = User.order_by(created_at: :desc).page(page).per(per_page)
+    {
+    success: true,
+    users: AdminSerializers::UserAdminSerializer.new(users).serializable_hash,
+    meta: { total_count: users.total_count, current_page: page, per_page: per_page },
+    status: :ok
+    }
   end
 
   def get_user(user_id)

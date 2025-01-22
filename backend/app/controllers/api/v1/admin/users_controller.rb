@@ -5,9 +5,12 @@ class Api::V1::Admin::UsersController < ApplicationController
   before_action :set_user_params, only: [ :update ]
 
   def index
-    result = @service.get_users
+    page = params[:page].presence || 1
+    per_page = params[:per_page].presence || 10
+    result = @service.get_users(page.to_i, per_page.to_i)
     render json: result.except(:status), status: result[:status]
   end
+
 
   def show
     result = @service.get_user(params[:id])
