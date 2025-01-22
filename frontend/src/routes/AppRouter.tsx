@@ -29,9 +29,14 @@ const AppRouter: React.FC = () => {
           <Route path="/events/:id" element={<Event />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/settings" element={<Settings />} />
-          <MasterControlProvider>
-            <Route path="/master-control" element={<MasterControl />} />
-          </MasterControlProvider>
+          <Route
+            path="/master-control"
+            element={
+              <MasterControlProvider>
+                <MasterControl />
+              </MasterControlProvider>
+            }
+          />
         </Route>
       </Routes>
     </Router>

@@ -2,6 +2,7 @@ import React from "react";
 import { RootState } from "../store";
 import { useSelector } from "react-redux";
 import UniversalBoard from "../components/universal/UniversalBoard";
+import UsersManagement from "../components/masterControlPanelSubComponents/UsersManagement";
 
 const MasterControl: React.FC = () => {
   const { isLoggedIn, isAdmin } = useSelector((state: RootState) => state.auth);
@@ -27,7 +28,7 @@ const MasterControl: React.FC = () => {
   const sections = [
     {
       label: "Users",
-      component: <p>Users</p>,
+      component: <UsersManagement />,
     },
     {
       label: "Groups",

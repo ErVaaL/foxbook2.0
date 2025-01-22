@@ -1,25 +1,26 @@
 import React from "react";
-import { API_BASE_URL } from "../../config";
-import axios from "axios";
-
+import { useUsers } from "../../contexts/masterControlContext/subMasterContext/MasterUsersContext";
+import UserTable from "./UserTable";
 const UsersManagement: React.FC = () => {
-  export const fetchUsers = createAsyncThunk(
-    "users/fetchUsers",
-    async ({ page = 1 }: { page: number }, { rejectWithValue }) => {
-      try {
-        const response = await axios.get(
-          `${API_BASE_URL}/admin/users?page=${page}&per_page=10`,
-        );
-        return {
-          users: response.data.users.data,
-          totalPages: Math.ceil(response.data.meta.total_count / 10),
-        };
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          return rejectWithValue(error.response?.data);
-        }
-      }
-    },
+  const { state } = useUsers();
+  const { data: users, loading, error } = state;
+
+  return (
+    <div className="p-4">
+      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 text-center py-2">
+        Manage Users
+      </h2>
+
+      {loading && <p className="text-blue-500">Loading users...</p>}
+
+      {error && <p className="text-red-500">{error}</p>}
+
+      {!loading && !error && users.length > 0 && <UserTable data={users} />}
+
+      {!loading && !error && users.length === 0 && (
+        <p className="text-gray-600">No users found.</p>
+      )}
+    </div>
   );
 };
 

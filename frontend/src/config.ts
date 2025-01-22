@@ -37,7 +37,9 @@ export const API_ENDPOINTS = {
   EVENT_ATTEND: (eventId: string) => `/events/${eventId}/attendees`,
   EVENT_UNATTEND: (eventId: string, userId: string) =>
     `/events/${eventId}/attendees/${userId}`,
-  
+  ADMIN_USERS: "/admin/users",
+  ADMIN_GROUPS: "/admin/groups",
+  ADMIN_CONTENT: "/admin/content",
 };
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;

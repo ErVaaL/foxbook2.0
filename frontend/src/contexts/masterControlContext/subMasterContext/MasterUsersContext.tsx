@@ -1,9 +1,13 @@
-import React, { createContext, useReducer, useContext, ReactNode } from "react";
+import React, { createContext, useContext, ReactNode } from "react";
 import { useCrudOperations } from "../../../hooks/useCrudOperations";
+import { API_BASE_URL, API_ENDPOINTS } from "../../../config";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store";
 
 interface UserSettings {
   privacy: "public" | "private" | "friends_only";
   notifications: boolean;
+  theme: "light" | "dark";
 }
 
 export interface User {
@@ -20,53 +24,47 @@ export interface User {
   friend_requests_sent: string[];
   friend_requests_received: string[];
   password_digest?: string;
-  theme: string;
   settings: UserSettings;
 }
 
 interface UsersState {
-  users: User[];
+  data: User[];
   loading: boolean;
   error: string | null;
 }
 
-const initialState: UsersState = {
-  users: [],
-  loading: false,
-  error: null,
-};
+interface UsersContextType {
+  state: UsersState;
+  editItem: (id: string, updatedData: Partial<User>) => Promise<void>;
+  deleteItem: (id: string) => Promise<void>;
+}
 
-type Action =
-  | { type: "SET_USERS"; payload: User[] }
-  | { type: "SET_LOADING"; payload: boolean }
-  | { type: "SET_ERROR"; payload: string | null };
-
-const usersReducer = (state: UsersState, action: Action): UsersState => {
-  switch (action.type) {
-    case "SET_USERS":
-      return { ...state, users: action.payload, loading: false, error: null };
-    case "SET_LOADING":
-      return { ...state, loading: action.payload };
-    case "SET_ERROR":
-      return { ...state, error: action.payload, loading: false };
-    default:
-      return state;
-  }
-};
-
-const UsersContext = createContext<any>(null);
+const MasterUsersContext = createContext<UsersContextType | undefined>(
+  undefined,
+);
 
 export const UsersProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const { state, editItem, deleteItem } =
-    useCrudOperations<User>("/api/admin/users");
+  const { token } = useSelector((state: RootState) => state.auth);
+  console.log("token", token);
+
+  const { state, editItem, deleteItem } = useCrudOperations<User>(
+    `${API_BASE_URL}${API_ENDPOINTS.ADMIN_USERS}`,
+    token,
+  );
 
   return (
-    <UsersContext.Provider value={{ state, editItem, deleteItem }}>
+    <MasterUsersContext.Provider value={{ state, editItem, deleteItem }}>
       {children}
-    </UsersContext.Provider>
+    </MasterUsersContext.Provider>
   );
 };
 
-export const useUsers = () => useContext(UsersContext);
+export const useUsers = () => {
+  const context = useContext(MasterUsersContext);
+  if (!context) {
+    throw new Error("useUsers must be used within a UsersProvider");
+  }
+  return context;
+};

@@ -1,5 +1,8 @@
 import { useReducer, useEffect } from "react";
 import axios from "axios";
+interface Identifiable {
+  id: string;
+}
 
 interface CrudState<T> {
   data: T[];
@@ -28,42 +31,63 @@ const crudReducer = <T>(
   }
 };
 
-export const useCrudOperations = <T>(endpoint: string) => {
+export const useCrudOperations = <T extends Identifiable>(
+  endpoint: string,
+  token: string | null,
+) => {
   const initialState: CrudState<T> = { data: [], loading: false, error: null };
   const [state, dispatch] = useReducer(crudReducer<T>, initialState);
 
   useEffect(() => {
+    if (!token) {
+      console.warn("Token not available yet, waiting...");
+      return;
+    }
     const fetchData = async () => {
       dispatch({ type: "SET_LOADING", payload: true });
+      const header = token ? { Authorization: `Bearer ${token}` } : {};
+
       try {
-        const response = await axios.get(endpoint);
-        dispatch({ type: "SET_DATA", payload: response.data });
+        const response = await axios.get(endpoint, {
+          headers: header,
+        });
+        const responseData: T[] =
+          response.data?.users?.data?.map((user: any) => ({
+            id: user.id,
+            ...user.attributes,
+          })) || [];
+        dispatch({ type: "SET_DATA", payload: responseData });
       } catch (error) {
         if (axios.isAxiosError(error)) {
           dispatch({
             type: "SET_ERROR",
-            payload: error.response?.data.message || "Failed to fetch data",
+            payload: error.response?.data?.message || "Failed to fetch data",
           });
         }
       }
     };
+
     fetchData();
-  }, [endpoint]);
+  }, [endpoint, token]);
 
   const editItem = async (id: string, updatedData: Partial<T>) => {
     try {
-      await axios.put(`${endpoint}/${id}`, updatedData);
+      await axios.put(`${endpoint}/${id}`, updatedData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       dispatch({
         type: "SET_DATA",
         payload: state.data.map((item) =>
-          item["id"] === id ? { ...item, ...updatedData } : item,
+          item.id === id ? { ...item, ...updatedData } : item,
         ),
       });
     } catch (error) {
       if (axios.isAxiosError(error)) {
         dispatch({
           type: "SET_ERROR",
-          payload: error.response?.data.message || "Failed to update data",
+          payload: error.response?.data?.message || "Failed to update data",
         });
       }
     }
@@ -71,16 +95,20 @@ export const useCrudOperations = <T>(endpoint: string) => {
 
   const deleteItem = async (id: string) => {
     try {
-      await axios.delete(`${endpoint}/${id}`);
+      await axios.delete(`${endpoint}/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       dispatch({
         type: "SET_DATA",
-        payload: state.data.filter((item) => item["id"] !== id),
+        payload: state.data.filter((item) => item.id !== id),
       });
     } catch (error) {
       if (axios.isAxiosError(error)) {
         dispatch({
           type: "SET_ERROR",
-          payload: error.response?.data.message || "Failed to delete data",
+          payload: error.response?.data?.message || "Failed to delete data",
         });
       }
     }
