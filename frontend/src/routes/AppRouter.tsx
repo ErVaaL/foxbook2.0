@@ -11,6 +11,8 @@ import GroupDetails from "../pages/GroupDetails";
 import Event from "../pages/Event";
 import Notifications from "../pages/Notifications";
 import Settings from "../pages/Settings";
+import MasterControl from "../pages/MasterControl";
+import { MasterControlProvider } from "../contexts/masterControlContext/MasterControlContext";
 
 const AppRouter: React.FC = () => {
   return (
@@ -27,6 +29,9 @@ const AppRouter: React.FC = () => {
           <Route path="/events/:id" element={<Event />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/settings" element={<Settings />} />
+          <MasterControlProvider>
+            <Route path="/master-control" element={<MasterControl />} />
+          </MasterControlProvider>
         </Route>
       </Routes>
     </Router>

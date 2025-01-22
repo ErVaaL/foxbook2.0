@@ -4,6 +4,7 @@ import { API_BASE_URL, API_ENDPOINTS } from "../config";
 
 interface User {
   id: string;
+  role: "user" | "admin" | "superadmin";
   email: string;
   username: string;
   avatar?: string;
@@ -14,6 +15,7 @@ interface User {
 
 interface AuthState {
   isLoggedIn: boolean;
+  isAdmin: boolean;
   token: string;
   userId: string | null;
   user: User | null;
@@ -24,6 +26,7 @@ const parsedUser: User | null = storedUser ? JSON.parse(storedUser) : null;
 
 const initialState: AuthState = {
   isLoggedIn: false,
+  isAdmin: parsedUser?.role === "admin" || parsedUser?.role === "superadmin",
   token: "",
   userId: parsedUser?.id || null,
   user: parsedUser,
@@ -61,6 +64,7 @@ export const fetchUserData = createAsyncThunk(
       return {
         id: response.data.user.data.id || "",
         email: userData.email || "",
+        role: userData.role || "user",
         username: userData.username || "",
         avatar: userData.avatar || "",
         friends: userData.friends || [],
@@ -85,6 +89,8 @@ const authSlice = createSlice({
       const { token } = action.payload;
       sessionStorage.setItem("authToken", token);
       state.isLoggedIn = true;
+      state.isAdmin =
+        parsedUser?.role === "admin" || parsedUser?.role === "superadmin";
       state.token = token;
       state.userId = getUserIdFromToken(token);
       state.user = parsedUser;
@@ -93,6 +99,7 @@ const authSlice = createSlice({
       sessionStorage.removeItem("authToken");
       localStorage.removeItem("user");
       state.isLoggedIn = false;
+      state.isAdmin = false;
       state.token = "";
       state.userId = null;
       state.user = null;
