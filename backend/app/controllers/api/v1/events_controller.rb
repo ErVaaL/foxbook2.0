@@ -20,7 +20,7 @@ class Api::V1::EventsController < ApplicationController
   end
 
   def update
-    event_id =Event.find(params[:id])
+    event_id = Event.find(params[:id])
     event_params = needed_params(:event, [ :title, :description, :event_date ])
     result = @service.update_event(event_id, event_params)
     render json: result.except(:status), status: result[:status]

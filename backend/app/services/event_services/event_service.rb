@@ -2,11 +2,11 @@ module EventServices
   class EventService < ApplicationService
     def get_all_events
       events = Event.all.order(event_date: :asc)
-      { success: true, data: EventSerializer.new(events).serializable_hash, status: :ok }
+      { success: true, events: EventSerializer.new(events).serializable_hash, status: :ok }
     end
 
     def get_event(event)
-      return { success: false, data: { errors: "Event not found" }, status: :not_found } if event.nil?
+      return { success: false,  errors: "Event not found", status: :not_found } if event.nil?
       { success: true, data: EventSerializer.new(event).serializable_hash, status: :ok }
     end
 

@@ -37,8 +37,6 @@ class Api::V1::Admin::ContentController < ApplicationController
       case params[:type]
       when ->(type) { type == "posts" }
         @content_type = Post
-      when ->(type) { type == "comments" }
-        @content_type = Comment
       when ->(type) { type == "events" }
         @content_type = Event
       else
@@ -50,8 +48,6 @@ class Api::V1::Admin::ContentController < ApplicationController
       case @content_type
       when ->(type) { type == Post }
         needed_params(:posts, [ :title, :contents, :user_id ])
-      when ->(type) { type == Comment }
-        needed_params(:comments, [ :content ])
       when ->(type) { type == Event }
         needed_params(:event, [ :title, :description, :event_date, :user_id ])
       else
