@@ -18,7 +18,7 @@ class Api::V1::Admin::UsersController < ApplicationController
   end
 
   def update
-    result = @service.user_update(params[:id], @user_params, @profile_params)
+    result = @service.user_update(params[:id], @user_params)
     render json: result.except(:status), status: result[:status]
   end
 
@@ -34,7 +34,6 @@ class Api::V1::Admin::UsersController < ApplicationController
     end
 
     def set_user_params
-      @user_params = needed_params(:user, [ :first_name, :last_name, :username, :age, :email, :phone, :password_digest, :role ])
-      @profile_params = needed_params(:profile, [ :description, :birthday, address: [ :country, :state, :city ] ])
+      @user_params = needed_params(:user, [ :first_name, :last_name, :username, :birthday, :email, :phone, :password_digest, :role ])
     end
 end

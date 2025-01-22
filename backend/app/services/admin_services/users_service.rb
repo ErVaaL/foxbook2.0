@@ -20,17 +20,14 @@ class AdminServices::UsersService < ApplicationService
     { success: false, error: "User not found", status: :not_found }
   end
 
-  def user_update(user_id, user_params = nil, profile_params = nil)
+  def user_update(user_id, user_params = nil)
     return { success: false, error: "No data to change provided", status: :bad_request } if user_params.blank? && profile_params.blank?
-    return not_the_same_user_error unless @current_user.id == user_id || @current_user.role == "admin"
+    return not_the_same_user_error unless @current_user.id.to_s == user_id || @current_user.role.to_s == "admin"
     user = User.find(user_id)
     return { success: false, error: "User not found", status: :not_found } unless user
     user.update!(user_params) if user_params.present?
 
-    profile = user.profile
-    profile.update!(profile_params) if profile_params
-
-    { success: true, message: "Data successfully updated", details: ProfileSerializer.new(profile).serializable_hash, status: :accepted }
+    { success: true, message: "Data successfully updated", details: UserSerializer.new(user).serializable_hash, status: :accepted }
   rescue Mongoid::Errors::DocumentNotFound
     { success: false, error: "User not found", status: :not_found }
   rescue StandardError => e
