@@ -12,8 +12,8 @@ import { useNavigate } from "react-router-dom";
 
 const NotificationComponent: React.FC = () => {
   const [position, setPosition] = useState<{ x: number; y: number }>({
-    x: 1550,
-    y: 20,
+    x: Math.min(window.innerWidth - 60, window.innerWidth * 0.85),
+    y: Math.min(window.innerHeight - 60, 20),
   });
   const [dragging, setDragging] = useState(false);
   const [dragStart, setDragStart] = useState<{ x: number; y: number }>({
