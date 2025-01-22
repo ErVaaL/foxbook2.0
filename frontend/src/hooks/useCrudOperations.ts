@@ -1,6 +1,7 @@
 import { useReducer, useEffect } from "react";
 import axios from "axios";
 import { AdminUserFromAPI } from "../types/userTypes";
+import { AdminGroupFromAPI } from "../types/groupTypes";
 
 interface Identifiable {
   id: string;
@@ -17,7 +18,7 @@ type CrudAction<T> =
   | { type: "SET_LOADING"; payload: boolean }
   | { type: "SET_ERROR"; payload: string | null };
 
-const crudReducer = <T>(
+const crudReducer = <T extends Identifiable>(
   state: CrudState<T>,
   action: CrudAction<T>,
 ): CrudState<T> => {
@@ -36,29 +37,57 @@ const crudReducer = <T>(
 export const useCrudOperations = <T extends Identifiable>(
   endpoint: string,
   token: string | null,
+  type?: "posts" | "events" | "groups",
 ) => {
   const initialState: CrudState<T> = { data: [], loading: false, error: null };
   const [state, dispatch] = useReducer(crudReducer<T>, initialState);
+
+  const extractData = (response: any): T[] => {
+    switch (type) {
+      case "posts":
+      case "events":
+        return (
+          response.data?.[type]?.data?.map((item: any) => ({
+            id: item.id,
+            ...item.attributes,
+          })) || []
+        );
+
+      case "groups":
+        return (
+          response.data?.details?.data?.map((group: AdminGroupFromAPI) => ({
+            id: group.id,
+            ...group.attributes,
+          })) || []
+        );
+
+      default:
+        return (
+          response.data?.users?.data?.map((user: AdminUserFromAPI) => ({
+            id: user.id,
+            ...user.attributes,
+          })) || []
+        );
+    }
+  };
 
   useEffect(() => {
     if (!token) {
       console.warn("Token not available yet, waiting...");
       return;
     }
+
     const fetchData = async () => {
       dispatch({ type: "SET_LOADING", payload: true });
-      const header = token ? { Authorization: `Bearer ${token}` } : {};
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      let url = endpoint;
+      if (type !== "groups" && type !== undefined) {
+        url = `${endpoint}?type=${type}`;
+      }
 
       try {
-        const response = await axios.get(endpoint, {
-          headers: header,
-        });
-        const responseData: T[] =
-          response.data?.users?.data?.map((user: AdminUserFromAPI) => ({
-            id: user.id,
-            ...user.attributes,
-          })) || [];
-        dispatch({ type: "SET_DATA", payload: responseData });
+        const response = await axios.get(url, { headers });
+        dispatch({ type: "SET_DATA", payload: extractData(response) });
       } catch (error) {
         if (axios.isAxiosError(error)) {
           dispatch({
@@ -70,13 +99,14 @@ export const useCrudOperations = <T extends Identifiable>(
     };
 
     fetchData();
-  }, [endpoint, token]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [endpoint, token, type]);
 
   const editItem = async (id: string, updatedData: Partial<T>) => {
     try {
       const filteredData = Object.fromEntries(
         Object.entries(updatedData).filter(
-          ([key, value]) => value !== "" && value !== undefined,
+          ([, value]) => value !== "" && value !== undefined,
         ),
       );
 
@@ -85,26 +115,18 @@ export const useCrudOperations = <T extends Identifiable>(
         return;
       }
 
-      const payload = { user: filteredData };
+      const url = type ? `${endpoint}/${id}?type=${type}` : `${endpoint}/${id}`;
+      const payload = { [type || "user"]: filteredData };
 
-      await axios.patch(`${endpoint}/${id}`, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      await axios.patch(url, payload, {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       const response = await axios.get(endpoint, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const updatedUsers = response.data.users.data.map(
-        (user: AdminUserFromAPI) => ({
-          id: user.id,
-          ...user.attributes,
-        }),
-      );
-
-      dispatch({ type: "SET_DATA", payload: updatedUsers });
+      dispatch({ type: "SET_DATA", payload: extractData(response) });
     } catch (error) {
       if (axios.isAxiosError(error)) {
         dispatch({
@@ -117,11 +139,12 @@ export const useCrudOperations = <T extends Identifiable>(
 
   const deleteItem = async (id: string) => {
     try {
-      await axios.delete(`${endpoint}/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const url = type ? `${endpoint}/${id}?type=${type}` : `${endpoint}/${id}`;
+
+      await axios.delete(url, {
+        headers: { Authorization: `Bearer ${token}` },
       });
+
       dispatch({
         type: "SET_DATA",
         payload: state.data.filter((item) => item.id !== id),

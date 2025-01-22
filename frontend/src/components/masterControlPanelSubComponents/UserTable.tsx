@@ -10,6 +10,10 @@ import {
   Paper,
   IconButton,
   Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
 } from "@mui/material";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { User } from "../../contexts/masterControlContext/subMasterContext/MasterUsersContext";
@@ -18,12 +22,14 @@ import EditUserForm from "../../forms/masterForms/UserEditForm";
 interface Props {
   data: User[];
   editItem: (id: string, updatedData: Partial<User>) => Promise<void>;
+  deleteItem: (id: string) => Promise<void>;
 }
 
-const UserTable: React.FC<Props> = ({ data, editItem }) => {
+const UserTable: React.FC<Props> = ({ data, editItem, deleteItem }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [deleteUser, setDeleteUser] = useState<User | null>();
 
   const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage);
@@ -40,6 +46,14 @@ const UserTable: React.FC<Props> = ({ data, editItem }) => {
 
   const handleEditClose = () => setSelectedUser(null);
 
+  const handleDeleteClick = (user: User) => setDeleteUser(user);
+  const handleDeleteClose = () => setDeleteUser(null);
+  const handleConfirmDelete = async () => {
+    if (deleteUser) {
+      await deleteItem(deleteUser.id);
+      setDeleteUser(null);
+    }
+  };
   return (
     <Paper
       sx={{ width: "100%", overflow: "hidden" }}
@@ -107,7 +121,7 @@ const UserTable: React.FC<Props> = ({ data, editItem }) => {
                     <IconButton onClick={() => handleEditClick(user)}>
                       <FaEdit className="text-orange-400 hover:text-orange-600 dark:text-darkgoldenrod dark:hover:text-goldenrodhover" />
                     </IconButton>
-                    <IconButton>
+                    <IconButton onClick={() => handleDeleteClick(user)}>
                       <FaTrash className="text-red-500 hover:text-red-700" />
                     </IconButton>
                   </TableCell>
@@ -143,6 +157,33 @@ const UserTable: React.FC<Props> = ({ data, editItem }) => {
             onClose={handleEditClose}
           />
         )}
+      </Dialog>
+      <Dialog open={!!deleteUser} onClose={handleDeleteClose}>
+        <DialogTitle className="dark:bg-[#1a1a1a] dark:text-gray-300">
+          Confirm Deletion
+        </DialogTitle>
+        <DialogContent className="dark:bg-[#1a1a1a] dark:text-gray-300">
+          Are you sure you want to delete{" "}
+          <span className="font-bold">@{deleteUser?.username}</span>?
+        </DialogContent>
+        <DialogActions className="dark:bg-[#1a1a1a]">
+          <Button
+            onClick={handleDeleteClose}
+            sx={{ color: "#fa0022", "&:hover": { color: "#a50022" } }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmDelete}
+            sx={{
+              backgroundColor: "#367316",
+              color: "white",
+              "&:hover": { backgroundColor: "#005a00" },
+            }}
+          >
+            Delete
+          </Button>
+        </DialogActions>
       </Dialog>
     </Paper>
   );
