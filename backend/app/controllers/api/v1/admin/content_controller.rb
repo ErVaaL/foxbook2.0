@@ -5,7 +5,9 @@ class Api::V1::Admin::ContentController < ApplicationController
   before_action :set_service
 
   def index
-    result = @service.get_all_content(@content_type, params[:post_id])
+    page = params[:page].presence || 1
+    per_page = params[:per_page].presence || 10
+    result = @service.get_all_content(@content_type, params[:post_id], page.to_i, per_page.to_i)
     render json: result.except(:status), status: result[:status]
   rescue Mongoid::Errors::DocumentNotFound
     result = { success: false, error: "Post not found", status: :not_found }
@@ -49,7 +51,7 @@ class Api::V1::Admin::ContentController < ApplicationController
       when ->(type) { type == Post }
         needed_params(:posts, [ :title, :contents, :user_id ])
       when ->(type) { type == Event }
-        needed_params(:event, [ :title, :description, :event_date, :user_id ])
+        needed_params(:events, [ :title, :description, :event_date, :user_id ])
       else
         {}
       end

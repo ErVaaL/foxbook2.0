@@ -6,12 +6,12 @@ module AdminServices
       @events_service = initialize_service(EventServices::EventService)
     end
 
-    def get_all_content(content_type, post_id = nil)
+    def get_all_content(content_type, post_id = nil, page = 1, per_page = 10)
       case content_type
       when ->(type) { type == Post }
         all_posts
       when ->(type) { type == Event }
-        all_events
+        all_events(page, per_page)
       else
         { success: false, error: "Invalid resource", status: :bad_request }
       end
@@ -62,8 +62,14 @@ module AdminServices
         @posts_service.get_all_posts
       end
 
-      def all_events
-        @events_service.get_all_events
+      def all_events(page, per_page)
+        events = Event.all.order(event_date: :asc).page(page).per(per_page)
+        { success: true,
+        events: EventSerializer.new(events).serializable_hash,
+        meta: { total_count: events.count, current_page: page, per_page: per_page },
+        status: :ok }
+      rescue Mongoid::Errors::DocumentNotFound
+        { success: false, error: "Events not found", status: :not_found }
       end
   end
 end

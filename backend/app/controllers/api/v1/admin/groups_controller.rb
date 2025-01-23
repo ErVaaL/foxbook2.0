@@ -4,7 +4,9 @@ class Api::V1::Admin::GroupsController < ApplicationController
   before_action :set_service
 
   def index
-    result  = @service.get_all_groups
+    page = params[:page].presence || 1
+    per_page = params[:per_page].presence || 10
+    result  = @service.get_all_groups(page.to_i, per_page.to_i)
     render json: result.except(:status), status: result[:status]
   end
 
