@@ -5,6 +5,7 @@ import UniversalBoard from "../components/universal/UniversalBoard";
 import UsersManagement from "../components/masterControlPanelSubComponents/UsersManagement";
 import GroupsManagement from "../components/masterControlPanelSubComponents/GroupsManagement";
 import EventsManagement from "../components/masterControlPanelSubComponents/EventsManagement";
+import ReportsManagement from "../components/masterControlPanelSubComponents/ReportsManagement";
 
 const MasterControl: React.FC = () => {
   const { isLoggedIn, isAdmin } = useSelector((state: RootState) => state.auth);
@@ -41,8 +42,8 @@ const MasterControl: React.FC = () => {
       component: <EventsManagement />,
     },
     {
-      label: "Settings",
-      component: <p>Settings</p>,
+      label: "Reports",
+      component: <ReportsManagement />,
     },
   ];
 

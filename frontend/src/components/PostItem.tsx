@@ -18,6 +18,9 @@ import CommentItem from "./CommentItem";
 import { formatDate } from "../utils/formatDate";
 import UserMention from "../forms/postCreation/UserMention";
 import { useUserMentions } from "../hooks/useUserMentions";
+import { API_BASE_URL, API_ENDPOINTS } from "../config";
+import axios from "axios";
+import ReportModal from "./universal/ReportModal";
 
 type PostItemProps = {
   postId: string;
@@ -34,7 +37,9 @@ const PostItem: React.FC<PostItemProps> = ({ postId }) => {
   const loading = useSelector(selectLoading);
   const error = useSelector(selectError);
   const userId = useSelector((state: RootState) => state.auth.userId);
-  const { isLoggedIn, isAdmin } = useSelector((state: RootState) => state.auth);
+  const { isLoggedIn, isAdmin, token } = useSelector(
+    (state: RootState) => state.auth,
+  );
 
   const [showComments, setShowComments] = useState(false);
   const [commentInput, setCommentInput] = useState("");
@@ -44,6 +49,10 @@ const PostItem: React.FC<PostItemProps> = ({ postId }) => {
   const [editedContent, setEditedContent] = useState(post?.contents || "");
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [reportType, setReportType] = useState("inappropriate_content");
 
   const isLiked = userId ? (post?.like_ids.includes(userId) ?? false) : false;
 
@@ -120,6 +129,38 @@ const PostItem: React.FC<PostItemProps> = ({ postId }) => {
   const handleDeletePost = () => {
     dispatch(deletePost(postId));
     setShowDeleteModal(false);
+  };
+
+  const handleReportSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reportReason.trim()) return;
+
+    const reportData = {
+      reported_user_id: post?.author.id,
+      post_id: post?.id,
+      type: reportType,
+      reason: reportReason,
+    };
+
+    try {
+      await axios.post(
+        `${API_BASE_URL}${API_ENDPOINTS.CREATE_REPORT}`,
+        { reports: reportData },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      setShowReportModal(false);
+      setReportReason("");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error(error.response?.data);
+      }
+    }
   };
 
   if (!post) return <Loader size={60} />;
@@ -243,6 +284,12 @@ const PostItem: React.FC<PostItemProps> = ({ postId }) => {
               >
                 Delete
               </button>
+              <button
+                onClick={() => setShowReportModal(true)}
+                className="text-red-500 hover:text-red-700"
+              >
+                Report
+              </button>
             </div>
           )}
         </div>
@@ -283,6 +330,16 @@ const PostItem: React.FC<PostItemProps> = ({ postId }) => {
           </div>
         )}
       </div>
+      {showReportModal && (
+        <ReportModal
+          reportType={reportType}
+          reportReason={reportReason}
+          setReportReason={setReportReason}
+          setReportType={setReportType}
+          setShowReportModal={setShowReportModal}
+          handleReportSubmit={handleReportSubmit}
+        />
+      )}
       {showDeleteModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white dark:bg-[#2e2e2e] p-6 rounded-lg shadow-lg">

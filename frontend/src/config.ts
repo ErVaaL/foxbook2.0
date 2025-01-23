@@ -40,6 +40,8 @@ export const API_ENDPOINTS = {
   ADMIN_USERS: "/admin/users",
   ADMIN_GROUPS: "/admin/groups",
   ADMIN_CONTENT: "/admin/content",
+  CREATE_REPORT: "/reports",
+  REPORTS: "/admin/reports",
 };
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
