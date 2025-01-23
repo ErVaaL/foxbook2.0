@@ -2,6 +2,7 @@ import { useReducer, useEffect } from "react";
 import axios from "axios";
 import { AdminUserFromAPI } from "../types/userTypes";
 import { AdminGroupFromAPI } from "../types/groupTypes";
+import { AdminEventFromAPI } from "../types/eventTypes";
 
 interface Identifiable {
   id: string;
@@ -47,15 +48,13 @@ export const useCrudOperations = <T extends Identifiable>(
       case "posts":
       case "events":
         return (
-          response.data?.[type]?.data?.map((item: any) => ({
+          response.data?.[type]?.data?.map((item: AdminEventFromAPI) => ({
             id: item.id,
             ...item.attributes,
           })) || []
         );
 
       case "groups":
-        console.log(response.data);
-        
         return (
           response.data?.groups?.data?.map((group: AdminGroupFromAPI) => ({
             id: group.id,
@@ -75,7 +74,6 @@ export const useCrudOperations = <T extends Identifiable>(
 
   useEffect(() => {
     if (!token) {
-      console.warn("Token not available yet, waiting...");
       return;
     }
 
@@ -120,11 +118,20 @@ export const useCrudOperations = <T extends Identifiable>(
       const url = type ? `${endpoint}/${id}?type=${type}` : `${endpoint}/${id}`;
       const payload = { [type || "user"]: filteredData };
 
+      let confirmationUrl;
+      switch (type) {
+        case "events":
+          confirmationUrl = `${endpoint}?type=${type}`;
+          break;
+        default:
+          confirmationUrl = `${endpoint}`;
+      }
+
       await axios.patch(url, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const response = await axios.get(endpoint, {
+      const response = await axios.get(confirmationUrl, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

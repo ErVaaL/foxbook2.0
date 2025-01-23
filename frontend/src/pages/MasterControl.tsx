@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import UniversalBoard from "../components/universal/UniversalBoard";
 import UsersManagement from "../components/masterControlPanelSubComponents/UsersManagement";
 import GroupsManagement from "../components/masterControlPanelSubComponents/GroupsManagement";
+import EventsManagement from "../components/masterControlPanelSubComponents/EventsManagement";
 
 const MasterControl: React.FC = () => {
   const { isLoggedIn, isAdmin } = useSelector((state: RootState) => state.auth);
@@ -37,7 +38,7 @@ const MasterControl: React.FC = () => {
     },
     {
       label: "Events",
-      component: <p>Events</p>,
+      component: <EventsManagement />,
     },
     {
       label: "Settings",
