@@ -77,8 +77,14 @@ Rails.application.routes.draw do
         resources :content, only: [ :index, :show, :update, :destroy ]
         resources :groups, only: [ :index, :show, :update, :destroy ]
         # TODO
-        resources :reports, only: [ :index ]
+        resources :reports, only: [ :index, :show ] do
+          member do
+            patch :close
+          end
+        end
       end
+
+      resources :reports, only: [ :create ]
 
       # Additional routes
       # ask about
@@ -87,7 +93,6 @@ Rails.application.routes.draw do
       post "/social/share", to: "social#share"
       post "/social/follow", to: "social#follow"
 
-      get "/reports", to: "reports#index"
       get "/forums/:id/moderate", to: "forums#moderate"
       get "/history/changes", to: "history#changes"
       get "/analytics", to: "analytics#index"
