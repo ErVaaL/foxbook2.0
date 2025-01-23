@@ -4,8 +4,14 @@ class AdminServices::GroupsService < ApplicationService
     @group_service = initialize_service(GroupServices::GroupService)
   end
 
-  def get_all_groups
-    @group_service.get_all_groups
+  def get_all_groups(page = 1, per_page = 10)
+    groups = Group.order_by(created_at: :desc).page(page).per(per_page)
+    { success: true,
+      groups: GroupSerializer.new(groups).serializable_hash,
+      meta: { total_count: groups.count, current_page: page, per_page: per_page },
+      status: :ok }
+  rescue Mongoid::Errors::DocumentNotFound
+    { success: false, error: "Groups not found", status: :not_found }
   end
 
   def get_group(group_id)

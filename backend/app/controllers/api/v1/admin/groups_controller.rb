@@ -14,7 +14,7 @@ class Api::V1::Admin::GroupsController < ApplicationController
   end
 
   def update
-    group_params = needed_params(:group, [ :name, :description, :is_public, :owner ])
+    group_params = needed_params(:groups, [ :name, :description, :is_public, :owner ])
     result = @service.group_update(params[:id], group_params)
     render json: result.except(:status), status: result[:status]
   end
