@@ -1,6 +1,6 @@
 import React from "react";
 import { useUsers } from "../../contexts/masterControlContext/subMasterContext/MasterUsersContext";
-import UserTable from "./UserTable";
+import UserTable from "./tables/UserTable";
 const UsersManagement: React.FC = () => {
   const { state, editItem, deleteItem } = useUsers();
   const { data: users, loading, error } = state;

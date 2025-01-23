@@ -16,8 +16,8 @@ import {
   Button,
 } from "@mui/material";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import { User } from "../../contexts/masterControlContext/subMasterContext/MasterUsersContext";
-import EditUserForm from "../../forms/masterForms/UserEditForm";
+import { User } from "../../../contexts/masterControlContext/subMasterContext/MasterUsersContext";
+import EditUserForm from "../../../forms/masterForms/UserEditForm";
 
 interface Props {
   data: User[];
