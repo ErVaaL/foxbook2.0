@@ -9,6 +9,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import { Group } from "../../contexts/masterControlContext/subMasterContext/MasterGroupsContext";
+import { useUsers } from "../../contexts/masterControlContext/subMasterContext/MasterUsersContext";
 
 interface Props {
   group: Group;
@@ -17,6 +18,9 @@ interface Props {
 }
 
 const EditGroupForm: React.FC<Props> = ({ group, onSave, onClose }) => {
+  const { state: usersState } = useUsers();
+  const { data: users, loading: usersLoading } = usersState;
+
   const validationSchema = Yup.object({
     name: Yup.string()
       .required("Group Name is required")
@@ -25,6 +29,7 @@ const EditGroupForm: React.FC<Props> = ({ group, onSave, onClose }) => {
       .required("Description is required")
       .min(3, "Description must be at least 3 characters"),
     is_public: Yup.boolean().required("Public status is required"),
+    owner: Yup.string().required("Owner is required"),
   });
 
   type FormFields = keyof typeof formik.values;
@@ -34,6 +39,7 @@ const EditGroupForm: React.FC<Props> = ({ group, onSave, onClose }) => {
       name: group.name,
       description: group.description,
       is_public: group.is_public,
+      owner: group.owner.id,
     },
     validationSchema,
     onSubmit: async (values) => {
@@ -111,6 +117,44 @@ const EditGroupForm: React.FC<Props> = ({ group, onSave, onClose }) => {
               ))}
           </TextField>
         ))}
+        <TextField
+          name="owner"
+          label="Owner"
+          select
+          fullWidth
+          margin="dense"
+          value={formik.values.owner}
+          onChange={formik.handleChange}
+          error={formik.touched.owner && !!formik.errors.owner}
+          helperText={formik.touched.owner && formik.errors.owner}
+          sx={{
+            "& label": { color: "#b0b0b0" },
+            "& label.Mui-focused": { color: "#e0e0e0" },
+            "& .MuiInputBase-root": {
+              backgroundColor: "#2e2e2e",
+              color: "#e0e0e0",
+            },
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderColor: "#555",
+            },
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: "#888",
+            },
+            "& .Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: "#aaa",
+            },
+          }}
+        >
+          {usersLoading ? (
+            <MenuItem disabled>Loading users...</MenuItem>
+          ) : (
+            users.map((user) => (
+              <MenuItem key={user.id} value={user.id}>
+                @{user.username}
+              </MenuItem>
+            ))
+          )}
+        </TextField>
       </DialogContent>
       <DialogActions className="bg-[#2e2e2a] outline-orange-500 dark:border-t dark:border-gray-600">
         <Button

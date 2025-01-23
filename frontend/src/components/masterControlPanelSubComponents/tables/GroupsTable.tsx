@@ -116,7 +116,7 @@ const GroupsTable: React.FC<Props> = ({ data, editItem, deleteItem }) => {
                     {group.description}
                   </TableCell>
                   <TableCell className="dark:text-white">
-                    {group.owner.username}
+                    @{group.owner.username}
                   </TableCell>
                   <TableCell className="dark:text-white">
                     {group.is_public ? "Public" : "Private"}
@@ -162,7 +162,12 @@ const GroupsTable: React.FC<Props> = ({ data, editItem, deleteItem }) => {
         {selectedGroup && (
           <EditGroupForm
             group={selectedGroup}
-            onSave={editItem}
+            onSave={(id, updatedData) =>
+              editItem(id, {
+                ...updatedData,
+                owner: updatedData.owner,
+              })
+            }
             onClose={handleEditClose}
           />
         )}
