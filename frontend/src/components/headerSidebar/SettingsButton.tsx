@@ -29,6 +29,10 @@ const SettingsButton: React.FC<SettingsButtonProps> = ({
           onLogout={() => {
             setShowLogoutModal(true);
           }}
+          onMaster={() => {
+            navigate("/master-control");
+            setShowDropdown(false);
+          }}
           closeDropdown={() => setShowDropdown(false)}
         />
       )}
