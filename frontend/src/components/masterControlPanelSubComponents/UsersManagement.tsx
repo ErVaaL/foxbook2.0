@@ -1,6 +1,7 @@
 import React from "react";
 import { useUsers } from "../../contexts/masterControlContext/subMasterContext/MasterUsersContext";
 import UserTable from "./tables/UserTable";
+import Loader from "../Loader";
 const UsersManagement: React.FC = () => {
   const { state, editItem, deleteItem } = useUsers();
   const { data: users, loading, error } = state;
@@ -11,7 +12,7 @@ const UsersManagement: React.FC = () => {
         Manage Users
       </h2>
 
-      {loading && <p className="text-blue-500">Loading users...</p>}
+      {loading && <Loader size={60} />}
 
       {error && <p className="text-red-500">{error}</p>}
 

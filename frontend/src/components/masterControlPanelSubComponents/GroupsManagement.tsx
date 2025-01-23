@@ -1,6 +1,7 @@
 import React from "react";
 import { useGroups } from "../../contexts/masterControlContext/subMasterContext/MasterGroupsContext";
 import GroupsTable from "./tables/GroupsTable";
+import Loader from "../Loader";
 
 const GroupsManagement: React.FC = () => {
   const { state, editItem, deleteItem } = useGroups();
@@ -9,10 +10,10 @@ const GroupsManagement: React.FC = () => {
   return (
     <div className="p-4">
       <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 text-center py-2">
-        Manage Users
+        Manage Groups
       </h2>
 
-      {loading && <p className="text-blue-500">Loading users...</p>}
+      {loading && <Loader size={60} />}
 
       {error && <p className="text-red-500">{error}</p>}
 
@@ -25,7 +26,7 @@ const GroupsManagement: React.FC = () => {
       )}
 
       {!loading && !error && groups.length === 0 && (
-        <p className="text-gray-600">No users found.</p>
+        <p className="text-gray-600">No groups found</p>
       )}
     </div>
   );
