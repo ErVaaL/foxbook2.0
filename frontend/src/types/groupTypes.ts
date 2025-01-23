@@ -6,10 +6,12 @@ export interface AdminGroupFromAPI {
     created_at: string;
     updated_at: string;
     is_public: boolean;
-    owner: {
-      id: string;
-      username: string;
-      email: string;
-    };
+    owner: Owner;
   };
+}
+
+interface Owner {
+  id: string;
+  username: string;
+  email: string;
 }

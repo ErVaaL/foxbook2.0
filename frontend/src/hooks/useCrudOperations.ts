@@ -54,8 +54,10 @@ export const useCrudOperations = <T extends Identifiable>(
         );
 
       case "groups":
+        console.log(response.data);
+        
         return (
-          response.data?.details?.data?.map((group: AdminGroupFromAPI) => ({
+          response.data?.groups?.data?.map((group: AdminGroupFromAPI) => ({
             id: group.id,
             ...group.attributes,
           })) || []
