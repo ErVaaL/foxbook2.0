@@ -34,7 +34,7 @@ const PostItem: React.FC<PostItemProps> = ({ postId }) => {
   const loading = useSelector(selectLoading);
   const error = useSelector(selectError);
   const userId = useSelector((state: RootState) => state.auth.userId);
-  const { isLoggedIn } = useSelector((state: RootState) => state.auth);
+  const { isLoggedIn, isAdmin } = useSelector((state: RootState) => state.auth);
 
   const [showComments, setShowComments] = useState(false);
   const [commentInput, setCommentInput] = useState("");
@@ -114,6 +114,8 @@ const PostItem: React.FC<PostItemProps> = ({ postId }) => {
     }
     setIsEditing(false);
   };
+
+  const canManagePost = isAdmin || (post && post.author.id === userId);
 
   const handleDeletePost = () => {
     dispatch(deletePost(postId));
@@ -227,7 +229,7 @@ const PostItem: React.FC<PostItemProps> = ({ postId }) => {
               💬 {post.comments_count}
             </button>
           </div>
-          {post.author.id === userId && !isEditing && (
+          {canManagePost && !isEditing && (
             <div>
               <button
                 onClick={() => setIsEditing(true)}
