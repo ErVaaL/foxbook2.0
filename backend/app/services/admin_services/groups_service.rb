@@ -23,10 +23,34 @@ class AdminServices::GroupsService < ApplicationService
 
   def group_update(group_id, group_params)
     group = Group.find(group_id)
+
+    if group_params[:owner]
+      return { success: false, error: "Unauthorized to change owner", status: :unauthorized } unless @current_user.admin? || group.owner_id == @current_user.id
+
+      old_owner = group.owner
+      new_owner = User.find(group_params[:owner])
+
+      new_owner_membership = Membership.find_by(group_id: group.id, user_id: new_owner.id)
+
+      unless new_owner_membership
+        new_owner_membership = Membership.create!(group: group, user: new_owner, role: "owner")
+      end
+
+      old_owner_membership = Membership.find_by(group_id: group.id, user_id: old_owner.id)
+
+      group.update!(owner: new_owner)
+
+      old_owner_membership.update!(role: "member") if old_owner_membership
+      new_owner_membership.update!(role: "owner")
+    end
+
     @group_service.update_group(group, group_params)
   rescue Mongoid::Errors::DocumentNotFound
     { success: false, error: "Group not found", status: :not_found }
+  rescue StandardError => e
+    { success: false, error: e.message, status: :unprocessable_entity }
   end
+
 
   def group_delete(group_id)
     group = Group.find(group_id)

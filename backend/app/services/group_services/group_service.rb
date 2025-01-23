@@ -89,6 +89,8 @@ module GroupServices
       return no_group_error if group.nil?
       return user_not_found_error if user.nil?
 
+      return { success: false, error: "Cannot remove group owner", status: :bad_request } if group.owner_id == user.id
+
       membership = Membership.where(group: group, user: user).first
       return { success: false, error: "User not in group", status: :bad_request } unless membership
 
