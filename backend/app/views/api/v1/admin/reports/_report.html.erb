@@ -1,0 +1,35 @@
+<tr
+  id="report_<%= report.id %>"
+  class="
+    border border-gray-400 dark:border-gray-700 hover:bg-gray-600 transition
+  "
+>
+  <td class="border border-gray-400 px-4 py-2"><%= report.id %></td>
+  <td class="border border-gray-400 px-4 py-2"><%= report.reported_user&.username || "N/A" %></td>
+  <td class="border border-gray-400 px-4 py-2"><%= report.type %></td>
+  <td class="border border-gray-400 px-4 py-2"><%= report.reason.presence || "No reason given" %></td>
+  <td class="border border-gray-400 px-4 py-2">
+    <span
+      class="
+        px-2 py-1 rounded-full text-white <%= report.status == 'open' ? 'bg-red-500' : 'bg-green-500' %>
+      "
+    >
+      <%= report.status.capitalize %>
+    </span>
+  </td>
+  <td class="border border-gray-400 px-4 py-2 text-center">
+    <%= link_to "View",
+    api_v1_admin_report_path(report),
+    class: "text-blue-500 hover:text-blue-700" %>
+    |
+    <%= link_to "Close",
+    close_api_v1_admin_report_path(report),
+    method: :patch,
+    class: "text-red-500 hover:text-red-700",
+    data: {
+      turbo_stream: true,
+      confirm: "Are you sure you want to close this report?",
+    } %>
+
+  </td>
+</tr>

@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get "test/index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   mount ActionCable.server => "/cable"
@@ -84,7 +85,7 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :reports, only: [ :create ]
+      resources :reports, only: [ :create ], controller: "admin/reports"
 
       # Additional routes
       # ask about

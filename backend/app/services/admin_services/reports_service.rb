@@ -15,7 +15,11 @@ class AdminServices::ReportsService < ApplicationService
 
   def create_report(report_params)
     report = Report.new(report_params)
-    { success: false, error: report.errors.full_messages.join(", "), status: :bad_request } unless report.save
+    if report.save
+      { success: true, report: ReportSerializer.new(report).serializable_hash, status: :created }
+    else
+      { success: false, error: report.errors.full_messages.join(", "), status: :bad_request }
+    end
     { success: true, report: ReportSerializer.new(report).serializable_hash, status: :created }
   end
 

@@ -23,6 +23,9 @@ gem "dotenv-rails", groups: [ :development, :test ]
 
 gem "factory_bot_rails"
 
+
+gem "turbo-rails"
+
 gem "bcrypt"
 
 gem "jsonapi-serializer"
@@ -57,3 +60,11 @@ group :development, :test do
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
 end
+
+gem "tailwindcss-rails", "~> 3.3"
+
+gem "sprockets-rails", "~> 3.5"
+
+gem "importmap-rails", "~> 2.1"
+
+gem "rails-controller-testing", "~> 1.0"

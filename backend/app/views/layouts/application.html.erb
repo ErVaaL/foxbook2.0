@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>MyRailsApp</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <!-- Link TailwindCSS Styles -->
+    <%= stylesheet_link_tag "application.tailwind", "data-turbo-track": "reload" %>
+    <!-- JavaScript (Turbo & Hotwire) -->
+    <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body class="bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-200">
+    <%= yield %>
+    <!-- This renders content from views -->
+  </body>
+</html>

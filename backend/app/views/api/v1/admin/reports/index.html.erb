@@ -1,0 +1,33 @@
+<h1
+  class="text-3xl font-bold text-gray-800 dark:text-gray-100 text-center my-4"
+>
+  Reports Management
+</h1>
+
+<% if @reports.any? %>
+  <p class="dark:text-gray-300">Reports Found:
+    <%= @reports.count %></p>
+<% else %>
+  <p class="text-red-500">No reports found.</p>
+<% end %>
+
+<table
+  class="
+    w-full border-collapse border border-gray-400 dark:border-gray-700 shadow-lg
+    dark:text-gray-300
+  "
+>
+  <thead class="bg-gray-200 dark:bg-[#2e2e2e]">
+    <tr>
+      <th class="border border-gray-400 px-4 py-2">ID</th>
+      <th class="border border-gray-400 px-4 py-2">Reported User</th>
+      <th class="border border-gray-400 px-4 py-2">Type</th>
+      <th class="border border-gray-400 px-4 py-2">Reason</th>
+      <th class="border border-gray-400 px-4 py-2">Status</th>
+      <th class="border border-gray-400 px-4 py-2">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= render @reports %>
+  </tbody>
+</table>

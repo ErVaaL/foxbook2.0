@@ -1,4 +1,4 @@
-class ApplicationController < ActionController::API
+class ApplicationController < ActionController::Base
   before_action :authorize_request
 
   SECRET_KEY = Rails.application.credentials.jwt_key
