@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "../store";
 import { fetchUserData, login } from "../store/authSlice";
 import { API_BASE_URL, API_ENDPOINTS } from "../config";
+import axios from "axios";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -19,31 +20,28 @@ const Login: React.FC = () => {
     setError("");
 
     try {
-      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.LOGIN}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const response = await axios.post(
+        `${API_BASE_URL}${API_ENDPOINTS.LOGIN}`,
+        {
           user: {
             email: email,
             password: password,
           },
-        }),
-      });
+        },
+      );
 
-      if (!response.ok) {
-        const errorResponse = await response.json();
-        setError(errorResponse.error || "Invalid credentials");
-        return;
+      if (![200, 202].includes(response.status)) {
+        throw new Error("Invalid credentials");
       }
 
-      const { token } = await response.json();
+      const { token } = await response.data;
       dispatch(login({ token }));
       await dispatch(fetchUserData(token));
       navigate("/");
     } catch (error) {
-      setError(`An error occurred. ${error}`);
+      if (axios.isAxiosError(error)) {
+        setError(error.response?.data || "Failed to log in");
+      }
     }
   };
 

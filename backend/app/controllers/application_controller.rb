@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  protect_from_forgery with: :null_session
   before_action :authorize_request
 
   SECRET_KEY = Rails.application.credentials.jwt_key
