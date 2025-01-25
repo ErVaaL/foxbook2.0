@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { API_BASE_URL, API_ENDPOINTS } from "../config";
 
 interface User {
@@ -22,14 +23,22 @@ interface AuthState {
 }
 
 const storedUser = localStorage.getItem("user");
-const parsedUser: User | null = storedUser ? JSON.parse(storedUser) : null;
+let parsedUser: User | null = null;
+
+try {
+  parsedUser = storedUser ? JSON.parse(storedUser) : null;
+} catch (error) {
+  console.error("Error parsing stored user data:", error);
+  localStorage.removeItem("user");
+  parsedUser = null;
+}
 
 const initialState: AuthState = {
   isLoggedIn: false,
-  isAdmin: parsedUser?.role === "admin" || parsedUser?.role === "superadmin",
   token: "",
   userId: parsedUser?.id || null,
   user: parsedUser,
+  isAdmin: parsedUser?.role === "admin" || parsedUser?.role === "superadmin",
 };
 
 const getUserIdFromToken = (token: string): string | null => {
@@ -89,15 +98,15 @@ const authSlice = createSlice({
       const { token } = action.payload;
       sessionStorage.setItem("authToken", token);
       state.isLoggedIn = true;
-      state.isAdmin =
-        parsedUser?.role === "admin" || parsedUser?.role === "superadmin";
       state.token = token;
       state.userId = getUserIdFromToken(token);
-      state.user = parsedUser;
+      state.user = null;
+      state.isAdmin = false;
     },
     logout: (state) => {
       sessionStorage.removeItem("authToken");
       localStorage.removeItem("user");
+      Cookies.remove("cable_token");
       state.isLoggedIn = false;
       state.isAdmin = false;
       state.token = "";
@@ -137,6 +146,9 @@ const authSlice = createSlice({
     builder
       .addCase(fetchUserData.fulfilled, (state, action) => {
         state.user = action.payload;
+        state.isAdmin =
+          action.payload.role === "admin" ||
+          action.payload.role === "superadmin";
         localStorage.setItem("user", JSON.stringify(action.payload));
       })
       .addCase(fetchUserData.rejected, (state) => {
