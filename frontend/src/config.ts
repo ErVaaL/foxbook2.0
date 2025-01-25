@@ -42,6 +42,7 @@ export const API_ENDPOINTS = {
   ADMIN_CONTENT: "/admin/content",
   CREATE_REPORT: "/reports",
   REPORTS: "/admin/reports",
+  REPORTS_CLOSE: (reportId: string) => `/admin/reports/${reportId}/close`,
 };
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;

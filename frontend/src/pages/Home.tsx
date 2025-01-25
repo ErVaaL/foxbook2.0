@@ -13,13 +13,15 @@ const Home: React.FC = () => {
     setTimeout(() => {
       const postElement = document.getElementById(`post-${postId}`);
       if (!postElement) return;
+
       postElement.scrollIntoView({ behavior: "smooth", block: "center" });
       postElement.classList.add("border-2", "border-blue-500");
+
       setTimeout(() => {
         postElement.classList.remove("border-2", "border-blue-500");
       }, 2000);
 
-      navigate("/", { replace: true, state: { postId: null } });
+      navigate("/", { replace: true, state: {} });
     }, 500);
   }, [navigate, postId]);
 

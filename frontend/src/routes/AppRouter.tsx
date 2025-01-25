@@ -13,10 +13,12 @@ import Notifications from "../pages/Notifications";
 import Settings from "../pages/Settings";
 import MasterControl from "../pages/MasterControl";
 import { MasterControlProvider } from "../contexts/masterControlContext/MasterControlContext";
+import ReportActions from "../components/ReportActions";
 
 const AppRouter: React.FC = () => {
   return (
     <Router>
+      <ReportActions />
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
