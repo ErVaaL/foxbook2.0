@@ -40,7 +40,8 @@ const Login: React.FC = () => {
       navigate("/");
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        setError(error.response?.data || "Failed to log in");
+        const errorMessage = error.response?.data?.error || "Failed to log in";
+        setError(errorMessage);
       }
     }
   };

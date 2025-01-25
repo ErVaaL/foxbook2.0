@@ -1,7 +1,7 @@
 export const API_ENDPOINTS = {
   LOGIN: "/auth/login",
   REGISTER: "/users/register",
-  LOGOUT: "/logout",
+  LOGOUT: "/auth/logout",
   USERS: "/users",
   PROFILE: (profileUserId: string) => `/users/${profileUserId}/profile`,
   FRIENDS: (userId: string) => `/users/${userId}/friends`,

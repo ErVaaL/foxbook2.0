@@ -10,6 +10,8 @@ import LogoutModal from "../settingsComponents/LogoutModal";
 import SettingsButton from "./SettingsButton";
 import ProfileButton from "./ProfileButton";
 import UniversalHeaderSidebarButton from "./UniversalHeaderSidebarButton";
+import { API_BASE_URL, API_ENDPOINTS } from "../../config";
+import axios from "axios";
 
 const HeaderSidebar: React.FC = () => {
   const { isLoggedIn, token, user } = useSelector(
@@ -49,6 +51,26 @@ const HeaderSidebar: React.FC = () => {
     { text: "Sign in", action: () => navigate("/login") },
     { text: "Sign up", action: () => navigate("/register") },
   ];
+
+  const serverLogout = async () => {
+    try {
+      const response = await axios.delete(
+        `${API_BASE_URL}${API_ENDPOINTS.LOGOUT}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      if (![200, 204].includes(response.status)) {
+        throw new Error("Invalid response");
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error(error.response?.data || "Failed to log out");
+      }
+    }
+  };
 
   const renderAuthButtons = () => {
     if (isLoggedIn) {
@@ -92,6 +114,7 @@ const HeaderSidebar: React.FC = () => {
         <LogoutModal
           onCancel={() => setShowLogoutModal(false)}
           onConfirm={() => {
+            serverLogout();
             dispatch(logout());
             setShowLogoutModal(false);
             navigate("/login");
