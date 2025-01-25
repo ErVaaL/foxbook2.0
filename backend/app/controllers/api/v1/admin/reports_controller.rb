@@ -15,8 +15,10 @@ class Api::V1::Admin::ReportsController < ApplicationController
   end
 
   def show
-    result = @service.get_report(@report)
-    render json: result.except(:status), status: result[:status]
+    respond_to do |format|
+      format.html
+      format.turbo_stream { render turbo_stream: turbo_stream.replace("report_details", partial: "reports/show", locals: { report: @report }) }
+    end
   end
 
   def create
@@ -28,11 +30,13 @@ class Api::V1::Admin::ReportsController < ApplicationController
 
   def close
     @report.update!(status: "closed")
+
     respond_to do |format|
-      format.html { redirect_to admin_reports_path, notice: "Report closed successfully" }
-      format.turbo_stream
+      format.json { render json: { success: true, message: "Report closed successfully", report: @report }, status: :ok }
+      format.turbo_stream { render turbo_stream: turbo_stream.replace("report_#{@report.id}", partial: "reports/report", locals: { report: @report }) }
     end
   end
+
 
   private
 

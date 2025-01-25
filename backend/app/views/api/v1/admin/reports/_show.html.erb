@@ -1,0 +1,18 @@
+<div
+  id="report_details"
+  class="p-4 bg-gray-100 dark:bg-gray-800 rounded shadow-lg"
+>
+  <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Report Details</h2>
+  <p><strong>ID:</strong>
+    <%= report.id %></p>
+  <p><strong>Reported User:</strong>
+    <%= report.reported_user&.username || "N/A" %></p>
+  <p><strong>Type:</strong>
+    <%= report.type %></p>
+  <p><strong>Reason:</strong>
+    <%= report.reason.presence || "No reason given" %></p>
+  <p><strong>Status:</strong>
+    <%= report.status.capitalize %></p>
+  <p><strong>Created At:</strong>
+    <%= report.created_at.strftime("%Y-%m-%d %H:%M") %></p>
+</div>
