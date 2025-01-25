@@ -6,14 +6,14 @@ class Api::V1::AuthController < ApplicationController
   def login
     auth_params = needed_params(:user, [ :email, :password ])
     result = @service.login_user(auth_params)
-    render json: result.except(:status), status: result[:status]
+    render json: result.except(:status), status: result[:status] || :ok
   end
 
   def logout
     token = request.headers["Authorization"]&.split(" ")&.last
 
     result = @service.logout_user(token)
-    render json: result.except(:status), status: result[:status]
+    render json: result.except(:status), status: result[:status] || :ok
 
   rescue ActiveRecord::RecordInvalid => e
     render json: { error: "Logout failed: #{e.message}" }, status: :internal_server_error

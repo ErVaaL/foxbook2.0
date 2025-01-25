@@ -4,7 +4,7 @@ class Api::V1::SearchController < ApplicationController
 
   def index
     result = @service.call
-    render json: result.except(:status), status: result[:status]
+    render json: result.except(:status), status: result[:status] || :ok
   rescue StandardError => e
     render json: { success: false, error: e.message, status: :internal_server_error }, status: :internal_server_error
   end

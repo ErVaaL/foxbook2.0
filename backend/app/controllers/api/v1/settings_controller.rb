@@ -5,13 +5,13 @@ class Api::V1::SettingsController < ApplicationController
 
   def show
     result = @service.show_settings(@user)
-    render json: result.except(:status), status: result[:status]
+    render json: result.except(:status), status: result[:status] || :ok
   end
 
   def update
     settings_params = needed_params(:settings, [ :theme, :language, :notifications, :privacy ])
     result = @service.update(@current_user, settings_params)
-    render json: result.except(:status), status: result[:status]
+    render json: result.except(:status), status: result[:status] || :accepted
   end
 
   private

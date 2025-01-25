@@ -5,13 +5,13 @@ class Api::V1::PreferencesController < ApplicationController
 
   def show
     result = @service.show_preferences(@user)
-    render json: result.except(:status), status: result[:status]
+    render json: result.except(:status), status: result[:status] || :ok
   end
 
   def update
     preferences_params = needed_params(:preferences, [ :friend_recommendations, :group_recommendations, :stranger_invites ])
     result = @service.update_preferences(@user, preferences_params)
-    render json: result.except(:status), status: result[:status]
+    render json: result.except(:status), status: result[:status] || :accepted
   end
 
   private

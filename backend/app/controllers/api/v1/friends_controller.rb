@@ -9,17 +9,17 @@ class Api::V1::FriendsController < ApplicationController
 
   def destroy
     result = @service.remove_friend
-    render json: result.except(:status), status: result[:status]
+    render json: result.except(:status), status: result[:status] || :no_content
   end
 
   def recieved_friend_requests
     result = @service.recieved_friend_requests
-    render json: result.except(:status), status: result[:status]
+    render json: result.except(:status), status: result[:status] || :ok
   end
 
   def sent_friend_requests
     result = @service.sent_friend_requests
-    render json: result.except(:status), status: result[:status]
+    render json: result.except(:status), status: result[:status] || :ok
   end
 
   private

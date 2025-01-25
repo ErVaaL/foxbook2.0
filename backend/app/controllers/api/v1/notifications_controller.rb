@@ -4,12 +4,12 @@ class Api::V1::NotificationsController < ApplicationController
 
   def index
     result = @service.get_notifications
-    render json: result.except(:status), status: result[:status]
+    render json: result.except(:status), status: result[:status] || :ok
   end
 
   def switch_read_status
     result = @service.switch_was_seen(params[:id])
-    render json: result.except(:status), status: result[:status]
+    render json: result.except(:status), status: result[:status] || :accepted
   end
 
   private
