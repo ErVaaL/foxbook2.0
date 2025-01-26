@@ -4,7 +4,7 @@ class Api::V1::FriendsController < ApplicationController
   before_action :set_user
 
   def show
-    render json: { friends: @user.friends.map { |id| UserSerializer.new(User.find(id)).serializable_hash[:data][:attributes] } }, status: :ok
+    render json: { success: true, friends: @user.friends.map { |id| UserSerializer.new(User.find(id)).serializable_hash[:data][:attributes] } }, status: :ok
   end
 
   def destroy
