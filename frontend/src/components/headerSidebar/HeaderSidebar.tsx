@@ -12,6 +12,9 @@ import ProfileButton from "./ProfileButton";
 import UniversalHeaderSidebarButton from "./UniversalHeaderSidebarButton";
 import { API_BASE_URL, API_ENDPOINTS } from "../../config";
 import axios from "axios";
+import Logo from "../../assets/logo.png";
+
+const LOGO = Logo;
 
 const HeaderSidebar: React.FC = () => {
   const { isLoggedIn, token, user } = useSelector(
@@ -99,7 +102,11 @@ const HeaderSidebar: React.FC = () => {
       id="headerSidebar"
       className="bg-orange-600 dark:bg-[#1a1a1a] text-white w-24 flex flex-col items-center py-4"
     >
-      <div className="flex-grow text-2xl items-center font-bold mb-3">Logo</div>
+      <img
+        src={LOGO}
+        alt="Logo"
+        className="flex-grow text-2xl items-center mb-3 font-bold w-10 h-10 rounded-full"
+      />
       <nav className="flex flex-col items-center space-y-6">
         {buttonList.map((button, index) => (
           <UniversalHeaderSidebarButton key={index} {...button} />
