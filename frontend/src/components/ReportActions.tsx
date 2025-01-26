@@ -44,6 +44,11 @@ const ReportActions: React.FC = () => {
             statusSpan.classList.remove("bg-red-500");
             statusSpan.classList.add("bg-green-500");
           }
+          const closeButton = target as HTMLElement;
+          if (closeButton) {
+            closeButton.outerHTML =
+              '<span class="text-gray-500 italic">Closed</span>';
+          }
         } catch (error) {
           console.error("Error closing report:", error);
         }

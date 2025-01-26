@@ -1,1 +1,7 @@
-<turbo-stream action="remove" target="report_<%= @report.id %>"></turbo-stream>
+<turbo-stream action="remove" target="report_<%= @report.id %>">
+  <turbo-stream action="replace" target="report_<%= @report.id %>">
+    <template>
+      <%= render @report %>
+    </template>
+  </turbo-stream>
+</turbo-stream>
