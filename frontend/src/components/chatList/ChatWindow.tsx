@@ -47,7 +47,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ friend, onClose }) => {
         if (response.status !== 200)
           throw new Error("Failed to fetch messages");
         const messages = response.data.messages;
-        setMessages(messages);
+        if (!messages) {
+          setMessages([]);
+        } else {
+          setMessages(messages);
+        }
       } catch (error) {
         if (axios.isAxiosError(error)) {
           setError(error.response?.data.message);
