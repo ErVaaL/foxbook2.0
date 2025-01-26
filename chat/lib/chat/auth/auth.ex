@@ -3,12 +3,16 @@ defmodule Chat.Auth do
 
   use Joken.Config
 
-  @jwt_secret System.get_env("JWT_SECRET")
-
   def verify_token(token) do
-    signer = Joken.Signer.create("HS256", @jwt_secret)
+    jwt_secret =
+      System.get_env("JWT_SECRET") ||
+        raise "JWT_SECRET is missing"
 
-    Joken.token(token)
-    |> Joken.verify(signer)
+    signer = Joken.Signer.create("HS256", jwt_secret)
+
+    case Joken.Signer.verify(token, signer) do
+      {:ok, claims} -> {:ok, claims}
+      {:error, reason} -> {:error, reason}
+    end
   end
 end

@@ -30,7 +30,7 @@ config :chat, ChatWeb.Endpoint,
 
 # MongoDB Configuration
 config :chat, Chat.Mongo,
-  name: "chat_mongo",
+  name: :mongo,
   url: System.get_env("MONGO_URL"),
   database: "rails_db",
   pool_size: 5

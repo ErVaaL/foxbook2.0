@@ -10,7 +10,7 @@ defmodule Chat.Application do
       # ✅ Use MongoDB connection instead of Ecto.Repo
       {Mongo,
        [
-         name: :chat_mongo,
+         name: :mongo,
          url: System.get_env("MONGO_URL"),
          database: "rails_db",
          pool_size: 5
