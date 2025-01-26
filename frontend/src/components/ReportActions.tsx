@@ -11,9 +11,10 @@ const ReportActions: React.FC = () => {
 
   useEffect(() => {
     const handleClick = async (event: Event) => {
-      event.preventDefault();
       const target = event.target as HTMLElement;
-
+      if (target.closest(".close-report") || target.closest(".view-report")) {
+        event.preventDefault();
+      }
       if (target.closest(".close-report")) {
         const reportId = target.getAttribute("data-report-id");
         if (!reportId) return;
