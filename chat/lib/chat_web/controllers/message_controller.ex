@@ -24,9 +24,10 @@ defmodule ChatWeb.MessageController do
     json(conn, %{messages: messages})
   end
 
-  # ✅ GET /messages/sender/:sender_id - Get messages by sender
-  def get_by_sender(conn, %{"sender_id" => sender_id}) do
-    messages = Messages.get_messages_by_sender(sender_id)
+  # ✅ GET /messages/conversation/:user2 - Get messages between two users
+  def get_conversation(conn, %{"sender_id" => sender_id}) do
+    current_user = conn.assigns[:current_user]
+    messages = Messages.get_conversation(current_user, sender_id)
     json(conn, %{messages: messages})
   end
 end

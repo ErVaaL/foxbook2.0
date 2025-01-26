@@ -17,11 +17,12 @@ if config_env() == :prod do
       Expected format: mongodb://USER:PASS@HOST:PORT/chat_db?authSource=admin
       """
 
-
   config :chat, :mongo,
     name: Chat.Mongo,
     url: mongo_url,
     pool_size: 10
+
+  config :chat, Chat.Auth, jwt_secret: System.get_env("JWT_SECRET")
 
   ## ====== SECRET KEYS ====== ##
 
@@ -44,8 +45,7 @@ if config_env() == :prod do
 
   # Phoenix Endpoint Configuration
   config :chat, ChatWeb.Endpoint,
-  url: [host: System.get_env("PHX_HOST") || "localhost"],
-  http: [port: String.to_integer(System.get_env("PORT") || "4000")],
-  secret_key_base: System.get_env("SECRET_KEY_BASE")
+    url: [host: System.get_env("PHX_HOST") || "localhost"],
+    http: [port: String.to_integer(System.get_env("PORT") || "4000")],
+    secret_key_base: System.get_env("SECRET_KEY_BASE")
 end
-

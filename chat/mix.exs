@@ -33,14 +33,15 @@ defmodule Chat.MixProject do
   defp deps do
     [
       {:phoenix, "~> 1.7.18"},
-      {:dotenv_parser, "~> 2.0"},
-      {:phoenix_pubsub, "~> 2.0"},
-      {:mongodb_driver, "~> 0.9.1"},
-      {:jason, "~> 1.2"},
-      {:bandit, "~> 1.5"},
-      {:plug_cowboy, "~> 2.5"},
-      {:decimal, "~> 2.0"},
-      {:gettext, "~> 0.18"},
+      {:dotenv_parser, "~> 2.0.1"},
+      {:phoenix_pubsub, "~> 2.1.3"},
+      {:mongodb_driver, "~> 1.5.0"},
+      {:jason, "~> 1.4.4"},
+      {:joken, "~> 2.6.2"},
+      {:bandit, "~> 1.6.5"},
+      {:plug_cowboy, "~> 2.7.2"},
+      {:decimal, "~> 2.1.1"},
+      {:gettext, "~> 0.26.2"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"}
     ]

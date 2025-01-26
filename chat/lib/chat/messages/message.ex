@@ -1,10 +1,10 @@
 defmodule Chat.Message do
   @moduledoc "Defines a Message struct for MongoDB storage"
 
-  defstruct [:id, :sender, :receiver, :content, :timestamp]
+  @derive {Jason.Encoder, only: [:sender, :receiver, :content, :timestamp]}
+  defstruct [:sender, :receiver, :content, :timestamp]
 
   @type t :: %__MODULE__{
-          id: String.t(),
           sender: String.t(),
           receiver: String.t(),
           content: String.t(),
@@ -13,7 +13,6 @@ defmodule Chat.Message do
 
   def new(attrs) do
     %__MODULE__{
-      id: Map.get(attrs, "_id", BSON.ObjectId.encode!(BSON.ObjectId.new())),
       sender: Map.get(attrs, "sender"),
       receiver: Map.get(attrs, "receiver"),
       content: Map.get(attrs, "content"),
