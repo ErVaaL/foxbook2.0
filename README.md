@@ -16,8 +16,9 @@ Created as a project for the course "Web Applications" of the Department of Info
 ## 3. Installation
 
 1. Clone the repository
-2. In each directory (backend, frontend, chat) install dependencies: backend - bundle install, frontend - npm install, chat - mix deps.get
-3. Build mongo database with docker-compose up -d --build
+   `git clone https://github.com/ErVaaL/foxbook2.0.git`
+2. In each directory (backend, frontend, chat) install dependencies: backend - `bundle install`, frontend - `npm install`, chat - `mix deps.get`
+3. Build mongo database with `docker-compose up -d --build`
 4. Run backend with `rails s`
 5. Run frontend with `npm run dev`
 6. Run chat with `mix phx.server`
