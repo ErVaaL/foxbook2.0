@@ -10,7 +10,7 @@ config :chat, Chat.Mongo,
 # We don't run a server during test.
 config :chat, ChatWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
-  secret_key_base: "ddXjnkI0IhjyFN1ZuGpaZSLxCNZfdnkBqky9mnzOb4Z3HQ2Ulc8PEX0WxfX7xtus",
+  secret_key_base: System.get_env("SECRET_KEY_BASE") || "fallback-key-for-tests"
   server: false
 
 # Print only warnings and errors during test
