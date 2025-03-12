@@ -37,6 +37,7 @@ frontend/.yarnclean
 frontend/.env
 backend/app/assets/builds/.keep
 backend/vendor/javascript/.keep
+backend/config/master.key
 
 chat/_build
 chat/deps
@@ -52,3 +53,4 @@ chat/priv/static/fonts
 chat/assets/node_modules
 chat/.env
 chat/priv/repo/seeds.exs
+backend/config/master.key
